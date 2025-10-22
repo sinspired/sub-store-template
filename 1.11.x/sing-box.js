@@ -13,6 +13,9 @@ let proxies = await produceArtifact({
   produceType: 'internal',
 })
 
+// 过滤掉包含 server_ports 字段的项,在1.11中无法识别
+proxies = proxies.filter(p => !('server_ports' in p))
+
 config.outbounds.push(...proxies)
 
 config.outbounds.map(i => {
