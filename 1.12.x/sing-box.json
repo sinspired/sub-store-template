@@ -2,7 +2,7 @@
   "dns": {
     "servers": [
       {
-        "tag": "google",
+        "tag": "googleDNS",
         "type": "https",
         "server": "8.8.8.8",
         "detour": "PROXY"
@@ -49,7 +49,7 @@
         "server": "ali"
       }
     ],
-    "final": "google",
+    "final": "googleDNS",
     "independent_cache": true
   },
   "route": {
@@ -422,7 +422,7 @@
       "tolerance": 50
     },
     {
-      "tag": "google",
+      "tag": "Google",
       "type": "selector",
       "outbounds": [
         "PROXY",
