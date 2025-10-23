@@ -406,22 +406,6 @@
       "default": "OpenAI"
     },
     {
-      "tag": "OpenAI",
-      "type": "urltest",
-      "outbounds": [],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "1m",
-      "tolerance": 50
-    },
-    {
-      "tag": "AUTO",
-      "type": "urltest",
-      "outbounds": [],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "1m",
-      "tolerance": 50
-    },
-    {
       "tag": "Google",
       "type": "selector",
       "outbounds": [
@@ -460,6 +444,7 @@
       "tag": "TWITTER",
       "type": "selector",
       "outbounds": [
+        "TWITTER优选",
         "OpenAI",
         "Gemini",
         "Youtube",
@@ -518,6 +503,22 @@
       "default": "HK AUTO"
     },
     {
+      "tag": "AUTO",
+      "type": "urltest",
+      "outbounds": [],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "1m",
+      "tolerance": 50
+    },
+    {
+      "tag": "OpenAI",
+      "type": "urltest",
+      "outbounds": [],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "1m",
+      "tolerance": 50
+    },
+    {
       "tag": "Gemini",
       "type": "urltest",
       "outbounds": [],
@@ -527,6 +528,14 @@
     },
     {
       "tag": "Youtube",
+      "type": "urltest",
+      "outbounds": [],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "1m",
+      "tolerance": 50
+    },
+    {
+      "tag": "TWITTER优选",
       "type": "urltest",
       "outbounds": [],
       "url": "https://www.gstatic.com/generate_204",

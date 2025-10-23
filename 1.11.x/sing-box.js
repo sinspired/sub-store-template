@@ -22,6 +22,9 @@ config.outbounds.map(i => {
   if (['AUTO'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies))
   }
+  if (['手动选择'].includes(i.tag)) {
+    i.outbounds.push(...getTags(proxies))
+  }
   // 地区分组
   if (['HK AUTO'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:HK(?!⁻)|港|Hong\s?Kong)\b/gi))
@@ -76,8 +79,8 @@ config.outbounds.map(i => {
   if (['Youtube'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i));
   }
-  if (['OpenAI'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*\b(openai|chatgpt|gpt)\b)/i));
+  if (['TWITTER优选'].includes(i.tag)) {
+    i.outbounds.push(...getTags(proxies, /^(?=.*\b(X|twitter)\b)/i));
   }
 })
 
