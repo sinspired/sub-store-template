@@ -205,6 +205,13 @@
       },
       {
         "rule_set": [
+          "private_domain"
+        ],
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": [
           "apple_ip",
           "apple_domain"
         ],
@@ -221,6 +228,13 @@
       }
     ],
     "rule_set": [
+      {
+        "tag": "private_domain",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs",
+        "download_detour": "DIRECT"
+      },
       {
         "tag": "apple_ip",
         "type": "remote",
