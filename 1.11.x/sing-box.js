@@ -22,9 +22,9 @@ config.outbounds.map(i => {
   if (['AUTO'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies))
   }
-  if (['手动选择'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies))
-  }
+  // if (['手动选择'].includes(i.tag)) {
+  //   i.outbounds.push(...getTags(proxies))
+  // }
   // 地区分组
   if (['HK AUTO'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:HK(?!⁻)|港|Hong\s?Kong)\b/gi))
@@ -41,13 +41,13 @@ config.outbounds.map(i => {
   if (['US AUTO'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:US(?!⁻)|美|american)\b/gi))
   }
-  if (['KR AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:KR(?!⁻)|韩|korea)\b/gi))
-  }
+  // if (['KR AUTO'].includes(i.tag)) {
+  //   i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:KR(?!⁻)|韩|korea)\b/gi))
+  // }
   // TikTok
-  if (['手动选择|TT'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(tk|tiktok)/i));
-  }
+  // if (['手动选择|TT'].includes(i.tag)) {
+  //   i.outbounds.push(...getTags(proxies, /(tk|tiktok)/i));
+  // }
   if (['TIKTOK-US'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])US|TK-US))/i));
   }
@@ -57,15 +57,15 @@ config.outbounds.map(i => {
   if (['TIKTOK-JP'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])JP|TK-JP))/i));
   }
-  if (['TIKTOK-KR'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])KR|TK-KR))/i));
-  }
+  // if (['TIKTOK-KR'].includes(i.tag)) {
+  //   i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])KR|TK-KR))/i));
+  // }
   if (['TIKTOK-SG'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])SG|TK-SG))/i));
   }
-  if (['TIKTOK-GB'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])GB|TK-GB))/i));
-  }
+  // if (['TIKTOK-GB'].includes(i.tag)) {
+  //   i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])GB|TK-GB))/i));
+  // }
   if (['TIKTOK-TW'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])TW|TK-TW))/i));
   }

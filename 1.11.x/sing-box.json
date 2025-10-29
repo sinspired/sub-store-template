@@ -86,6 +86,13 @@
         "action": "hijack-dns"
       },
       {
+        "rule_set": [
+          "private_domain"
+        ],
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+      {
         "ip_is_private": true,
         "action": "route",
         "outbound": "DIRECT"
@@ -202,13 +209,6 @@
         ],
         "action": "route",
         "outbound": "Google"
-      },
-      {
-        "rule_set": [
-          "private_domain"
-        ],
-        "action": "route",
-        "outbound": "DIRECT"
       },
       {
         "rule_set": [
