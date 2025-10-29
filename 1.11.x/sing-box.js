@@ -71,7 +71,7 @@ config.outbounds.map(i => {
   }
   // AI
   if (['OpenAI'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*\b(openai|chatgpt|gpt)\b)/i));
+    i.outbounds.push(...getTags(proxies, /^(?=.*\b(openai|chatgpt|gpt⁺)\b)/i));
   }
   if (['Gemini'].includes(i.tag)) {
     i.outbounds.push(...getTags(proxies, /^(?=.*\b(gemini|gm)\b)/i));
