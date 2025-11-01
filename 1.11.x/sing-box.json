@@ -8,7 +8,7 @@
     "servers": [
       {
         "tag": "googleDNS",
-        "address": "https://8.8.8.8/dns-query",
+        "address": "h3://8.8.8.8/dns-query",
         "detour": "PROXY"
       },
       {
