@@ -13,75 +13,77 @@ let proxies = await produceArtifact({
   produceType: 'internal',
 })
 
-// 过滤掉包含 server_ports 字段的项,在1.11中无法识别
+// 过滤掉singbox-1.11无法识别的协议和字段
 proxies = proxies.filter(p => !('server_ports' in p))
+proxies = proxies.filter(p => !(p.type == 'anytls'))
 
 config.outbounds.push(...proxies)
 
 config.outbounds.map(i => {
   if (['AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies))
+    safePush(i, getTags(proxies))
   }
-  // if (['手动选择'].includes(i.tag)) {
-  //   i.outbounds.push(...getTags(proxies))
-  // }
+
   // 地区分组
   if (['HK AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:HK(?!⁻)|港|Hong\s?Kong)\b/gi))
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:HK(?!⁻)|港|Hong\s?Kong)\b/gi))
   }
   if (['TW AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:TW(?!⁻)|台|taiwan)\b/gi))
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:TW(?!⁻)|台|taiwan)\b/gi))
   }
   if (['JP AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:JP(?!⁻)|日|japan)\b/gi))
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:JP(?!⁻)|日|japan)\b/gi))
   }
   if (['SG AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:SG(?!⁻)|新|singapore)\b/gi))
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:SG(?!⁻)|新|singapore)\b/gi))
   }
   if (['US AUTO'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:US(?!⁻)|美|american)\b/gi))
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:US(?!⁻)|美|american)\b/gi))
   }
-  // if (['KR AUTO'].includes(i.tag)) {
-  //   i.outbounds.push(...getTags(proxies, /(?:^|[^-])\b(?:KR(?!⁻)|韩|korea)\b/gi))
-  // }
   // TikTok
-  // if (['手动选择|TT'].includes(i.tag)) {
-  //   i.outbounds.push(...getTags(proxies, /(tk|tiktok)/i));
-  // }
   if (['TIKTOK-US'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])US|TK-US))/i));
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])US|TK-US))/i))
   }
   if (['TIKTOK-VN'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])VN|TK-VN))/i));
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])VN|TK-VN))/i))
   }
   if (['TIKTOK-JP'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])JP|TK-JP))/i));
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])JP|TK-JP))/i))
   }
-  // if (['TIKTOK-KR'].includes(i.tag)) {
-  //   i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])KR|TK-KR))/i));
-  // }
   if (['TIKTOK-SG'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])SG|TK-SG))/i));
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])SG|TK-SG))/i))
   }
-  // if (['TIKTOK-GB'].includes(i.tag)) {
-  //   i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])GB|TK-GB))/i));
-  // }
   if (['TIKTOK-TW'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])TW|TK-TW))/i));
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])TW|TK-TW))/i))
   }
   // AI
   if (['OpenAI'].includes(i.tag)) {
-  i.outbounds.push(...getTags(proxies, /^(?=.*(\b(openai|chatgpt)\b|\bgpt⁺))/i));
-}
+    safePush(i, getTags(proxies, /^(?=.*(\b(openai|chatgpt)\b|\bgpt⁺))/i))
+  }
   if (['Gemini'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*\b(gemini|gm)\b)/i));
+    safePush(i, getTags(proxies, /^(?=.*\b(gemini|gm)\b)/i))
   }
   if (['Youtube'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i));
+    safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
   }
   if (['TWITTER优选'].includes(i.tag)) {
-    i.outbounds.push(...getTags(proxies, /^(?=.*\b(X|twitter)\b)/i));
+    safePush(i, getTags(proxies, /^(?=.*\b(X|twitter)\b)/i))
   }
+
+  if (['AI-plus'].includes(i.tag)) {
+    safePush(i, getTags(
+      proxies,
+      /^(?=.*gpt⁺)(?=.*(gemini|gm))/i
+    ))
+  }
+
+  if (['全部解锁'].includes(i.tag)) {
+    safePush(i, getTags(
+      proxies,
+      /^(?=.*gpt⁺)(?=.*(gemini|gm))(?=.*(youtube|yt))(?=.*(X|twitter))/i
+    ))
+  }
+
 })
 
 config.outbounds.forEach(outbound => {
@@ -99,3 +101,34 @@ $content = JSON.stringify(config, null, 2)
 function getTags(proxies, regex) {
   return (regex ? proxies.filter(p => regex.test(p.tag)) : proxies).map(p => p.tag)
 }
+
+function safePush(i, tags) {
+  // 如果 outbounds 不是数组，或者是 null，初始化为空数组
+  if (!Array.isArray(i.outbounds)) {
+    i.outbounds = []
+  }
+
+  // 过滤掉数组中的 null 值
+  i.outbounds = i.outbounds.filter(v => v !== null)
+
+  if (i.outbounds.includes("")) {
+    // 如果有空字符串，替换为第一个 tag
+    if (tags.length > 0) {
+      const idx = i.outbounds.indexOf("")
+      i.outbounds[idx] = tags[0]
+      // 如果还有剩余的 tag，继续追加
+      if (tags.length > 1) {
+        i.outbounds.push(...tags.slice(1))
+      }
+    }
+  } else {
+    // 如果没有 ""，直接追加
+    i.outbounds.push(...tags)
+  }
+
+  // 如果最终还是空数组，确保转换为 []
+  if (i.outbounds.length === 0) {
+    i.outbounds = []
+  }
+}
+
