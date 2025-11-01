@@ -6,6 +6,11 @@
       "inet6_range": "fc00::/18"
     },
     "servers": [
+     {
+        "tag": "DHCP",
+        "address": "dhcp://auto",
+        "detour": "DIRECT"
+      },
       {
         "tag": "googleDNS",
         "address": "https://8.8.8.8/dns-query",
@@ -22,6 +27,11 @@
       }
     ],
     "rules": [
+      {
+        "rule_set": "private_domain",
+        "action": "route",
+        "server": "DHCP"
+      },
       {
         "outbound": "any",
         "action": "route",
