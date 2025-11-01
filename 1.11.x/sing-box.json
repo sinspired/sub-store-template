@@ -63,6 +63,15 @@
   "route": {
     "rules": [
       {
+        "domain_suffix": ["local"],
+        "outbound": "direct"
+      },
+      {
+        "domain": ["dell"],
+        "port": [8199],
+        "outbound": "direct"
+      },
+      {
         "action": "sniff",
         "sniffer": [
           "http",
