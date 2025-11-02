@@ -25,48 +25,52 @@
         "address": "fakeip"
       }
     ],
-    "rules": [
-      {
-        "rule_set": "private_domain",
-        "action": "route",
-        "server": "local"
-      },
-      {
-        "outbound": "any",
-        "action": "route",
-        "server": "ali",
-        "disable_cache": true
-      },
-      {
-        "clash_mode": "Direct",
-        "action": "route",
-        "server": "ali"
-      },
-      {
-        "clash_mode": "Global",
-        "action": "route",
-        "server": "fakeip"
-      },
-      {
-        "query_type": "HTTPS",
-        "action": "reject"
-      },
-      {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "action": "route",
-        "server": "fakeip",
-        "rewrite_ttl": 1
-      },
-      {
-        "rule_set": "cn_domain",
-        "action": "route",
-        "server": "ali"
-      }
-    ],
-    "final": "googleDNS",
+"rules": [
+  // 1. 内部/私有域名，使用本地 DNS
+  {
+    "rule_set": "private_domain",
+    "server": "local"
+  },
+  // 2. 阻止 DoH (HTTPS) 查询，防止泄露
+  {
+    "query_type": "HTTPS",
+    "action": "reject"
+  },
+  // 3. Clash 直连模式，国内域名使用阿里 DNS
+  {
+    "clash_mode": "Direct",
+    "server": "ali"
+  },
+  {
+    "rule_set": "cn_domain",
+    "clash_mode": "Direct", // 可以叠加条件，更精确
+    "server": "ali"
+  },
+  // 4. Clash 全局模式，所有 A/AAAA 查询走 Fake IP
+  {
+    "clash_mode": "Global",
+    "query_type": [ "A", "AAAA" ],
+    "server": "fakeip",
+    "rewrite_ttl": 1
+  },
+  // 5. 【核心】默认（规则模式）下，国内域名走阿里 DNS
+  {
+    "rule_set": "cn_domain",
+    "server": "ali"
+  },
+  // 6. 【核心】默认（规则模式）下，其他所有 A/AAAA 查询走 Fake IP
+  {
+    "query_type": [ "A", "AAAA" ],
+    "server": "fakeip",
+    "rewrite_ttl": 1
+  },
+  // 7. (原错误规则) 移到最后：处理其他所有查询类型 (如 MX, SRV)，走阿里 DNS
+  {
+    "outbound": "any",
+    "server": "ali"
+  }
+],
+"final": "googleDNS" // 最后的备胎，走代理
     "independent_cache": true
   },
   "route": {
