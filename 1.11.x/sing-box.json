@@ -548,6 +548,13 @@
         "download_detour": "DIRECT"
       },
       {
+        "tag": "geoip-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "download_detour": "DIRECT"
+      },
+      {
         "tag": "google_ip",
         "type": "remote",
         "format": "binary",
@@ -701,6 +708,10 @@
       {
         "clash_mode": "Direct",
         "outbound": "DIRECT"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "outbound": "CN"
       },
       {
         "rule_set": [
