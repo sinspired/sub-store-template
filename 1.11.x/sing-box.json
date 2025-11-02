@@ -62,7 +62,7 @@
     "server": "ali"
   }
 ],
-"final": "googleDNS"
+"final": "googleDNS",
     "independent_cache": true
   },
   "route": {
