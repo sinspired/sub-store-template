@@ -106,19 +106,6 @@
         "action": "route",
         "outbound": "DIRECT"
       },
-        {
-        "domain_suffix": [".local"],
-        "action": "route",
-        "outbound": "direct"
-      },
-      {
-        "port": [
-          8199,
-          8299
-        ],
-        "action": "route",
-        "outbound": "DIRECT"
-      },
       {
         "clash_mode": "Global",
         "action": "route",
