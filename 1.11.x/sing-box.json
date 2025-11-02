@@ -47,7 +47,10 @@
         "action": "route",
         "server": "fakeip"
       },
-      
+      {
+        "query_type": "HTTPS",
+        "action": "reject"
+      },
       {
         "query_type": [
           "A",
