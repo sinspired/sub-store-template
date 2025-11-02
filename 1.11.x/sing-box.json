@@ -78,10 +78,6 @@
         "timeout": "500ms"
       },
       {
-        "domain_suffix": ["local"],
-        "outbound": "direct"
-      },
-      {
         "type": "logical",
         "mode": "or",
         "rules": [
@@ -103,6 +99,19 @@
       },
       {
         "ip_is_private": true,
+        "action": "route",
+        "outbound": "DIRECT"
+      },
+        {
+        "domain_suffix": [".local"],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "port": [
+          8199,
+          8299
+        ],
         "action": "route",
         "outbound": "DIRECT"
       },
