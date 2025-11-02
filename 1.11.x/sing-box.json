@@ -7,6 +7,10 @@
     },
     "servers": [
       {
+        "tag": "local",
+        "address": "local"
+      },
+      {
         "tag": "googleDNS",
         "address": "h3://8.8.8.8/dns-query",
         "detour": "PROXY"
@@ -25,7 +29,7 @@
       {
         "rule_set": "private_domain",
         "action": "route",
-        "server": "ali"
+        "server": "local"
       },
       {
         "outbound": "any",
