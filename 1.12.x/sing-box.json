@@ -11,16 +11,15 @@
         "detour": "DIRECT"
       },
       {
-        "type": "h3",
-        "tag": "ali",
-        "detour": "DIRECT",
-        "server": "223.5.5.5"
-      },
-      {
         "type": "https",
         "tag": "googleDNS",
         "detour": "PROXY",
         "server": "8.8.8.8"
+      },
+      {
+        "type": "h3",
+        "tag": "ali",
+        "server": "223.5.5.5"
       },
       {
         "type": "fakeip",
@@ -35,33 +34,24 @@
         "server": "local"
       },
       {
-        "query_type": "HTTPS",
-        "action": "reject"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali"
+      },
+      {
+        "clash_mode": "Global",
+        "server": "fakeip"
       },
       {
         "query_type": [
           "A",
           "AAAA"
         ],
-        "clash_mode": "Global",
         "server": "fakeip",
         "rewrite_ttl": 1
       },
       {
         "rule_set": "cn_domain",
         "server": "ali"
-      },
-      {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "server": "fakeip",
-        "rewrite_ttl": 1
       }
     ],
     "final": "googleDNS",
@@ -501,6 +491,9 @@
         "action": "hijack-dns"
       },
       {
+        "action": "resolve"
+      },
+      {
         "rule_set": "private_domain",
         "outbound": "DIRECT"
       },
@@ -517,13 +510,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "cn_ip",
-          "cn_domain"
-        ],
-        "outbound": "CN"
-      },
-      {
         "rule_set": "bilibili_domain",
         "outbound": "bilibili"
       },
@@ -533,20 +519,6 @@
           "netflix_domain"
         ],
         "outbound": "netflix"
-      },
-      {
-        "rule_set": [
-          "apple_ip",
-          "apple_domain"
-        ],
-        "outbound": "Apple"
-      },
-      {
-        "rule_set": [
-          "google_ip",
-          "google_domain"
-        ],
-        "outbound": "Google"
       },
       {
         "rule_set": "bahamut_domain",
@@ -589,6 +561,26 @@
         "outbound": "OneDrive"
       },
       {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "proxy_domain"
+          },
+          {
+            "rule_set": [
+              "cn_domain",
+              "apple_domain",
+              "google_domain",
+              "telegram_domain",
+              "netflix_domain"
+            ],
+            "invert": true
+          }
+        ],
+        "outbound": "PROXY"
+      },
+      {
         "rule_set": [
           "telegram_ip",
           "telegram_domain"
@@ -596,7 +588,25 @@
         "outbound": "Telegram"
       },
       {
-        "action": "resolve"
+        "rule_set": [
+          "google_ip",
+          "google_domain"
+        ],
+        "outbound": "Google"
+      },
+      {
+        "rule_set": [
+          "apple_ip",
+          "apple_domain"
+        ],
+        "outbound": "Apple"
+      },
+      {
+        "rule_set": [
+          "cn_ip",
+          "cn_domain"
+        ],
+        "outbound": "CN"
       }
     ],
     "rule_set": [
@@ -740,7 +750,12 @@
       }
     ],
     "final": "Final",
-    "auto_detect_interface": true
+    "auto_detect_interface": true,
+    "default_domain_resolver": {
+      "server": "ali",
+      "rewrite_ttl": 60,
+      "client_subnet": "223.5.5.5"
+    }
   },
   "experimental": {
     "cache_file": {
