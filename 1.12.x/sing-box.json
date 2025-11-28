@@ -517,10 +517,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geoip-cn",
-        "outbound": "CN"
-      },
-      {
         "rule_set": [
           "cn_ip",
           "cn_domain"
@@ -644,12 +640,6 @@
         "type": "remote",
         "tag": "cn_domain",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs",
-        "download_detour": "DIRECT"
-      },
-      {
-        "type": "remote",
-        "tag": "geoip-cn",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
         "download_detour": "DIRECT"
       },
       {
