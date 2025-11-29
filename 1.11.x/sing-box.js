@@ -14,7 +14,7 @@ let proxies = await produceArtifact({
 })
 
 // 过滤掉singbox-1.11无法识别的协议和字段
-proxies = proxies.filter(p => !('server_ports' in p))
+// proxies = proxies.filter(p => !('server_ports' in p))
 proxies = proxies.filter(p => !(p.type == 'anytls'))
 
 config.outbounds.push(...proxies)

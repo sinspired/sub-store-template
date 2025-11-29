@@ -87,6 +87,7 @@
       "outbounds": [
         "AUTO",
         "全部解锁",
+        "TWITTER优选",
         "HK AUTO",
         "JP AUTO",
         "TW AUTO",
@@ -107,7 +108,8 @@
         "AI-plus",
         "OpenAI",
         "Gemini",
-        "全部解锁"
+        "全部解锁",
+        "TWITTER优选"
       ],
       "default": "AI-plus"
     },
@@ -117,6 +119,7 @@
       "outbounds": [
         "PROXY",
         "Youtube",
+        "TWITTER优选",
         "AUTO",
         "HK AUTO",
         "JP AUTO",
@@ -131,6 +134,7 @@
       "tag": "TWITTER",
       "outbounds": [
         "TWITTER优选",
+        "全部解锁",
         "AI-plus",
         "OpenAI",
         "Gemini",
@@ -606,6 +610,28 @@
         "outbound": "netflix"
       },
       {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": [
+              "cloudflare_ip",
+              "cloudflare_domain"
+            ]
+          },
+          {
+            "rule_set": [
+              "openai_domain",
+              "claude_domain",
+              "copilot_domain",
+              "twitter_domain"
+            ],
+            "invert": true
+          }
+        ],
+        "outbound": "TWITTER优选"
+      },
+      {
         "rule_set": [
           "apple_ip",
           "apple_domain"
@@ -701,6 +727,18 @@
         "type": "remote",
         "tag": "github_domain",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "cloudflare_ip",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "cloudflare_domain",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs",
         "download_detour": "DIRECT"
       },
       {
