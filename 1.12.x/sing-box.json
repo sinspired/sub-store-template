@@ -491,9 +491,6 @@
         "action": "hijack-dns"
       },
       {
-        "action": "resolve"
-      },
-      {
         "rule_set": "private_domain",
         "outbound": "DIRECT"
       },
@@ -512,13 +509,6 @@
       {
         "rule_set": "bilibili_domain",
         "outbound": "bilibili"
-      },
-      {
-        "rule_set": [
-          "netflix_ip",
-          "netflix_domain"
-        ],
-        "outbound": "netflix"
       },
       {
         "rule_set": "bahamut_domain",
@@ -561,6 +551,10 @@
         "outbound": "OneDrive"
       },
       {
+        "rule_set": "github_domain",
+        "outbound": "PROXY"
+      },
+      {
         "type": "logical",
         "mode": "and",
         "rules": [
@@ -573,12 +567,22 @@
               "apple_domain",
               "google_domain",
               "telegram_domain",
-              "netflix_domain"
+              "netflix_domain",
+              "youtube_domain",
+              "openai_domain",
+              "gemini_domain",
+              "claude_domain",
+              "copilot_domain",
+              "twitter_domain",
+              "tiktok_domain"
             ],
             "invert": true
           }
         ],
         "outbound": "PROXY"
+      },
+      {
+        "action": "resolve"
       },
       {
         "rule_set": [
@@ -596,10 +600,21 @@
       },
       {
         "rule_set": [
+          "netflix_ip",
+          "netflix_domain"
+        ],
+        "outbound": "netflix"
+      },
+      {
+        "rule_set": [
           "apple_ip",
           "apple_domain"
         ],
         "outbound": "Apple"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "outbound": "CN"
       },
       {
         "rule_set": [
@@ -654,6 +669,12 @@
       },
       {
         "type": "remote",
+        "tag": "geoip-cn",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
         "tag": "google_ip",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs",
         "download_detour": "DIRECT"
@@ -674,6 +695,12 @@
         "type": "remote",
         "tag": "netflix_domain",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "github_domain",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs",
         "download_detour": "DIRECT"
       },
       {

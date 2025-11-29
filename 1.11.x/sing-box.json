@@ -11,14 +11,14 @@
         "detour": "DIRECT"
       },
       {
-        "tag": "ali",
-        "address": "h3://223.5.5.5/dns-query",
-        "detour": "DIRECT"
-      },
-      {
         "tag": "googleDNS",
         "address": "https://8.8.8.8/dns-query",
         "detour": "PROXY"
+      },
+      {
+        "tag": "ali",
+        "address": "h3://223.5.5.5/dns-query",
+        "detour": "DIRECT"
       },
       {
         "tag": "fakeip",
@@ -31,20 +31,19 @@
         "server": "local"
       },
       {
-        "query_type": "HTTPS",
-        "action": "reject",
-        "method": "default"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali"
+      },
+      {
+        "clash_mode": "Global",
+        "server": "fakeip",
+        "rewrite_ttl": 1
       },
       {
         "query_type": [
           "A",
           "AAAA"
         ],
-        "clash_mode": "Global",
         "server": "fakeip",
         "rewrite_ttl": 1
       },
@@ -53,16 +52,9 @@
         "server": "ali"
       },
       {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "server": "fakeip",
-        "rewrite_ttl": 1
-      },
-      {
         "outbound": "any",
-        "server": "ali"
+        "server": "ali",
+        "disable_cache": true
       }
     ],
     "final": "googleDNS",
@@ -523,40 +515,8 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geoip-cn",
-        "outbound": "CN"
-      },
-      {
-        "rule_set": [
-          "cn_ip",
-          "cn_domain"
-        ],
-        "outbound": "CN"
-      },
-      {
         "rule_set": "bilibili_domain",
         "outbound": "bilibili"
-      },
-      {
-        "rule_set": [
-          "netflix_ip",
-          "netflix_domain"
-        ],
-        "outbound": "netflix"
-      },
-      {
-        "rule_set": [
-          "apple_ip",
-          "apple_domain"
-        ],
-        "outbound": "Apple"
-      },
-      {
-        "rule_set": [
-          "google_ip",
-          "google_domain"
-        ],
-        "outbound": "Google"
       },
       {
         "rule_set": "bahamut_domain",
@@ -599,6 +559,40 @@
         "outbound": "OneDrive"
       },
       {
+        "rule_set": "github_domain",
+        "outbound": "PROXY"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "proxy_domain"
+          },
+          {
+            "rule_set": [
+              "cn_domain",
+              "apple_domain",
+              "google_domain",
+              "telegram_domain",
+              "netflix_domain",
+              "youtube_domain",
+              "openai_domain",
+              "gemini_domain",
+              "claude_domain",
+              "copilot_domain",
+              "twitter_domain",
+              "tiktok_domain"
+            ],
+            "invert": true
+          }
+        ],
+        "outbound": "PROXY"
+      },
+      {
+        "action": "resolve"
+      },
+      {
         "rule_set": [
           "telegram_ip",
           "telegram_domain"
@@ -606,7 +600,36 @@
         "outbound": "Telegram"
       },
       {
-        "action": "resolve"
+        "rule_set": [
+          "google_ip",
+          "google_domain"
+        ],
+        "outbound": "Google"
+      },
+      {
+        "rule_set": [
+          "netflix_ip",
+          "netflix_domain"
+        ],
+        "outbound": "netflix"
+      },
+      {
+        "rule_set": [
+          "apple_ip",
+          "apple_domain"
+        ],
+        "outbound": "Apple"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "outbound": "CN"
+      },
+      {
+        "rule_set": [
+          "cn_ip",
+          "cn_domain"
+        ],
+        "outbound": "CN"
       }
     ],
     "rule_set": [
@@ -692,6 +715,13 @@
         "tag": "netflix_domain",
         "format": "binary",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "github_domain",
+        "format": "binary",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs",
         "download_detour": "DIRECT"
       },
       {
