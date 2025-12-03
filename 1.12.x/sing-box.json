@@ -306,7 +306,7 @@
       "tag": "TW AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "31m0s",
+      "interval": "29m0s",
       "tolerance": 50
     },
     {
@@ -314,7 +314,7 @@
       "tag": "SG AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "32m0s",
+      "interval": "28m0s",
       "tolerance": 50
     },
     {
@@ -322,7 +322,7 @@
       "tag": "JP AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "33m0s",
+      "interval": "27m0s",
       "tolerance": 50
     },
     {
@@ -330,7 +330,7 @@
       "tag": "US AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "34m0s",
+      "interval": "26m0s",
       "tolerance": 50
     },
     {
