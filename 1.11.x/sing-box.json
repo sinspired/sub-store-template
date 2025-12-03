@@ -155,7 +155,7 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "HK AUTO"
+      "default": "TWITTER优选"
     },
     {
       "type": "selector",
@@ -470,7 +470,7 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "PROXY"
     },
     {
       "type": "direct",
