@@ -271,7 +271,6 @@
         "block",
         "direct"
       ],
-      "default": "block",
       "interrupt_exist_connections": true
     },
     {
