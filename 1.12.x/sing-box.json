@@ -54,8 +54,7 @@
         "server": "ali"
       }
     ],
-    "final": "googleDNS",
-    "strategy": "prefer_ipv6"
+    "final": "googleDNS"
   },
   "inbounds": [
     {
@@ -797,7 +796,6 @@
     "auto_detect_interface": true,
     "default_domain_resolver": {
       "server": "ali",
-      "rewrite_ttl": 60,
       "client_subnet": "223.5.5.5"
     }
   },
@@ -805,12 +803,6 @@
     "cache_file": {
       "enabled": true,
       "store_fakeip": true
-    },
-    "clash_api": {
-      "external_controller": "127.0.0.1:9090",
-      "external_ui": "uiui",
-      "external_ui_download_url": "https://ghfast.top/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
-      "external_ui_download_detour": "DIRECT"
     }
   }
 }
