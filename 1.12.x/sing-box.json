@@ -59,6 +59,7 @@
   "inbounds": [
     {
       "type": "tun",
+      "tag": "tun-in",
       "address": [
         "172.19.0.0/30",
         "fdfe:dcba:9876::/126"
@@ -75,6 +76,7 @@
     },
     {
       "type": "mixed",
+      "tag": "mixed-in",
       "listen": "127.0.0.1",
       "listen_port": 7890,
       "tcp_fast_open": true
@@ -250,6 +252,16 @@
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "8m0s",
       "tolerance": 50
+    },
+    {
+      "type": "selector",
+      "tag": "广告拦截",
+      "outbounds": [
+        "block",
+        "direct"
+      ],
+      "default": "block",
+      "interrupt_exist_connections": true
     },
     {
       "type": "urltest",
@@ -460,6 +472,7 @@
   "route": {
     "rules": [
       {
+        "inbound": "tun-in",
         "action": "sniff",
         "sniffer": [
           "http",
@@ -632,9 +645,28 @@
           "cn_domain"
         ],
         "outbound": "CN"
+      },
+      {
+        "rule_set": [
+          "Category-Ads",
+          "Advertising_rules"
+        ],
+        "outbound": "广告拦截"
       }
     ],
     "rule_set": [
+      {
+        "type": "remote",
+        "tag": "Category-Ads",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "Advertising_rules",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Advertising/Advertising.srs",
+        "download_detour": "DIRECT"
+      },
       {
         "type": "remote",
         "tag": "private_domain",
@@ -802,8 +834,11 @@
   "experimental": {
     "cache_file": {
       "enabled": true,
+      "path": "cache_sinspired.db",
+      "cache_id": "ID_for_cache_sinspired",
       "store_fakeip": true,
-      "store_rdrc": true
+      "store_rdrc": true,
+      "rdrc_timeout": "168h0m0s"
     }
   }
 }
