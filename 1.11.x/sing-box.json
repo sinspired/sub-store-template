@@ -54,7 +54,7 @@
       {
         "outbound": "any",
         "server": "ali",
-        "disable_cache": false
+        "disable_cache": true
       }
     ],
     "final": "googleDNS",
