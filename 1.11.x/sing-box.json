@@ -18,8 +18,7 @@
       {
         "tag": "ali",
         "address": "h3://223.6.6.6/dns-query",
-        "detour": "DIRECT",
-        "tcp_fast_open": true
+        "detour": "DIRECT"
       },
       {
         "tag": "fakeip",
