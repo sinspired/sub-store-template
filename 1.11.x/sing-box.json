@@ -17,7 +17,7 @@
       },
       {
         "tag": "ali",
-        "address": "h3://223.6.6.6/dns-query",
+        "address": "https://223.6.6.6/dns-query",
         "detour": "DIRECT"
       },
       {
@@ -54,7 +54,7 @@
       {
         "outbound": "any",
         "server": "ali",
-        "disable_cache": true
+        "disable_cache": false
       }
     ],
     "final": "googleDNS",
