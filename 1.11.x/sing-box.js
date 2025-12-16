@@ -17,6 +17,7 @@ let proxies = await produceArtifact({
 // proxies = proxies.filter(p => !('server_ports' in p))
 proxies = proxies.filter(p => !(p.type == 'anytls'))
 
+
 config.outbounds.push(...proxies)
 
 config.outbounds.map(i => {
@@ -66,9 +67,6 @@ config.outbounds.map(i => {
   if (['Youtube'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
   }
-  if (['CF优选'].includes(i.tag)) {
-    safePush(i, getTags(proxies, /^(?=.*\b(X|twitter)\b)/i))
-  }
 
   if (['AI-plus'].includes(i.tag)) {
     safePush(i, getTags(
@@ -76,6 +74,14 @@ config.outbounds.map(i => {
       /^(?=.*gpt⁺)(?=.*(gemini|gm))/i
     ))
   }
+
+  if (['CF优选'].includes(i.tag)) {
+    safePush(i, getTags(
+      proxies,
+      /^(?=.*gpt⁺)(?=.*(X|twitter))/i
+    ))
+  }
+
 })
 
 config.outbounds.forEach(outbound => {
@@ -107,7 +113,6 @@ function getTags(proxies, regex) {
 
   return list.map(p => p.tag)
 }
-
 
 function safePush(i, tags) {
   // 如果 outbounds 不是数组，或者是 null，初始化为空数组

@@ -62,9 +62,6 @@ config.outbounds.map(i => {
   if (['Youtube'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
   }
-  if (['CF优选'].includes(i.tag)) {
-    safePush(i, getTags(proxies, /^(?=.*\b(X|twitter)\b)/i))
-  }
 
   if (['AI-plus'].includes(i.tag)) {
     safePush(i, getTags(
@@ -73,10 +70,10 @@ config.outbounds.map(i => {
     ))
   }
 
-  if (['全部解锁'].includes(i.tag)) {
+  if (['CF优选'].includes(i.tag)) {
     safePush(i, getTags(
       proxies,
-      /^(?=.*gpt⁺)(?=.*(gemini|gm))(?=.*(youtube|yt))(?=.*(X|twitter))/i
+      /^(?=.*gpt⁺)(?=.*(X|twitter))/i
     ))
   }
 
