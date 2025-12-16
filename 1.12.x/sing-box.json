@@ -254,16 +254,6 @@
       "tolerance": 50
     },
     {
-      "type": "selector",
-      "tag": "广告拦截",
-      "outbounds": [
-        "BLOCK",
-        "DIRECT"
-      ],
-      "default": "BLOCK",
-      "interrupt_exist_connections": true
-    },
-    {
       "type": "urltest",
       "tag": "TIKTOK-US",
       "outbounds": null,
@@ -467,10 +457,6 @@
     {
       "type": "direct",
       "tag": "DIRECT"
-    },
-    {
-      "type": "block",
-      "tag": "BLOCK"
     }
   ],
   "route": {
@@ -564,7 +550,11 @@
         "mode": "and",
         "rules": [
           {
-            "rule_set": "proxy_domain"
+            "rule_set": [
+              "proxy_domain",
+              "global_site",
+              "porn_collect"
+            ]
           },
           {
             "rule_set": [
@@ -649,28 +639,9 @@
           "cn_domain"
         ],
         "outbound": "CN"
-      },
-      {
-        "rule_set": [
-          "category_ads",
-          "ads_rules"
-        ],
-        "outbound": "广告拦截"
       }
     ],
     "rule_set": [
-      {
-        "type": "remote",
-        "tag": "category_ads",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs",
-        "download_detour": "DIRECT"
-      },
-      {
-        "type": "remote",
-        "tag": "ads_rules",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Advertising/Advertising.srs",
-        "download_detour": "DIRECT"
-      },
       {
         "type": "remote",
         "tag": "private_domain",
@@ -807,6 +778,18 @@
         "type": "remote",
         "tag": "proxy_domain",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Proxy/Proxy.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "global_site",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Global/Global.srs",
+        "download_detour": "DIRECT"
+      },
+      {
+        "type": "remote",
+        "tag": "porn_collect",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs",
         "download_detour": "DIRECT"
       },
       {
