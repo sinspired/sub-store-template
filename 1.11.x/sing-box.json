@@ -38,7 +38,11 @@
         "clash_mode": "Global",
         "server": "fakeip"
       },
-
+      {
+        "query_type": "HTTPS",
+        "action": "reject",
+        "method": "default"
+      },
       {
         "query_type": [
           "A",
