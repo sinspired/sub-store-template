@@ -62,7 +62,7 @@ config.outbounds.map(i => {
   if (['Youtube'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
   }
-  if (['TWITTER优选'].includes(i.tag)) {
+  if (['CF优选'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(X|twitter)\b)/i))
   }
 
