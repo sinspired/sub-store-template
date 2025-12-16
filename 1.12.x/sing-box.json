@@ -552,8 +552,7 @@
           {
             "rule_set": [
               "proxy_domain",
-              "global_site",
-              "porn_collect"
+              "global_site"
             ]
           },
           {
@@ -784,12 +783,6 @@
         "type": "remote",
         "tag": "global_site",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Global/Global.srs",
-        "download_detour": "DIRECT"
-      },
-      {
-        "type": "remote",
-        "tag": "porn_collect",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs",
         "download_detour": "DIRECT"
       },
       {
