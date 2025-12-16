@@ -268,9 +268,10 @@
       "type": "selector",
       "tag": "广告拦截",
       "outbounds": [
-        "block",
-        "direct"
+        "BLOCK",
+        "DIRECT"
       ],
+      "default": "BLOCK",
       "interrupt_exist_connections": true
     },
     {
@@ -477,6 +478,10 @@
     {
       "type": "direct",
       "tag": "DIRECT"
+    },
+    {
+      "type": "block",
+      "tag": "BLOCK"
     }
   ],
   "route": {
@@ -667,14 +672,14 @@
     "rule_set": [
       {
         "type": "remote",
-        "tag": "Category-Ads",
+        "tag": "category_ads",
         "format": "binary",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs",
         "download_detour": "DIRECT"
       },
       {
         "type": "remote",
-        "tag": "Advertising_rules",
+        "tag": "ads_rules",
         "format": "binary",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Advertising/Advertising.srs",
         "download_detour": "DIRECT"
