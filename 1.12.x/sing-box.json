@@ -407,21 +407,6 @@
     },
     {
       "type": "selector",
-      "tag": "bahamut",
-      "outbounds": [
-        "PROXY",
-        "Youtube",
-        "AUTO",
-        "HK AUTO",
-        "JP AUTO",
-        "US AUTO",
-        "TW AUTO",
-        "SG AUTO"
-      ],
-      "default": "PROXY"
-    },
-    {
-      "type": "selector",
       "tag": "CN",
       "outbounds": [
         "DIRECT",
@@ -517,10 +502,6 @@
       {
         "rule_set": "bilibili_domain",
         "outbound": "bilibili"
-      },
-      {
-        "rule_set": "bahamut_domain",
-        "outbound": "bahamut"
       },
       {
         "rule_set": "youtube_domain",
@@ -671,12 +652,6 @@
         "type": "remote",
         "tag": "apple_domain",
         "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs",
-        "download_detour": "DIRECT"
-      },
-      {
-        "type": "remote",
-        "tag": "bahamut_domain",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bahamut.srs",
         "download_detour": "DIRECT"
       },
       {
