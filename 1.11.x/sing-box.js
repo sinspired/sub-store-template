@@ -76,14 +76,6 @@ config.outbounds.map(i => {
       /^(?=.*gpt⁺)(?=.*(gemini|gm))/i
     ))
   }
-
-  if (['全部解锁'].includes(i.tag)) {
-    safePush(i, getTags(
-      proxies,
-      /^(?=.*gpt⁺)(?=.*(gemini|gm))(?=.*(youtube|yt))(?=.*(X|twitter))/i
-    ))
-  }
-
 })
 
 config.outbounds.forEach(outbound => {

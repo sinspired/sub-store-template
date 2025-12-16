@@ -95,7 +95,6 @@
       "tag": "PROXY",
       "outbounds": [
         "AUTO",
-        "全部解锁",
         "CF优选",
         "HK AUTO",
         "JP AUTO",
@@ -117,7 +116,6 @@
         "AI-plus",
         "OpenAI",
         "Gemini",
-        "全部解锁",
         "CF优选"
       ],
       "default": "AI-plus"
@@ -143,7 +141,6 @@
       "tag": "TWITTER",
       "outbounds": [
         "CF优选",
-        "全部解锁",
         "AI-plus",
         "OpenAI",
         "Gemini",
@@ -245,14 +242,6 @@
       "outbounds": null,
       "url": "https://www.google.com/generate_204",
       "interval": "13m0s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "全部解锁",
-      "outbounds": null,
-      "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "14m0s",
       "tolerance": 50
     },
     {
