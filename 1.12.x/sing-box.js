@@ -95,7 +95,21 @@ config.outbounds.forEach(outbound => {
 $content = JSON.stringify(config, null, 2)
 
 function getTags(proxies, regex) {
-  return (regex ? proxies.filter(p => regex.test(p.tag)) : proxies).map(p => p.tag)
+  let list = regex ? proxies.filter(p => regex.test(p.tag)) : proxies
+
+  // 解析速度函数：从 tag 中提取 MB/s 数字
+  function parseSpeed(tag) {
+    const match = tag.match(/\|([\d.]+)MB\/s\|/)
+    return match ? parseFloat(match[1]) : 0
+  }
+
+  // 按速度从高到低排序
+  list = list.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
+
+  // 每个分组只取前 100 个
+  list = list.slice(0, 100)
+
+  return list.map(p => p.tag)
 }
 
 function safePush(i, tags) {
