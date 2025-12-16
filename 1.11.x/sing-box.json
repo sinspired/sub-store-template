@@ -265,16 +265,6 @@
       "tolerance": 50
     },
     {
-      "type": "selector",
-      "tag": "广告拦截",
-      "outbounds": [
-        "BLOCK",
-        "DIRECT"
-      ],
-      "default": "BLOCK",
-      "interrupt_exist_connections": true
-    },
-    {
       "type": "urltest",
       "tag": "TIKTOK-US",
       "outbounds": null,
@@ -478,10 +468,6 @@
     {
       "type": "direct",
       "tag": "DIRECT"
-    },
-    {
-      "type": "block",
-      "tag": "BLOCK"
     }
   ],
   "route": {
@@ -666,7 +652,7 @@
           "category_ads",
           "ads_rules"
         ],
-        "outbound": "广告拦截"
+        "action": "reject"
       }
     ],
     "rule_set": [
