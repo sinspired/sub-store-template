@@ -77,8 +77,7 @@
     {
       "type": "mixed",
       "listen": "127.0.0.1",
-      "listen_port": 7890,
-      "tcp_fast_open": true
+      "listen_port": 7890
     }
   ],
   "outbounds": [
