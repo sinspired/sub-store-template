@@ -218,7 +218,7 @@
       "type": "urltest",
       "tag": "AUTO",
       "outbounds": null,
-      "url": "https://gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "15m0s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
@@ -227,7 +227,7 @@
       "type": "urltest",
       "tag": "AI-plus",
       "outbounds": null,
-      "url": "https://gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "12m0s",
       "tolerance": 50
     },
@@ -235,7 +235,7 @@
       "type": "urltest",
       "tag": "OpenAI",
       "outbounds": null,
-      "url": "https://gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "14m0s",
       "tolerance": 50
     },
@@ -259,7 +259,7 @@
       "type": "urltest",
       "tag": "CF优选",
       "outbounds": null,
-      "url": "https://gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "8m0s",
       "tolerance": 50
     },

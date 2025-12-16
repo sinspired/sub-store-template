@@ -211,9 +211,9 @@
       "tag": "AUTO",
       "outbounds": null,
       "url": "https://cp.cloudflare.com/generate_204",
-      "idle_timeout": "30m",
       "interval": "15m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -268,90 +268,90 @@
       "tag": "TIKTOK-US",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "31m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "TIKTOK-JP",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "32m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "TIKTOK-VN",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "33m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "TIKTOK-SG",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "34m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "TIKTOK-TW",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "34m10s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "HK AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "30m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "TW AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "31m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "SG AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "32m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "JP AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "33m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "urltest",
       "tag": "US AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "idle_timeout": "35m",
       "interval": "34m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
     },
     {
       "type": "selector",
