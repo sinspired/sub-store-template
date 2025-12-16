@@ -1,6 +1,7 @@
 {
   "log": {
-    "level": "error",
+    "disabled": false,
+    "level": "info",
     "timestamp": true
   },
   "dns": {
@@ -36,8 +37,11 @@
       },
       {
         "clash_mode": "Global",
-        "server": "fakeip",
-        "rewrite_ttl": 1
+        "server": "fakeip"
+      },
+      {
+        "query_type": "HTTPS",
+        "action": "reject"
       },
       {
         "query_type": [
