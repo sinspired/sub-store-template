@@ -55,6 +55,7 @@
       }
     ],
     "final": "googleDNS",
+    "strategy": "prefer_ipv6",
     "independent_cache": true
   },
   "inbounds": [
