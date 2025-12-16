@@ -1,6 +1,6 @@
 {
   "log": {
-    "level": "info",
+    "level": "error",
     "timestamp": true
   },
   "dns": {
@@ -85,7 +85,8 @@
     {
       "type": "mixed",
       "listen": "127.0.0.1",
-      "listen_port": 7890
+      "listen_port": 7890,
+      "tcp_fast_open": true
     }
   ],
   "outbounds": [
@@ -95,7 +96,7 @@
       "outbounds": [
         "AUTO",
         "全部解锁",
-        "TWITTER优选",
+        "CF优选",
         "HK AUTO",
         "JP AUTO",
         "TW AUTO",
@@ -117,7 +118,7 @@
         "OpenAI",
         "Gemini",
         "全部解锁",
-        "TWITTER优选"
+        "CF优选"
       ],
       "default": "AI-plus"
     },
@@ -127,7 +128,7 @@
       "outbounds": [
         "PROXY",
         "Youtube",
-        "TWITTER优选",
+        "CF优选",
         "AUTO",
         "HK AUTO",
         "JP AUTO",
@@ -141,7 +142,7 @@
       "type": "selector",
       "tag": "TWITTER",
       "outbounds": [
-        "TWITTER优选",
+        "CF优选",
         "全部解锁",
         "AI-plus",
         "OpenAI",
@@ -155,7 +156,7 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "TWITTER优选"
+      "default": "CF优选"
     },
     {
       "type": "selector",
@@ -217,8 +218,9 @@
       "type": "urltest",
       "tag": "AUTO",
       "outbounds": null,
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "10m0s",
+      "url": "https://cp.cloudflare.com/generate_204",
+      "idle_timeout": "30m",
+      "interval": "15m0s",
       "tolerance": 50
     },
     {
@@ -241,8 +243,16 @@
       "type": "urltest",
       "tag": "Gemini",
       "outbounds": null,
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "5m0s",
+      "url": "https://www.google.com/generate_204",
+      "interval": "13m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "全部解锁",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "14m0s",
       "tolerance": 50
     },
     {
@@ -250,12 +260,12 @@
       "tag": "Youtube",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "7m0s",
+      "interval": "16m0s",
       "tolerance": 50
     },
     {
       "type": "urltest",
-      "tag": "TWITTER优选",
+      "tag": "CF优选",
       "outbounds": null,
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "8m0s",
@@ -266,7 +276,8 @@
       "tag": "TIKTOK-US",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m0s",
+      "idle_timeout": "35m",
+      "interval": "31m0s",
       "tolerance": 50
     },
     {
@@ -274,7 +285,8 @@
       "tag": "TIKTOK-JP",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "23m0s",
+      "idle_timeout": "35m",
+      "interval": "32m0s",
       "tolerance": 50
     },
     {
@@ -282,7 +294,8 @@
       "tag": "TIKTOK-VN",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "24m0s",
+      "idle_timeout": "35m",
+      "interval": "33m0s",
       "tolerance": 50
     },
     {
@@ -290,7 +303,8 @@
       "tag": "TIKTOK-SG",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "26m0s",
+      "idle_timeout": "35m",
+      "interval": "34m0s",
       "tolerance": 50
     },
     {
@@ -298,7 +312,8 @@
       "tag": "TIKTOK-TW",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "28m0s",
+      "idle_timeout": "35m",
+      "interval": "34m10s",
       "tolerance": 50
     },
     {
@@ -306,6 +321,7 @@
       "tag": "HK AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
+      "idle_timeout": "35m",
       "interval": "30m0s",
       "tolerance": 50
     },
@@ -314,6 +330,7 @@
       "tag": "TW AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
+      "idle_timeout": "35m",
       "interval": "31m0s",
       "tolerance": 50
     },
@@ -322,6 +339,7 @@
       "tag": "SG AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
+      "idle_timeout": "35m",
       "interval": "32m0s",
       "tolerance": 50
     },
@@ -330,6 +348,7 @@
       "tag": "JP AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
+      "idle_timeout": "35m",
       "interval": "33m0s",
       "tolerance": 50
     },
@@ -338,6 +357,7 @@
       "tag": "US AUTO",
       "outbounds": null,
       "url": "https://www.gstatic.com/generate_204",
+      "idle_timeout": "35m",
       "interval": "34m0s",
       "tolerance": 50
     },
@@ -450,11 +470,6 @@
         "SG AUTO"
       ],
       "default": "PROXY"
-    },
-    {
-      "type": "selector",
-      "tag": "全部解锁",
-      "outbounds": null
     },
     {
       "type": "selector",
@@ -637,7 +652,7 @@
             "invert": true
           }
         ],
-        "outbound": "TWITTER优选"
+        "outbound": "CF优选"
       },
       {
         "rule_set": [
@@ -859,7 +874,7 @@
     },
     "clash_api": {
       "external_controller": "127.0.0.1:9090",
-      "external_ui": "ui",
+      "external_ui": "uiui",
       "external_ui_download_url": "https://ghfast.top/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "DIRECT"
     }
