@@ -16,8 +16,13 @@
         "detour": "PROXY"
       },
       {
+        "tag": "cfDNS",
+        "address": "h3://1.1.1.1/dns-query",
+        "detour": "DIRECT"
+      },
+      {
         "tag": "ali",
-        "address": "https://223.6.6.6/dns-query",
+        "address": "h3://223.6.6.6/dns-query",
         "detour": "DIRECT"
       },
       {
@@ -38,7 +43,6 @@
         "clash_mode": "Global",
         "server": "fakeip"
       },
-
       {
         "query_type": [
           "A",
@@ -57,7 +61,7 @@
         "disable_cache": false
       }
     ],
-    "final": "googleDNS",
+    "final": "cfDNS",
     "fakeip": {
       "enabled": true,
       "inet4_range": "198.18.0.0/15",

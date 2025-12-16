@@ -18,6 +18,11 @@
       },
       {
         "type": "h3",
+        "tag": "cfDNS",
+        "server": "1.1.1.1"
+      },
+      {
+        "type": "h3",
         "tag": "ali",
         "server": "223.5.5.5"
       },
@@ -54,7 +59,7 @@
         "server": "ali"
       }
     ],
-    "final": "googleDNS",
+    "final": "cfDNS",
     "strategy": "prefer_ipv6"
   },
   "inbounds": [
