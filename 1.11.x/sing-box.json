@@ -663,8 +663,8 @@
       },
       {
         "rule_set": [
-          "Category-Ads",
-          "Advertising_rules"
+          "category_ads",
+          "ads_rules"
         ],
         "outbound": "广告拦截"
       }
