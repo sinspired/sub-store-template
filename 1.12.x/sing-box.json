@@ -43,7 +43,7 @@
         "server": "ali"
       },
       {
-        "clash_mode": "代理",
+        "clash_mode": "全局",
         "server": "fakeip"
       },
       {
@@ -522,7 +522,7 @@
         "outbound": "DIRECT"
       },
       {
-        "clash_mode": "代理",
+        "clash_mode": "全局",
         "outbound": "GLOBAL"
       },
       {
