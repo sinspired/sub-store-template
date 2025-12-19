@@ -830,7 +830,7 @@
       "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
       "external_ui_download_detour": "AUTO",
       "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452eb",
-      "default_mode": "rule",
+      "default_mode": "规则",
       "access_control_allow_origin": "*",
       "access_control_allow_private_network": true
     }
