@@ -56,8 +56,30 @@
         "rewrite_ttl": 1
       },
       {
-        "rule_set": "cn_domain",
+        "rule_set": [
+          "apple_domain",
+          "cn_domain",
+          "bilibili_domain"
+        ],
         "server": "ali"
+      },
+      {
+        "rule_set": [
+          "google_domain",
+          "youtube_domain",
+          "proxy_domain",
+          "category_porn"
+        ],
+        "server": "googleDNS"
+      },
+      {
+        "rule_set": [
+          "openai_domain",
+          "claude_domain",
+          "twitter_domain",
+          "telegram_domain"
+        ],
+        "server": "cfDNS"
       }
     ],
     "final": "cfDNS"
@@ -559,7 +581,7 @@
           {
             "rule_set": [
               "proxy_domain",
-              "global_site"
+              "category_porn"
             ]
           },
           {
@@ -783,13 +805,13 @@
       {
         "type": "remote",
         "tag": "proxy_domain",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Proxy/Proxy.srs",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs",
         "download_detour": "DIRECT"
       },
       {
         "type": "remote",
-        "tag": "global_site",
-        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Global/Global.srs",
+        "tag": "category_porn",
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs",
         "download_detour": "DIRECT"
       },
       {
