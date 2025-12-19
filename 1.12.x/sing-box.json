@@ -74,7 +74,9 @@
       {
         "rule_set": [
           "openai_domain",
+          "cloudflare_domain",
           "claude_domain",
+          "copilot_domain",
           "twitter_domain",
           "telegram_domain"
         ],
