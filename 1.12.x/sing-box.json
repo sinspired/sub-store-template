@@ -6,9 +6,15 @@
   "dns": {
     "servers": [
       {
+        "type": "h3",
+        "tag": "cfDNS",
+        "detour": "OpenAI",
+        "domain_resolver": "local",
+        "server": "1.1.1.1"
+      },
+      {
         "type": "local",
-        "tag": "local",
-        "detour": "DIRECT"
+        "tag": "local"
       },
       {
         "type": "https",
@@ -34,11 +40,11 @@
         "server": "local"
       },
       {
-        "clash_mode": "Direct",
+        "clash_mode": "直连",
         "server": "ali"
       },
       {
-        "clash_mode": "Global",
+        "clash_mode": "代理",
         "server": "fakeip"
       },
       {
@@ -54,9 +60,17 @@
         "server": "ali"
       }
     ],
-    "final": "googleDNS"
+    "final": "cfDNS"
   },
   "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 7890,
+      "tcp_fast_open": true,
+      "udp_fragment": false
+    },
     {
       "type": "tun",
       "tag": "tun-in",
@@ -65,7 +79,7 @@
         "fdfe:dcba:9876::/126"
       ],
       "auto_route": true,
-      "stack": "mixed",
+      "stack": "system",
       "platform": {
         "http_proxy": {
           "enabled": true,
@@ -73,16 +87,25 @@
           "server_port": 7890
         }
       }
-    },
-    {
-      "type": "mixed",
-      "tag": "mixed-in",
-      "listen": "127.0.0.1",
-      "listen_port": 7890,
-      "tcp_fast_open": true
     }
   ],
   "outbounds": [
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "PROXY"
+    },
     {
       "type": "selector",
       "tag": "PROXY",
@@ -439,22 +462,6 @@
       "default": "PROXY"
     },
     {
-      "type": "selector",
-      "tag": "GLOBAL",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "Youtube",
-        "AUTO",
-        "HK AUTO",
-        "JP AUTO",
-        "US AUTO",
-        "TW AUTO",
-        "SG AUTO"
-      ],
-      "default": "PROXY"
-    },
-    {
       "type": "direct",
       "tag": "DIRECT"
     }
@@ -494,11 +501,11 @@
         "outbound": "DIRECT"
       },
       {
-        "clash_mode": "Global",
+        "clash_mode": "代理",
         "outbound": "GLOBAL"
       },
       {
-        "clash_mode": "Direct",
+        "clash_mode": "直连",
         "outbound": "DIRECT"
       },
       {
@@ -806,10 +813,7 @@
     ],
     "final": "Final",
     "auto_detect_interface": true,
-    "default_domain_resolver": {
-      "server": "ali",
-      "client_subnet": "223.5.5.5"
-    }
+    "default_domain_resolver": "ali"
   },
   "experimental": {
     "cache_file": {
@@ -819,6 +823,16 @@
       "store_fakeip": true,
       "store_rdrc": true,
       "rdrc_timeout": "168h0m0s"
+    },
+    "clash_api": {
+      "external_controller": "127.0.0.1:20123",
+      "external_ui": "ui",
+      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "AUTO",
+      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452eb",
+      "default_mode": "rule",
+      "access_control_allow_origin": "*",
+      "access_control_allow_private_network": true
     }
   }
 }
