@@ -9,7 +9,6 @@
         "type": "h3",
         "tag": "cfDNS",
         "detour": "OpenAI",
-        "domain_resolver": "local",
         "server": "1.1.1.1"
       },
       {
@@ -847,10 +846,10 @@
       "rdrc_timeout": "168h0m0s"
     },
     "clash_api": {
-      "external_controller": "127.0.0.1:20123",
+      "external_controller": "127.0.0.1:48909",
       "external_ui": "ui",
-      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
-      "external_ui_download_detour": "AUTO",
+      "external_ui_download_url": "https://ghfast.top/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "DIRECT",
       "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452eb",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
