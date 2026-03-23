@@ -64,6 +64,9 @@ config.outbounds.map(i => {
   if (['Gemini'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(gemini|gm)\b)/i))
   }
+  if (['Copilot'].includes(i.tag)) {
+    safePush(i, getTags(proxies, /^(?=.*\b(copilot|CP)\b)/i))
+  }
   if (['Youtube'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
   }

@@ -144,6 +144,7 @@
         "Youtube",
         "AI",
         "Gemini",
+        "Copilot",
         "DIRECT"
       ],
       "default": "AUTO"
@@ -155,6 +156,7 @@
         "AI-plus",
         "OpenAI",
         "Gemini",
+        "Copilot",
         "CF优选"
       ],
       "default": "AI-plus"
@@ -183,6 +185,7 @@
         "AI-plus",
         "OpenAI",
         "Gemini",
+        "Copilot",
         "Youtube",
         "PROXY",
         "AUTO",
@@ -281,6 +284,14 @@
       "outbounds": null,
       "url": "https://www.google.com/generate_204",
       "interval": "13m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "Copilot",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "13m30s",
       "tolerance": 50
     },
     {
@@ -553,7 +564,7 @@
       },
       {
         "rule_set": "copilot_domain",
-        "outbound": "AI"
+        "outbound": "Copilot"
       },
       {
         "rule_set": "twitter_domain",
