@@ -163,9 +163,22 @@
     },
     {
       "type": "selector",
+      "tag": "Copilot-Select",
+      "outbounds": [
+        "AI-plus",
+        "OpenAI",
+        "Gemini",
+        "Copilot",
+        "CF优选"
+      ],
+      "default": "OpenAI"
+    },
+    {
+      "type": "selector",
       "tag": "Google",
       "outbounds": [
         "PROXY",
+        "Gemini",
         "Youtube",
         "CF优选",
         "AUTO",
@@ -564,7 +577,7 @@
       },
       {
         "rule_set": "copilot_domain",
-        "outbound": "Copilot"
+        "outbound": "Copilot-Select"
       },
       {
         "rule_set": "twitter_domain",
