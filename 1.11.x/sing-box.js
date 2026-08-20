@@ -15,8 +15,20 @@ let proxies = await produceArtifact({
 
 // 过滤掉singbox-1.11无法识别的协议和字段
 // proxies = proxies.filter(p => !('server_ports' in p))
-proxies = proxies.filter(p => !(p.type == 'anytls'))
+function cleanProxy(proxy) {
+  const invalidKeys = ['system']
+  invalidKeys.forEach(k => {
+    if (k in proxy) {
+      delete proxy[k]
+    }
+  })
+  return proxy
+}
 
+// 过滤掉 sing-box 1.11 无法识别的协议和字段
+proxies = proxies
+  .filter(p => p.type !== 'anytls')
+  .map(cleanProxy)
 
 config.outbounds.push(...proxies)
 
@@ -41,6 +53,7 @@ config.outbounds.map(i => {
   if (['US AUTO'].includes(i.tag)) {
     safePush(i, getTags(proxies, /(?:^|[^-])\b(?:US(?!⁻)|美|american)\b/gi))
   }
+
   // TikTok
   if (['TIKTOK-US'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])US|TK-US))/i))
@@ -57,6 +70,7 @@ config.outbounds.map(i => {
   if (['TIKTOK-TW'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])TW|TK-TW))/i))
   }
+
   // AI
   if (['OpenAI'].includes(i.tag)) {
     safePush(i, getTags(proxies, /^(?=.*(\b(openai|chatgpt)\b|\bgpt⁺))/i))
