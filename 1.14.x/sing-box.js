@@ -13,48 +13,84 @@ let proxies = await produceArtifact({
 // 注入节点
 config.outbounds.push(...proxies)
 
-// 分组映射（预编译正则，减少重复计算）
-const groupMap = {
-  'AUTO': null,
-  'HK AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
-  'TW AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
-  'JP AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
-  'SG AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
-  'US AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
+// 只对 urltest 做分组填充，不动 selector
+config.outbounds.forEach(i => {
+  if (i.type !== 'urltest') return
 
-  'TIKTOK-US': /^(?=.*TK|tiktok)(?=.*US)/i,
-  'TIKTOK-VN': /^(?=.*TK|tiktok)(?=.*VN)/i,
-  'TIKTOK-JP': /^(?=.*TK|tiktok)(?=.*JP)/i,
-  'TIKTOK-SG': /^(?=.*TK|tiktok)(?=.*SG)/i,
-  'TIKTOK-TW': /^(?=.*TK|tiktok)(?=.*TW)/i,
+  const tag = i.tag
 
-  'OpenAI': /openai|chatgpt|gpt⁺/i,
-  'Gemini': /gemini|gm/i,
-  'Copilot': /copilot|CP/i,
-  'Youtube': /youtube|yt/i,
+  // AUTO 总分组
+  if (tag === 'AUTO') {
+    safePush(i, getTags(proxies))
+  }
 
-  'AI-plus': /^(?=.*gpt⁺)(?=.*gemini)/i,
-  'CF优选': /^(?=.*gpt⁺)(?=.*(X|twitter))/i,
-}
+  // 地区分组
+  if (tag === 'HK AUTO') {
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:HK(?!⁻)|港|Hong\s?Kong)\b/gi))
+  }
+  if (tag === 'TW AUTO') {
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:TW(?!⁻)|台|taiwan)\b/gi))
+  }
+  if (tag === 'JP AUTO') {
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:JP(?!⁻)|日|japan)\b/gi))
+  }
+  if (tag === 'SG AUTO') {
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:SG(?!⁻)|新|singapore)\b/gi))
+  }
+  if (tag === 'US AUTO') {
+    safePush(i, getTags(proxies, /(?:^|[^-])\b(?:US(?!⁻)|美|american)\b/gi))
+  }
 
-// 分组填充
-for (const outbound of config.outbounds) {
-  if (outbound.type !== 'selector' && outbound.type !== 'urltest') continue
+  // TikTok 分组
+  if (tag === 'TIKTOK-US') {
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])US|TK-US))/i))
+  }
+  if (tag === 'TIKTOK-VN') {
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])VN|TK-VN))/i))
+  }
+  if (tag === 'TIKTOK-JP') {
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])JP|TK-JP))/i))
+  }
+  if (tag === 'TIKTOK-SG') {
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])SG|TK-SG))/i))
+  }
+  if (tag === 'TIKTOK-TW') {
+    safePush(i, getTags(proxies, /^(?=.*TK|tiktok)(?=.*(?:(?:^|[^-])TW|TK-TW))/i))
+  }
 
-  const regex = groupMap[outbound.tag]
-  const tags = getTags(proxies, regex)
+  // AI 分组
+  if (tag === 'OpenAI') {
+    safePush(i, getTags(proxies, /^(?=.*(\b(openai|chatgpt)\b|\bgpt⁺))/i))
+  }
+  if (tag === 'Gemini') {
+    safePush(i, getTags(proxies, /^(?=.*\b(gemini|gm)\b)/i))
+  }
+  if (tag === 'Copilot') {
+    safePush(i, getTags(proxies, /^(?=.*\b(copilot|CP)\b)/i))
+  }
+  if (tag === 'Youtube') {
+    safePush(i, getTags(proxies, /^(?=.*\b(youtube|yt)\b)/i))
+  }
 
-  safePush(outbound, tags)
-}
+  if (tag === 'AI-plus') {
+    safePush(i, getTags(
+      proxies,
+      /^(?=.*gpt⁺)(?=.*(gemini|gm))/i
+    ))
+  }
 
-// 最终统一兜底（确保所有 outbounds 都合法）
-for (const outbound of config.outbounds) {
-  normalizeOutbounds(outbound, [])
-}
+  if (tag === 'CF优选') {
+    safePush(i, getTags(
+      proxies,
+      /^(?=.*gpt⁺)(?=.*(X|twitter))/i
+    ))
+  }
+})
 
+// 输出最终配置
 $content = JSON.stringify(config, null, 2)
 
-// 工具函数：按速度排序
+// 工具函数：按速度排序并取前 100 个
 function getTags(proxies, regex) {
   let list = regex ? proxies.filter(p => regex.test(p.tag)) : proxies
 
@@ -72,39 +108,26 @@ function getTags(proxies, regex) {
   return list.map(p => p.tag)
 }
 
-// 高性能 normalize：null → DIRECT，[] → DIRECT，DIRECT → 替换真实节点
-function normalizeOutbounds(outbound, tags) {
-  let o = outbound.outbounds
-
-  // null → ["DIRECT"]
-  if (!Array.isArray(o)) {
-    outbound.outbounds = ["DIRECT"]
-    o = outbound.outbounds
+// safePush：处理 null / [] / DIRECT 占位，并替换为真实节点
+function safePush(i, tags) {
+  // 如果 outbounds 不是数组（null 等），视为 ["DIRECT"] 占位
+  if (!Array.isArray(i.outbounds)) {
+    i.outbounds = ["DIRECT"]
   }
 
-  // [] → ["DIRECT"]
-  if (o.length === 0) {
-    outbound.outbounds = ["DIRECT"]
-    o = outbound.outbounds
+  // 如果是空数组，同样视为 ["DIRECT"] 占位
+  if (i.outbounds.length === 0) {
+    i.outbounds = ["DIRECT"]
   }
 
-  // ["DIRECT"] 且有真实节点 → 替换 DIRECT
-  if (o.length === 1 && o[0] === "DIRECT" && tags.length > 0) {
-    outbound.outbounds = tags
-    return
-  }
-
-  // 正常追加
-  if (tags.length > 0) {
-    outbound.outbounds.push(...tags)
+  // 如果当前只有一个 DIRECT 且有真实节点 → 用真实节点替换 DIRECT
+  if (i.outbounds.length === 1 && i.outbounds[0] === "DIRECT" && tags.length > 0) {
+    i.outbounds = tags
+  } else if (tags.length > 0) {
+    // 否则正常追加
+    i.outbounds.push(...tags)
   }
 
   // 去重
-  outbound.outbounds = [...new Set(outbound.outbounds)]
+  i.outbounds = [...new Set(i.outbounds)]
 }
-
-// 智能追加 tag
-function safePush(outbound, tags) {
-  normalizeOutbounds(outbound, tags)
-}
-
