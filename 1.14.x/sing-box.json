@@ -276,7 +276,9 @@
     {
       "type": "urltest",
       "tag": "AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "15m0s",
       "tolerance": 50,
@@ -285,7 +287,9 @@
     {
       "type": "urltest",
       "tag": "AI-plus",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "12m0s",
       "tolerance": 50
@@ -293,7 +297,9 @@
     {
       "type": "urltest",
       "tag": "OpenAI",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "14m0s",
       "tolerance": 50
@@ -301,7 +307,9 @@
     {
       "type": "urltest",
       "tag": "Gemini",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.google.com/generate_204",
       "interval": "13m0s",
       "tolerance": 50
@@ -309,7 +317,9 @@
     {
       "type": "urltest",
       "tag": "Copilot",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "13m30s",
       "tolerance": 50
@@ -317,7 +327,9 @@
     {
       "type": "urltest",
       "tag": "Youtube",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "16m0s",
       "tolerance": 50
@@ -325,7 +337,9 @@
     {
       "type": "urltest",
       "tag": "CF优选",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "8m0s",
       "tolerance": 50
@@ -333,7 +347,9 @@
     {
       "type": "urltest",
       "tag": "TIKTOK-US",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "31m0s",
       "tolerance": 50,
@@ -342,7 +358,9 @@
     {
       "type": "urltest",
       "tag": "TIKTOK-JP",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "32m0s",
       "tolerance": 50,
@@ -351,7 +369,9 @@
     {
       "type": "urltest",
       "tag": "TIKTOK-VN",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "33m0s",
       "tolerance": 50,
@@ -360,7 +380,9 @@
     {
       "type": "urltest",
       "tag": "TIKTOK-SG",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "34m0s",
       "tolerance": 50,
@@ -369,7 +391,9 @@
     {
       "type": "urltest",
       "tag": "TIKTOK-TW",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "34m10s",
       "tolerance": 50,
@@ -378,7 +402,9 @@
     {
       "type": "urltest",
       "tag": "HK AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "30m0s",
       "tolerance": 50,
@@ -387,7 +413,9 @@
     {
       "type": "urltest",
       "tag": "TW AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "31m0s",
       "tolerance": 50,
@@ -396,7 +424,9 @@
     {
       "type": "urltest",
       "tag": "SG AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "32m0s",
       "tolerance": 50,
@@ -405,7 +435,9 @@
     {
       "type": "urltest",
       "tag": "JP AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "33m0s",
       "tolerance": 50,
@@ -414,7 +446,9 @@
     {
       "type": "urltest",
       "tag": "US AUTO",
-      "outbounds": null,
+      "outbounds": [
+        "DIRECT"
+      ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "34m0s",
       "tolerance": 50,
