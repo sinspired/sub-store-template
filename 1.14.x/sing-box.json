@@ -1,0 +1,892 @@
+{
+  "log": {
+    "level": "error",
+    "timestamp": true
+  },
+  "http_clients": [
+    {
+      "tag": "http_direct",
+      "engine": "go",
+      "detour": "DIRECT"
+    }
+  ],
+  "dns": {
+    "servers": [
+      {
+        "type": "h3",
+        "tag": "cfDNS",
+        "detour": "OpenAI",
+        "server": "1.1.1.1"
+      },
+      {
+        "type": "local",
+        "tag": "local"
+      },
+      {
+        "type": "https",
+        "tag": "googleDNS",
+        "detour": "PROXY",
+        "server": "8.8.8.8"
+      },
+      {
+        "type": "h3",
+        "tag": "ali",
+        "server": "223.5.5.5"
+      },
+      {
+        "type": "fakeip",
+        "tag": "fakeip",
+        "inet4_range": "198.18.0.0/15",
+        "inet6_range": "fc00::/18"
+      }
+    ],
+    "rules": [
+      {
+        "rule_set": "private_domain",
+        "server": "local"
+      },
+      {
+        "clash_mode": "直连",
+        "server": "ali"
+      },
+      {
+        "clash_mode": "全局",
+        "server": "fakeip"
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakeip",
+        "rewrite_ttl": 1
+      },
+      {
+        "rule_set": [
+          "apple_domain",
+          "cn_domain",
+          "bilibili_domain"
+        ],
+        "server": "ali"
+      },
+      {
+        "rule_set": [
+          "google_domain",
+          "youtube_domain",
+          "proxy_domain",
+          "category_porn"
+        ],
+        "server": "googleDNS"
+      },
+      {
+        "rule_set": [
+          "openai_domain",
+          "cloudflare_domain",
+          "claude_domain",
+          "copilot_domain",
+          "twitter_domain",
+          "telegram_domain"
+        ],
+        "server": "cfDNS"
+      }
+    ],
+    "final": "cfDNS"
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 7890,
+      "tcp_fast_open": true,
+      "udp_fragment": false
+    },
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "address": [
+        "172.19.0.0/30",
+        "fdfe:dcba:9876::/126"
+      ],
+      "auto_route": true,
+      "stack": "system",
+      "platform": {
+        "http_proxy": {
+          "enabled": true,
+          "server": "127.0.0.1",
+          "server_port": 7890
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "PROXY"
+    },
+    {
+      "type": "selector",
+      "tag": "PROXY",
+      "outbounds": [
+        "AUTO",
+        "CF优选",
+        "HK AUTO",
+        "JP AUTO",
+        "TW AUTO",
+        "SG AUTO",
+        "US AUTO",
+        "TikTok",
+        "Youtube",
+        "AI",
+        "Gemini",
+        "Copilot",
+        "DIRECT"
+      ],
+      "default": "AUTO"
+    },
+    {
+      "type": "selector",
+      "tag": "AI",
+      "outbounds": [
+        "AI-plus",
+        "OpenAI",
+        "Gemini",
+        "Copilot",
+        "CF优选"
+      ],
+      "default": "AI-plus"
+    },
+    {
+      "type": "selector",
+      "tag": "Copilot-Select",
+      "outbounds": [
+        "AI-plus",
+        "OpenAI",
+        "Gemini",
+        "Copilot",
+        "CF优选"
+      ],
+      "default": "OpenAI"
+    },
+    {
+      "type": "selector",
+      "tag": "Google",
+      "outbounds": [
+        "PROXY",
+        "Gemini",
+        "Youtube",
+        "CF优选",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "PROXY"
+    },
+    {
+      "type": "selector",
+      "tag": "TWITTER",
+      "outbounds": [
+        "CF优选",
+        "AI-plus",
+        "OpenAI",
+        "Gemini",
+        "Copilot",
+        "Youtube",
+        "PROXY",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "CF优选"
+    },
+    {
+      "type": "selector",
+      "tag": "TikTok",
+      "outbounds": [
+        "TIKTOK-VN",
+        "TIKTOK-US",
+        "TIKTOK-JP",
+        "TIKTOK-SG",
+        "TIKTOK-TW"
+      ],
+      "default": "TIKTOK-VN"
+    },
+    {
+      "type": "selector",
+      "tag": "Bing",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "AI",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "Spotify",
+      "outbounds": [
+        "US AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "TW AUTO",
+        "SG AUTO",
+        "PROXY",
+        "DIRECT"
+      ],
+      "default": "US AUTO"
+    },
+    {
+      "type": "selector",
+      "tag": "Telegram",
+      "outbounds": [
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO",
+        "PROXY"
+      ],
+      "default": "AUTO"
+    },
+    {
+      "type": "urltest",
+      "tag": "AUTO",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "15m0s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "AI-plus",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "12m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "OpenAI",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "14m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "Gemini",
+      "outbounds": null,
+      "url": "https://www.google.com/generate_204",
+      "interval": "13m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "Copilot",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "13m30s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "Youtube",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "16m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "CF优选",
+      "outbounds": null,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "8m0s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "TIKTOK-US",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "31m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TIKTOK-JP",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "32m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TIKTOK-VN",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "33m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TIKTOK-SG",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "34m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TIKTOK-TW",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "34m10s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "HK AUTO",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "30m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TW AUTO",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "31m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "SG AUTO",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "32m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "JP AUTO",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "33m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "US AUTO",
+      "outbounds": null,
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "34m0s",
+      "tolerance": 50,
+      "idle_timeout": "35m0s"
+    },
+    {
+      "type": "selector",
+      "tag": "Apple",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "OneDrive",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "bilibili",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "netflix",
+      "outbounds": [
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "PROXY"
+    },
+    {
+      "type": "selector",
+      "tag": "CN",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "Final",
+      "outbounds": [
+        "PROXY",
+        "DIRECT",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO"
+      ],
+      "default": "PROXY"
+    },
+    {
+      "type": "direct",
+      "tag": "DIRECT"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "tun-in",
+        "action": "sniff",
+        "sniffer": [
+          "http",
+          "tls",
+          "quic",
+          "dns"
+        ],
+        "timeout": "500ms"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 53
+          },
+          {
+            "protocol": "dns"
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
+        "rule_set": "private_domain",
+        "outbound": "DIRECT"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "DIRECT"
+      },
+      {
+        "clash_mode": "全局",
+        "outbound": "GLOBAL"
+      },
+      {
+        "clash_mode": "直连",
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": "bilibili_domain",
+        "outbound": "bilibili"
+      },
+      {
+        "rule_set": "youtube_domain",
+        "outbound": "Youtube"
+      },
+      {
+        "rule_set": "openai_domain",
+        "outbound": "OpenAI"
+      },
+      {
+        "rule_set": "gemini_domain",
+        "outbound": "Gemini"
+      },
+      {
+        "rule_set": "claude_domain",
+        "outbound": "AI"
+      },
+      {
+        "rule_set": "copilot_domain",
+        "outbound": "Copilot-Select"
+      },
+      {
+        "rule_set": "twitter_domain",
+        "outbound": "TWITTER"
+      },
+      {
+        "rule_set": "tiktok_domain",
+        "outbound": "TikTok"
+      },
+      {
+        "rule_set": "spotify_domain",
+        "outbound": "Spotify"
+      },
+      {
+        "rule_set": "onedrive_domain",
+        "outbound": "OneDrive"
+      },
+      {
+        "rule_set": "github_domain",
+        "outbound": "PROXY"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": [
+              "proxy_domain",
+              "category_porn"
+            ]
+          },
+          {
+            "rule_set": [
+              "cn_domain",
+              "apple_domain",
+              "google_domain",
+              "telegram_domain",
+              "netflix_domain",
+              "youtube_domain",
+              "openai_domain",
+              "gemini_domain",
+              "claude_domain",
+              "copilot_domain",
+              "twitter_domain",
+              "tiktok_domain"
+            ],
+            "invert": true
+          }
+        ],
+        "outbound": "PROXY"
+      },
+      {
+        "action": "resolve"
+      },
+      {
+        "rule_set": [
+          "telegram_ip",
+          "telegram_domain"
+        ],
+        "outbound": "Telegram"
+      },
+      {
+        "rule_set": [
+          "google_ip",
+          "google_domain"
+        ],
+        "outbound": "Google"
+      },
+      {
+        "rule_set": [
+          "netflix_ip",
+          "netflix_domain"
+        ],
+        "outbound": "netflix"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": [
+              "cloudflare_ip",
+              "cloudflare_domain"
+            ]
+          },
+          {
+            "rule_set": [
+              "openai_domain",
+              "claude_domain",
+              "copilot_domain",
+              "twitter_domain"
+            ],
+            "invert": true
+          }
+        ],
+        "outbound": "CF优选"
+      },
+      {
+        "rule_set": [
+          "apple_ip",
+          "apple_domain"
+        ],
+        "outbound": "Apple"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "outbound": "CN"
+      },
+      {
+        "rule_set": [
+          "cn_ip",
+          "cn_domain"
+        ],
+        "outbound": "CN"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "private_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "apple_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "apple_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "bilibili_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "cn_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "cn_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "google_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "google_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "netflix_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "netflix_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "github_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "cloudflare_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "cloudflare_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "openai_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "gemini_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "claude_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "copilot_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "twitter_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "tiktok_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "spotify_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "onedrive_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "proxy_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "category_porn",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "telegram_ip",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "telegram_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs",
+        "http_client": "http_direct"
+      },
+      {
+        "type": "remote",
+        "tag": "youtube_domain",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs",
+        "http_client": "http_direct"
+      }
+    ],
+    "final": "Final",
+    "auto_detect_interface": true,
+    "default_domain_resolver": "ali"
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "cache_sinspired.db",
+      "cache_id": "ID_for_cache_sinspired",
+      "store_fakeip": true,
+      "store_dns": true,
+      "rdrc_timeout": "168h0m0s"
+    },
+    "clash_api": {
+      "external_controller": "127.0.0.1:48909",
+      "external_ui": "ui",
+      "external_ui_download_url": "https://ghproxy.net/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "DIRECT",
+      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452eb",
+      "default_mode": "规则",
+      "access_control_allow_origin": "*",
+      "access_control_allow_private_network": true
+    }
+  }
+}
