@@ -1,6 +1,6 @@
 const { type, name } = $arguments
 
-// 正则 & 分组规则
+// ---------- 统一正则 & 分组规则 ----------
 
 // 地区正则
 const REGIONS = {
@@ -33,7 +33,7 @@ const AI_RULES = {
   'CF优选': /^(?=.*gpt⁺)(?=.*(X|twitter))/i,
 }
 
-// 分组规则（selector / urltest 都可用）
+// 统一分组规则（selector / urltest 都可用）
 const GROUP_RULES = {
   // 自动分组
   'AUTO': null,
@@ -52,7 +52,8 @@ const GROUP_RULES = {
   ...AI_RULES,
 }
 
-// 解析配置 & 生成节点
+// ---------- 解析配置 & 生成节点 ----------
+
 let config = JSON.parse($files[0])
 
 let proxies = await produceArtifact({
@@ -62,10 +63,11 @@ let proxies = await produceArtifact({
   produceType: 'internal',
 })
 
-// 注入节点（原始 outbounds + 新节点）
+// 注入节点
 config.outbounds.push(...proxies)
 
-// 速度缓存
+// ---------- 性能优化：速度缓存 ----------
+
 const speedCache = new Map()
 
 function parseSpeed(tag) {
@@ -79,32 +81,26 @@ function parseSpeed(tag) {
 // 获取分组 tag 列表（按速度排序，最多 100 个）
 function getTags(proxies, regex) {
   let list = regex ? proxies.filter(p => regex.test(p.tag)) : proxies
-
   list.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
-
   return list.slice(0, 100).map(p => p.tag)
 }
 
 // TikTok 专用：必须同时满足 TikTok + 地区
 function getTikTokTags(proxies, regionRegex) {
   let list = proxies.filter(p => RE_TIKTOK.test(p.tag) && regionRegex.test(p.tag))
-
   list.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
-
   return list.slice(0, 100).map(p => p.tag)
 }
 
-// outbounds 智能填充
+// ---------- outbounds 归一化 & 智能填充 ----------
 
-// 统一处理 null / 空数组 / DIRECT 占位
+// 只处理 selector / urltest
 function normalizeOutbounds(o, tags) {
   // 没有 outbounds 或不是数组 → 视为 ["DIRECT"]
-  if (!Array.isArray(o.outbounds)) {
-    o.outbounds = ['DIRECT']
-  }
+  if (o.type !== 'selector' && o.type !== 'urltest') return
 
   // 空数组 → 视为 ["DIRECT"]
-  if (o.outbounds.length === 0) {
+  if (!Array.isArray(o.outbounds) || o.outbounds.length === 0) {
     o.outbounds = ['DIRECT']
   }
 
@@ -122,12 +118,12 @@ function normalizeOutbounds(o, tags) {
   }
 }
 
-// 安全追加（对 selector / urltest 通用）
 function safePush(o, tags) {
   normalizeOutbounds(o, tags)
 }
 
-// 主逻辑：按 tag 分组填充
+// ---------- 主逻辑：按 tag 分组填充 ----------
+
 for (const o of config.outbounds) {
   // 只处理有 tag 的 selector / urltest（未来可扩展）
   if (!o.tag) continue
@@ -140,20 +136,22 @@ for (const o of config.outbounds) {
 
   // TikTok 分组：必须同时满足 TikTok + 地区
   if (TIKTOK_REGION[tag]) {
-    const tags = getTikTokTags(proxies, TIKTOK_REGION[tag])
-    safePush(o, tags)
+    safePush(o, getTikTokTags(proxies, TIKTOK_REGION[tag]))
     continue
   }
 
   // 普通分组：AUTO / 地区 / AI / CF优选 等
-  const tags = getTags(proxies, rule)
-  safePush(o, tags)
+  safePush(o, getTags(proxies, rule))
 }
 
-// 统一修复所有 outbounds
+// ---------- 只修复 selector/urltest ----------
+
 for (const o of config.outbounds) {
-  normalizeOutbounds(o, [])
+  if (o.type === 'selector' || o.type === 'urltest') {
+    normalizeOutbounds(o, [])
+  }
 }
 
-// 输出
+// ---------- 输出 ----------
+
 $content = JSON.stringify(config, null, 2)
