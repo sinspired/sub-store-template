@@ -280,7 +280,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "15m0s",
+      "interval": "5m0s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -291,7 +291,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "12m0s",
+      "interval": "3m0s",
       "tolerance": 50
     },
     {
@@ -301,7 +301,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "14m0s",
+      "interval": "3m30s",
       "tolerance": 50
     },
     {
@@ -311,7 +311,7 @@
         "DIRECT"
       ],
       "url": "https://www.google.com/generate_204",
-      "interval": "13m0s",
+      "interval": "5m30s",
       "tolerance": 50
     },
     {
@@ -321,7 +321,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "13m30s",
+      "interval": "6m0s",
       "tolerance": 50
     },
     {
@@ -331,7 +331,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "16m0s",
+      "interval": "15m0s",
       "tolerance": 50
     },
     {
@@ -341,7 +341,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "8m0s",
+      "interval": "4m0s",
       "tolerance": 50
     },
     {
@@ -351,9 +351,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "31m0s",
+      "interval": "20m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -362,9 +362,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "32m0s",
+      "interval": "20m30s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -373,9 +373,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "33m0s",
+      "interval": "21m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -384,9 +384,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "34m0s",
+      "interval": "21m30s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -395,9 +395,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "34m10s",
+      "interval": "22m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -406,9 +406,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "30m0s",
+      "interval": "10m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -417,9 +417,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "31m0s",
+      "interval": "10m30s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -428,9 +428,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "32m0s",
+      "interval": "11m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -439,9 +439,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "33m0s",
+      "interval": "11m30s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -450,9 +450,9 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "34m0s",
+      "interval": "12m0s",
       "tolerance": 50,
-      "idle_timeout": "35m0s"
+      "idle_timeout": "30m0s"
     },
     {
       "type": "selector",
