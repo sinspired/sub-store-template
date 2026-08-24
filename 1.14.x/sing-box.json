@@ -1,13 +1,28 @@
 {
+  "$schema": "https://sing-box.sagernet.org/schema.json",
   "log": {
     "level": "error",
     "timestamp": true
+  },
+  "ntp": {
+    "enabled": true,
+    "server": "ntp.aliyun.com",
+    "server_port": 123,
+    "interval": "30m",
+    "detour": "DIRECT"
   },
   "http_clients": [
     {
       "tag": "http_direct",
       "engine": "go",
-      "detour": "DIRECT"
+      "detour": "DIRECT",
+      "connect_timeout": "15s"
+    },
+    {
+      "tag": "http_proxy",
+      "engine": "go",
+      "detour": "PROXY",
+      "connect_timeout": "10s"
     }
   ],
   "dns": {
@@ -54,14 +69,6 @@
         "server": "fakeip"
       },
       {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "server": "fakeip",
-        "rewrite_ttl": 1
-      },
-      {
         "rule_set": [
           "apple_domain",
           "cn_domain",
@@ -88,6 +95,14 @@
           "telegram_domain"
         ],
         "server": "cfDNS"
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakeip",
+        "rewrite_ttl": 1
       }
     ],
     "final": "cfDNS"
@@ -108,7 +123,14 @@
         "172.19.0.0/30",
         "fdfe:dcba:9876::/126"
       ],
+      "mtu": 9000,
       "auto_route": true,
+      "strict_route": true,
+      "endpoint_independent_nat": false,
+      "route_exclude_address": [
+        "192.168.0.0/16",
+        "fc00::/7"
+      ],
       "stack": "system",
       "platform": {
         "http_proxy": {
@@ -134,7 +156,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "PROXY"
+      "default": "PROXY",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -154,7 +177,8 @@
         "Copilot",
         "DIRECT"
       ],
-      "default": "AUTO"
+      "default": "AUTO",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -280,7 +304,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "5m0s",
+      "interval": "1m0s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -301,7 +325,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m30s",
+      "interval": "3m29s",
       "tolerance": 50
     },
     {
@@ -341,7 +365,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "4m0s",
+      "interval": "4m3s",
       "tolerance": 50
     },
     {
@@ -351,7 +375,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m0s",
+      "interval": "20m4s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -362,7 +386,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m30s",
+      "interval": "20m37s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -373,7 +397,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m0s",
+      "interval": "21m9s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -384,7 +408,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m30s",
+      "interval": "21m38s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -395,7 +419,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "22m0s",
+      "interval": "22m6s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -406,7 +430,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "10m0s",
+      "interval": "10m3s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -417,7 +441,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "10m30s",
+      "interval": "10m37s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -428,7 +452,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "11m0s",
+      "interval": "11m1s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -439,7 +463,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "11m30s",
+      "interval": "11m39s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -450,7 +474,7 @@
         "DIRECT"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "12m0s",
+      "interval": "12m4s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -557,7 +581,10 @@
   "route": {
     "rules": [
       {
-        "inbound": "tun-in",
+        "inbound": [
+          "tun-in",
+          "mixed-in"
+        ],
         "action": "sniff",
         "sniffer": [
           "http",
@@ -739,170 +766,157 @@
       {
         "type": "remote",
         "tag": "private_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs"
       },
       {
         "type": "remote",
         "tag": "apple_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs"
       },
       {
         "type": "remote",
         "tag": "apple_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs"
       },
       {
         "type": "remote",
         "tag": "bilibili_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs"
       },
       {
         "type": "remote",
         "tag": "cn_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs"
       },
       {
         "type": "remote",
         "tag": "cn_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs"
       },
       {
         "type": "remote",
         "tag": "geoip-cn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
       },
       {
         "type": "remote",
         "tag": "google_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs"
       },
       {
         "type": "remote",
         "tag": "google_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs"
       },
       {
         "type": "remote",
         "tag": "netflix_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs"
       },
       {
         "type": "remote",
         "tag": "netflix_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs"
       },
       {
         "type": "remote",
         "tag": "github_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs"
       },
       {
         "type": "remote",
         "tag": "cloudflare_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs"
       },
       {
         "type": "remote",
         "tag": "cloudflare_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs"
       },
       {
         "type": "remote",
         "tag": "openai_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs"
       },
       {
         "type": "remote",
         "tag": "gemini_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs"
       },
       {
         "type": "remote",
         "tag": "claude_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs"
       },
       {
         "type": "remote",
         "tag": "copilot_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs"
       },
       {
         "type": "remote",
         "tag": "twitter_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs"
       },
       {
         "type": "remote",
         "tag": "tiktok_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs"
       },
       {
         "type": "remote",
         "tag": "spotify_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs"
       },
       {
         "type": "remote",
         "tag": "onedrive_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs"
       },
       {
         "type": "remote",
         "tag": "proxy_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs"
       },
       {
         "type": "remote",
         "tag": "category_porn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs"
       },
       {
         "type": "remote",
         "tag": "telegram_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs"
       },
       {
         "type": "remote",
         "tag": "telegram_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs"
       },
       {
         "type": "remote",
         "tag": "youtube_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs",
-        "http_client": "http_direct"
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs"
       }
     ],
     "final": "Final",
     "auto_detect_interface": true,
-    "default_domain_resolver": "ali"
+    "default_domain_resolver": "ali",
+    "default_http_client": "http_direct"
   },
+  "services": [
+    {
+      "type": "api",
+      "listen": "127.0.0.1",
+      "listen_port": 9095,
+      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452ex",
+      "dashboard": {
+        "enabled": true,
+        "download_url": "https://ghproxy.net/https://github.com/SagerNet/sing-box-dashboard/archive/refs/heads/gh-pages.zip",
+        "http_client": "http_direct"
+      }
+    }
+  ],
   "experimental": {
     "cache_file": {
       "enabled": true,
@@ -917,7 +931,7 @@
       "external_ui": "ui",
       "external_ui_download_url": "https://ghproxy.net/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
       "external_ui_download_detour": "DIRECT",
-      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452eb",
+      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452ex",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
       "access_control_allow_private_network": true
