@@ -1,5 +1,5 @@
 {
-  "$schema": "https://sing-box.sagernet.org/schema.json",
+  "$schema": "./schema.json",
   "log": {
     "level": "error",
     "timestamp": true
@@ -14,26 +14,39 @@
     {
       "tag": "http_direct",
       "engine": "go",
-      "connect_timeout": "15s"
+      "connect_timeout": "15s",
+      "tcp_fast_open": true,
+      "tcp_multi_path": true,
+      "domain_resolver": "ali"
     },
     {
       "tag": "http_proxy",
       "engine": "go",
       "detour": "PROXY",
-      "connect_timeout": "10s"
+      "connect_timeout": "10s",
+      "tcp_fast_open": true,
+      "tcp_multi_path": true
     }
   ],
   "dns": {
     "servers": [
       {
+        "type": "local",
+        "tag": "local",
+        "prefer_go": false,
+        "neighbor_domain": [
+          ".",
+          ".lan",
+          ".local",
+          ".localdomain",
+          ".localhost"
+        ]
+      },
+      {
         "type": "h3",
         "tag": "cfDNS",
         "detour": "OpenAI",
         "server": "1.1.1.1"
-      },
-      {
-        "type": "local",
-        "tag": "local"
       },
       {
         "type": "https",
@@ -56,14 +69,18 @@
     "rules": [
       {
         "rule_set": "private_domain",
-        "server": "local"
+        "action": "route",
+        "server": "local",
+        "disable_cache": true
       },
       {
         "clash_mode": "直连",
+        "action": "route",
         "server": "ali"
       },
       {
         "clash_mode": "全局",
+        "action": "route",
         "server": "fakeip"
       },
       {
@@ -72,16 +89,8 @@
           "cn_domain",
           "bilibili_domain"
         ],
+        "action": "route",
         "server": "ali"
-      },
-      {
-        "rule_set": [
-          "google_domain",
-          "youtube_domain",
-          "proxy_domain",
-          "category_porn"
-        ],
-        "server": "googleDNS"
       },
       {
         "rule_set": [
@@ -92,54 +101,121 @@
           "twitter_domain",
           "telegram_domain"
         ],
+        "action": "route",
         "server": "cfDNS"
+      },
+      {
+        "rule_set": [
+          "google_domain",
+          "youtube_domain",
+          "proxy_domain"
+        ],
+        "action": "route",
+        "server": "googleDNS"
+      },
+      {
+        "rule_set": "category_porn",
+        "action": "route",
+        "server": "googleDNS"
+      },
+      {
+        "rule_set": "category_ads_all",
+        "action": "reject",
+        "method": "default"
+      },
+      {
+        "rule_set": "anti_ad",
+        "action": "reject",
+        "method": "default"
       },
       {
         "query_type": [
           "A",
           "AAAA"
         ],
+        "action": "route",
         "server": "fakeip",
         "rewrite_ttl": 1
       }
     ],
-    "final": "cfDNS"
+    "final": "cfDNS",
+    "strategy": "prefer_ipv6",
+    "timeout": "10s",
+    "disable_cache": false,
+    "disable_expire": false,
+    "cache_capacity": 8192,
+    "optimistic": {
+      "enabled": true,
+      "timeout": "1d"
+    }
   },
   "inbounds": [
     {
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 7890,
+      "listen_port": 10809,
       "tcp_fast_open": true,
+      "tcp_multi_path": true,
       "udp_fragment": false
     },
     {
       "type": "tun",
       "tag": "tun-in",
       "address": [
-        "172.19.0.0/30",
-        "fdfe:dcba:9876::/126"
+        "10.7.0.1/24",
+        "fd00:1:2:3::1/64"
       ],
       "mtu": 9000,
+      "dns_mode": "hijack",
+      "dns_address": [
+        "10.7.0.2",
+        "fd00:1:2:3::2"
+      ],
       "auto_route": true,
       "strict_route": true,
+      "auto_redirect": true,
       "endpoint_independent_nat": false,
       "route_exclude_address": [
         "192.168.0.0/16",
-        "fc00::/7"
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "169.254.0.0/16",
+        "fc00::/7",
+        "fe80::/10"
       ],
-      "stack": "system",
+      "route_exclude_address_set": [
+        "geoip-cn"
+      ],
+      "stack": "mixed",
       "platform": {
         "http_proxy": {
           "enabled": true,
           "server": "127.0.0.1",
-          "server_port": 7890
+          "server_port": 10809,
+          "bypass_domain": [
+            "*.local",
+            "*.lan",
+            "*.localdomain",
+            "localhost",
+            "127.0.0.1",
+            "*.apple.com",
+            "captive.apple.com",
+            "*.icloud.com"
+          ],
+          "match_domain": [
+            "google.com",
+            "itunes.apple.com"
+          ]
         }
       }
     }
   ],
   "outbounds": [
+    {
+      "type": "direct",
+      "tag": "DIRECT"
+    },
     {
       "type": "selector",
       "tag": "GLOBAL",
@@ -188,7 +264,8 @@
         "Copilot",
         "CF优选"
       ],
-      "default": "AI-plus"
+      "default": "AI-plus",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -200,7 +277,8 @@
         "Copilot",
         "CF优选"
       ],
-      "default": "OpenAI"
+      "default": "OpenAI",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -217,7 +295,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "PROXY"
+      "default": "PROXY",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -237,7 +316,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "CF优选"
+      "default": "CF优选",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -249,7 +329,8 @@
         "TIKTOK-SG",
         "TIKTOK-TW"
       ],
-      "default": "TIKTOK-VN"
+      "default": "TIKTOK-VN",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -265,7 +346,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -279,7 +361,8 @@
         "PROXY",
         "DIRECT"
       ],
-      "default": "US AUTO"
+      "default": "US AUTO",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -293,7 +376,8 @@
         "SG AUTO",
         "PROXY"
       ],
-      "default": "AUTO"
+      "default": "AUTO",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -304,7 +388,8 @@
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "1m0s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -314,7 +399,8 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -324,7 +410,8 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m29s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -334,7 +421,8 @@
       ],
       "url": "https://www.google.com/generate_204",
       "interval": "5m30s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -344,7 +432,8 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "6m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -354,7 +443,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -364,7 +454,8 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "4m3s",
-      "tolerance": 50
+      "tolerance": 50,
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -375,7 +466,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m4s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -386,7 +478,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m37s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -397,7 +490,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m9s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -408,7 +502,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m38s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -419,7 +514,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "22m6s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -430,7 +526,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m3s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -441,7 +538,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m37s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -452,7 +550,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m1s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -463,7 +562,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m39s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "urltest",
@@ -474,7 +574,8 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "12m4s",
       "tolerance": 50,
-      "idle_timeout": "30m0s"
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -490,7 +591,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -506,7 +608,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -522,7 +625,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -537,7 +641,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "PROXY"
+      "default": "PROXY",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -553,7 +658,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "DIRECT"
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
     },
     {
       "type": "selector",
@@ -569,11 +675,8 @@
         "TW AUTO",
         "SG AUTO"
       ],
-      "default": "PROXY"
-    },
-    {
-      "type": "direct",
-      "tag": "DIRECT"
+      "default": "PROXY",
+      "interrupt_exist_connections": false
     }
   ],
   "route": {
@@ -590,7 +693,7 @@
           "quic",
           "dns"
         ],
-        "timeout": "500ms"
+        "timeout": "300ms"
       },
       {
         "type": "logical",
@@ -619,6 +722,10 @@
       },
       {
         "clash_mode": "直连",
+        "outbound": "DIRECT"
+      },
+      {
+        "protocol": "stun",
         "outbound": "DIRECT"
       },
       {
@@ -758,6 +865,16 @@
           "cn_domain"
         ],
         "outbound": "CN"
+      },
+      {
+        "rule_set": "category_ads_all",
+        "action": "reject",
+        "method": "default"
+      },
+      {
+        "rule_set": "anti_ad",
+        "action": "reject",
+        "method": "default"
       }
     ],
     "rule_set": [
@@ -895,6 +1012,16 @@
         "type": "remote",
         "tag": "youtube_domain",
         "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs"
+      },
+      {
+        "type": "remote",
+        "tag": "category_ads_all",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs"
+      },
+      {
+        "type": "remote",
+        "tag": "anti_ad",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs"
       }
     ],
     "final": "Final",
@@ -907,7 +1034,7 @@
       "type": "api",
       "listen": "127.0.0.1",
       "listen_port": 58909,
-      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452ex",
+      "secret": "sinspired",
       "dashboard": {
         "enabled": true,
         "download_url": "https://ghproxy.net/https://github.com/SagerNet/sing-box-dashboard/archive/refs/heads/gh-pages.zip",
@@ -928,7 +1055,7 @@
       "external_controller": "127.0.0.1:48909",
       "external_ui": "ui",
       "external_ui_download_url": "https://ghproxy.net/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
-      "secret": "ce81d731be39a62c69028f7ec49528df37c7f2cb7a573a07cd16a738d4d452ex",
+      "secret": "sinspired",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
       "access_control_allow_private_network": true
