@@ -1,5 +1,5 @@
 {
-  "$schema": "./schema.json",
+  "$schema": "https://sing-box.sagernet.org/schema.json",
   "log": {
     "level": "error",
     "timestamp": true
@@ -33,7 +33,6 @@
       {
         "type": "local",
         "tag": "local",
-        "prefer_go": false,
         "neighbor_domain": [
           ".",
           ".lan",
@@ -68,7 +67,7 @@
     ],
     "rules": [
       {
-        "rule_set": "private_domain",
+        "rule_set": "geosite/private",
         "action": "route",
         "server": "local",
         "disable_cache": true
@@ -85,46 +84,56 @@
       },
       {
         "rule_set": [
-          "apple_domain",
-          "cn_domain",
-          "bilibili_domain"
+          "AliPay",
+          "geosite/apple-cn",
+          "geosite/apple",
+          "geosite/bilibili",
+          "geosite/xiaohongshu",
+          "geosite/amap",
+          "geosite/meituan",
+          "geosite/douyin",
+          "geosite/cn"
         ],
         "action": "route",
         "server": "ali"
       },
       {
         "rule_set": [
-          "openai_domain",
-          "cloudflare_domain",
-          "claude_domain",
-          "copilot_domain",
-          "twitter_domain",
-          "telegram_domain"
+          "geosite/openai",
+          "geosite/anthropic",
+          "geosite/cloudflare",
+          "geosite/telegram",
+          "Copilot",
+          "Spotify"
         ],
         "action": "route",
         "server": "cfDNS"
       },
       {
         "rule_set": [
-          "google_domain",
-          "youtube_domain",
-          "proxy_domain"
+          "geosite/apple-intelligence",
+          "geosite/apple-tvplus",
+          "geosite/google-gemini",
+          "geosite/youtube",
+          "geosite/tiktok",
+          "geosite/google",
+          "geosite/twitter",
+          "geosite/netflix",
+          "geosite/github",
+          "geosite/iqiyi@!cn",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn",
+          "geosite/category-porn",
+          "Proxy"
         ],
         "action": "route",
         "server": "googleDNS"
       },
       {
-        "rule_set": "category_porn",
-        "action": "route",
-        "server": "googleDNS"
-      },
-      {
-        "rule_set": "category_ads_all",
-        "action": "reject",
-        "method": "default"
-      },
-      {
-        "rule_set": "anti_ad",
+        "rule_set": [
+          "geosite/category-ads-all",
+          "anti_ad"
+        ],
         "action": "reject",
         "method": "default"
       },
@@ -160,6 +169,7 @@
       "udp_fragment": false
     },
     {
+      "stack": "mixed",
       "type": "tun",
       "tag": "tun-in",
       "address": [
@@ -184,9 +194,9 @@
         "fe80::/10"
       ],
       "route_exclude_address_set": [
-        "geoip-cn"
+        "geoip/private",
+        "geoip/cn"
       ],
-      "stack": "mixed",
       "platform": {
         "http_proxy": {
           "enabled": true,
@@ -595,6 +605,23 @@
     },
     {
       "type": "selector",
+      "tag": "Apple Intelligence",
+      "outbounds": [
+        "PROXY",
+        "Youtube",
+        "AUTO",
+        "HK AUTO",
+        "JP AUTO",
+        "US AUTO",
+        "TW AUTO",
+        "SG AUTO",
+        "DIRECT"
+      ],
+      "default": "PROXY",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
       "tag": "OneDrive",
       "outbounds": [
         "DIRECT",
@@ -708,7 +735,16 @@
         "action": "hijack-dns"
       },
       {
-        "rule_set": "private_domain",
+        "rule_set": [
+          "geoip/private",
+          "geosite/private",
+          "AliPay",
+          "geosite/apple-cn",
+          "geosite/xiaohongshu",
+          "geosite/amap",
+          "geosite/meituan",
+          "geosite/douyin"
+        ],
         "outbound": "DIRECT"
       },
       {
@@ -728,48 +764,48 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "bilibili_domain",
+        "rule_set": "geosite/bilibili",
         "outbound": "bilibili"
       },
       {
-        "rule_set": "youtube_domain",
+        "rule_set": "geosite/youtube",
         "outbound": "Youtube"
       },
       {
-        "rule_set": "openai_domain",
+        "rule_set": [
+          "geosite/openai",
+          "geosite/anthropic"
+        ],
         "outbound": "OpenAI"
       },
       {
-        "rule_set": "gemini_domain",
+        "rule_set": "geosite/google-gemini",
         "outbound": "Gemini"
       },
       {
-        "rule_set": "claude_domain",
-        "outbound": "AI"
-      },
-      {
-        "rule_set": "copilot_domain",
+        "rule_set": [
+          "Copilot",
+          "geosite/bing"
+        ],
         "outbound": "Copilot-Select"
       },
       {
-        "rule_set": "twitter_domain",
+        "rule_set": "geosite/twitter",
         "outbound": "TWITTER"
       },
       {
-        "rule_set": "tiktok_domain",
+        "rule_set": "geosite/tiktok",
         "outbound": "TikTok"
       },
       {
-        "rule_set": "spotify_domain",
+        "rule_set": "Spotify",
         "outbound": "Spotify"
       },
       {
-        "rule_set": "onedrive_domain",
-        "outbound": "OneDrive"
-      },
-      {
-        "rule_set": "github_domain",
-        "outbound": "PROXY"
+        "rule_set": [
+          "geosite/apple-intelligence"
+        ],
+        "outbound": "Apple Intelligence"
       },
       {
         "type": "logical",
@@ -777,24 +813,31 @@
         "rules": [
           {
             "rule_set": [
-              "proxy_domain",
-              "category_porn"
+              "geosite/github",
+              "geosite/apple-tvplus",
+              "geosite/iqiyi@!cn",
+              "geosite/youku@!cn",
+              "geosite/tencent@!cn",
+              "geosite/category-container",
+              "Proxy",
+              "geosite/category-porn"
             ]
           },
           {
             "rule_set": [
-              "cn_domain",
-              "apple_domain",
-              "google_domain",
-              "telegram_domain",
-              "netflix_domain",
-              "youtube_domain",
-              "openai_domain",
-              "gemini_domain",
-              "claude_domain",
-              "copilot_domain",
-              "twitter_domain",
-              "tiktok_domain"
+              "geosite/cn",
+              "geosite/apple",
+              "geosite/google",
+              "geosite/telegram",
+              "geosite/netflix",
+              "geosite/youtube",
+              "geosite/openai",
+              "geosite/gemini",
+              "geosite/anthropic",
+              "Copilot",
+              "geosite/bing",
+              "geosite/twitter",
+              "geosite/tiktok"
             ],
             "invert": true
           }
@@ -806,22 +849,22 @@
       },
       {
         "rule_set": [
-          "telegram_ip",
-          "telegram_domain"
+          "geoip/telegram",
+          "geosite/telegram"
         ],
         "outbound": "Telegram"
       },
       {
         "rule_set": [
-          "google_ip",
-          "google_domain"
+          "geoip/google",
+          "geosite/google"
         ],
         "outbound": "Google"
       },
       {
         "rule_set": [
-          "netflix_ip",
-          "netflix_domain"
+          "geoip/netflix",
+          "geosite/netflix"
         ],
         "outbound": "netflix"
       },
@@ -831,47 +874,56 @@
         "rules": [
           {
             "rule_set": [
-              "cloudflare_ip",
-              "cloudflare_domain"
+              "geoip/cloudflare",
+              "geosite/cloudflare"
             ]
           },
           {
+            "invert": true,
             "rule_set": [
-              "openai_domain",
-              "claude_domain",
-              "copilot_domain",
-              "twitter_domain"
-            ],
-            "invert": true
+              "geosite/openai",
+              "geosite/anthropic",
+              "Copilot",
+              "geosite/twitter"
+            ]
           }
         ],
         "outbound": "CF优选"
       },
       {
-        "rule_set": [
-          "apple_ip",
-          "apple_domain"
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": [
+              "geoip/apple",
+              "geosite/apple"
+            ]
+          },
+          {
+            "invert": true,
+            "rule_set": [
+              "geosite/apple-intelligence",
+              "geosite/apple-tvplus",
+              "geosite/apple-cn"
+            ]
+          }
         ],
         "outbound": "Apple"
       },
       {
-        "rule_set": "geoip-cn",
-        "outbound": "CN"
-      },
-      {
         "rule_set": [
-          "cn_ip",
-          "cn_domain"
+          "geosite/apple-cn",
+          "geoip/cn",
+          "geosite/cn"
         ],
         "outbound": "CN"
       },
       {
-        "rule_set": "category_ads_all",
-        "action": "reject",
-        "method": "default"
-      },
-      {
-        "rule_set": "anti_ad",
+        "rule_set": [
+          "geosite/category-ads-all",
+          "anti_ad"
+        ],
         "action": "reject",
         "method": "default"
       }
@@ -879,147 +931,77 @@
     "rule_set": [
       {
         "type": "remote",
-        "tag": "private_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs"
+        "tag": [
+          "geoip/private",
+          "geoip/cloudflare",
+          "geoip/google",
+          "geoip/twitter",
+          "geoip/telegram",
+          "geoip/netflix",
+          "geoip/cn"
+        ],
+        "format": "binary",
+        "http_client": "http_direct",
+        "initial_path": "rules/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs"
       },
       {
         "type": "remote",
-        "tag": "apple_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs"
+        "tag": [
+          "geosite/private",
+          "geosite/iqiyi@!cn",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn",
+          "geosite/bilibili",
+          "geosite/xiaohongshu",
+          "geosite/amap",
+          "geosite/meituan",
+          "geosite/douyin",
+          "geosite/cn",
+          "geosite/tiktok",
+          "geosite/bing",
+          "geosite/apple",
+          "geosite/apple-cn",
+          "geosite/apple-intelligence",
+          "geosite/apple-tvplus",
+          "geosite/github",
+          "geosite/google",
+          "geosite/youtube",
+          "geosite/netflix",
+          "geosite/telegram",
+          "geosite/twitter",
+          "geosite/cloudflare",
+          "geosite/openai",
+          "geosite/anthropic",
+          "geosite/google-gemini",
+          "geosite/category-porn",
+          "geosite/category-ads-all",
+          "geosite/category-container"
+        ],
+        "format": "binary",
+        "http_client": "http_direct",
+        "initial_path": "rules/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs"
       },
       {
         "type": "remote",
-        "tag": "apple_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "bilibili_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "cn_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "cn_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "geoip-cn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "google_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "google_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "netflix_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "netflix_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "github_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "cloudflare_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "cloudflare_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "openai_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "gemini_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "claude_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "copilot_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "twitter_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "tiktok_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "spotify_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "onedrive_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "proxy_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "category_porn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "telegram_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "telegram_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "youtube_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "category_ads_all",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs"
+        "tag": [
+          "AliPay",
+          "Copilot",
+          "Spotify",
+          "Proxy"
+        ],
+        "format": "binary",
+        "http_client": "http_direct",
+        "initial_path": "rules/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs"
       },
       {
         "type": "remote",
         "tag": "anti_ad",
+        "format": "binary",
+        "http_client": "http_direct",
+        "initial_path": "rules/anti_ad.srs",
         "url": "https://ghproxy.net/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs"
       }
     ],
