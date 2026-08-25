@@ -832,7 +832,7 @@
               "geosite/netflix",
               "geosite/youtube",
               "geosite/openai",
-              "geosite/gemini",
+              "geosite/google-gemini",
               "geosite/anthropic",
               "Copilot",
               "geosite/bing",
