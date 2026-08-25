@@ -896,7 +896,6 @@
         "rules": [
           {
             "rule_set": [
-              "geoip/apple",
               "geosite/apple"
             ]
           },
