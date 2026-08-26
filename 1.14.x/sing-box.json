@@ -266,7 +266,7 @@
         "AI",
         "Gemini",
         "Copilot",
-        "CN"
+        "DIRECT"
       ],
       "default": "AUTO",
       "interrupt_exist_connections": false
@@ -354,7 +354,7 @@
       "tag": "Bing",
       "outbounds": [
         "Copilot",
-        "CN",
+        "DIRECT",
         "PROXY",
         "MANUAL",
         "AUTO"
@@ -437,7 +437,7 @@
         "PROXY",
         "MANUAL",
         "AUTO",
-        "CN"
+        "DIRECT"
       ],
       "default": "US-AUTO",
       "interrupt_exist_connections": false
@@ -496,7 +496,7 @@
       "type": "selector",
       "tag": "Apple",
       "outbounds": [
-        "CN",
+        "DIRECT",
         "PROXY",
         "MANUAL",
         "AUTO",
@@ -506,7 +506,7 @@
         "TW-AUTO",
         "SG-AUTO"
       ],
-      "default": "CN",
+      "default": "DIRECT",
       "interrupt_exist_connections": false
     },
     {
@@ -521,7 +521,7 @@
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
-        "CN"
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": false
@@ -530,12 +530,12 @@
       "type": "selector",
       "tag": "Bilibili",
       "outbounds": [
-        "CN",
+        "DIRECT",
         "PROXY",
         "MANUAL",
         "AUTO"
       ],
-      "default": "CN",
+      "default": "DIRECT",
       "interrupt_exist_connections": false
     },
     {
@@ -543,6 +543,7 @@
       "tag": "CN",
       "outbounds": [
         "DIRECT",
+        "AI",
         "PROXY",
         "MANUAL",
         "AUTO"
@@ -556,7 +557,7 @@
       "outbounds": [
         "PROXY",
         "MANUAL",
-        "CN",
+        "DIRECT",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
