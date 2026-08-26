@@ -880,14 +880,6 @@
         "outbound": "Disney"
       },
       {
-        "rule_set": "geosite/google",
-        "outbound": "Google"
-      },
-      {
-        "rule_set": "geosite/youtube",
-        "outbound": "YouTube"
-      },
-      {
         "rule_set": "geosite/cloudflare",
         "outbound": "CF-AUTO"
       },
@@ -898,6 +890,14 @@
       {
         "rule_set": "geosite/google-gemini",
         "outbound": "Gemini"
+      },
+      {
+        "rule_set": "geosite/youtube",
+        "outbound": "YouTube"
+      },
+      {
+        "rule_set": "geosite/google",
+        "outbound": "Google"
       },
       {
         "rule_set": "Spotify",

@@ -103,6 +103,9 @@ if (-not $SkipDownload) {
 
 #  5. 场景域名池（与 v3 一致）
 $SceneDomains = @{
+    "githubproxy"   = @(
+        "ghproxy.net"
+    )
     "AI"            = @(
         "openai.com", "chatgpt.com", "api.openai.com",
         "claude.ai", "anthropic.com",
