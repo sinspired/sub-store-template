@@ -17,7 +17,7 @@
       "connect_timeout": "15s",
       "tcp_fast_open": true,
       "tcp_multi_path": true,
-      "domain_resolver": "ali"
+      "domain_resolver": "ali-dns"
     },
     {
       "tag": "http_proxy",
