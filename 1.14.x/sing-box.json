@@ -554,6 +554,7 @@
       "tag": "FINAL",
       "outbounds": [
         "PROXY",
+        "CF-AUTO",
         "MANUAL",
         "DIRECT",
         "AUTO",
@@ -833,6 +834,14 @@
       },
       {
         "protocol": "stun",
+        "outbound": "DIRECT"
+      },
+      {
+        "domain_suffix": [
+          "ghproxy.net",
+          "ghproxy.com",
+          "ghfast.top"
+        ],
         "outbound": "DIRECT"
       },
       {
