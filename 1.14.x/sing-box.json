@@ -951,7 +951,6 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
           "geosite/category-container",
-          "Proxy",
           "geosite/category-porn"
         ],
         "outbound": "PROXY"
@@ -975,6 +974,12 @@
       {
         "rule_set": "geoip/cloudflare",
         "outbound": "CF-AUTO"
+      },
+            {
+        "rule_set": [
+          "Proxy"
+        ],
+        "outbound": "PROXY"
       },
       {
         "rule_set": "geoip/cn",
