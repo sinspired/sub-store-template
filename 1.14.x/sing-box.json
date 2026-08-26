@@ -400,7 +400,6 @@
       "tag": "YouTube",
       "outbounds": [
         "YouTube-AUTO",
-        "PROXY",
         "MANUAL",
         "AUTO",
         "HK-AUTO",
@@ -420,7 +419,8 @@
         "TK-JP-AUTO",
         "TK-VN-AUTO",
         "TK-SG-AUTO",
-        "TK-TW-AUTO"
+        "TK-TW-AUTO",
+        "MANUAL"
       ],
       "default": "TK-US-AUTO",
       "interrupt_exist_connections": false
