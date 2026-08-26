@@ -33,6 +33,8 @@
       {
         "type": "local",
         "tag": "local-dns",
+        "prefer_go": true,
+        "detour": "DIRECT",
         "neighbor_domain": [
           ".",
           ".lan",
@@ -44,7 +46,7 @@
       {
         "type": "h3",
         "tag": "cf-dns",
-        "detour": "OpenAI",
+        "detour": "PROXY",
         "server": "1.1.1.1"
       },
       {
@@ -56,6 +58,7 @@
       {
         "type": "h3",
         "tag": "ali-dns",
+        "detour": "DIRECT",
         "server": "223.5.5.5"
       },
       {
@@ -140,6 +143,7 @@
           "geosite/google",
           "geosite/twitter",
           "geosite/netflix",
+          "geosite/disney",
           "geosite/github",
           "geosite/iqiyi@!cn",
           "geosite/youku@!cn",
@@ -251,7 +255,7 @@
       "outbounds": [
         "AUTO",
         "MANUAL",
-        "CF-BEST",
+        "CF-BEST-AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "TW-AUTO",
@@ -261,8 +265,8 @@
         "YouTube",
         "AI",
         "Gemini",
-        "Copilot-Select",
-        "DIRECT"
+        "Copilot",
+        "CN"
       ],
       "default": "AUTO",
       "interrupt_exist_connections": false
@@ -271,7 +275,7 @@
       "type": "selector",
       "tag": "MANUAL",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "interrupt_exist_connections": false
     },
@@ -291,63 +295,71 @@
     },
     {
       "type": "selector",
-      "tag": "GPT-Select",
+      "tag": "OpenAI",
       "outbounds": [
-        "AI-PLUS",
-        "OpenAI",
+        "OpenAI-AUTO",
+        "AI-PLUS-AUTO",
         "MANUAL",
-        "Copilot",
-        "CF-BEST",
-        "Gemini"
+        "Copilot-AUTO",
+        "CF-BEST-AUTO",
+        "Gemini-AUTO"
       ],
-      "default": "OpenAI",
+      "default": "OpenAI-AUTO",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
-      "tag": "CLAUDE-Select",
+      "tag": "Claude",
       "outbounds": [
-        "AI-PLUS",
-        "OpenAI",
+        "OpenAI-AUTO",
+        "AI-PLUS-AUTO",
         "MANUAL",
-        "Copilot",
-        "CF-BEST",
-        "Gemini"
+        "Copilot-AUTO",
+        "CF-BEST-AUTO",
+        "Gemini-AUTO"
       ],
-      "default": "OpenAI",
+      "default": "OpenAI-AUTO",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
-      "tag": "Copilot-Select",
+      "tag": "Gemini",
       "outbounds": [
-        "AI-PLUS",
-        "Copilot",
+        "Gemini-AUTO",
+        "AI-PLUS-AUTO",
         "MANUAL",
-        "OpenAI",
-        "Gemini",
-        "CF-BEST"
+        "OpenAI-AUTO",
+        "Copilot-AUTO",
+        "CF-BEST-AUTO"
       ],
-      "default": "Copilot",
+      "default": "Gemini-AUTO",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
-      "tag": "Bing-Select",
+      "tag": "Copilot",
       "outbounds": [
-        "Copilot-Select",
-        "DIRECT",
+        "Copilot-AUTO",
+        "AI-PLUS-AUTO",
+        "MANUAL",
+        "OpenAI-AUTO",
+        "Gemini-AUTO",
+        "CF-BEST-AUTO"
+      ],
+      "default": "Copilot-AUTO",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Bing",
+      "outbounds": [
+        "Copilot",
+        "CN",
         "PROXY",
         "MANUAL",
-        "AI",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
+        "AUTO"
       ],
-      "default": "Copilot-Select",
+      "default": "Copilot",
       "interrupt_exist_connections": false
     },
     {
@@ -358,7 +370,7 @@
         "MANUAL",
         "Gemini",
         "YouTube",
-        "CF-BEST",
+        "CF-BEST-AUTO",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -373,12 +385,21 @@
       "type": "selector",
       "tag": "Twitter",
       "outbounds": [
-        "CF-BEST",
-        "AI-PLUS",
+        "CF-BEST-AUTO",
+        "AI-PLUS-AUTO",
         "OpenAI",
-        "Gemini",
-        "Copilot",
-        "YouTube",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "CF-BEST-AUTO",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "YouTube",
+      "outbounds": [
+        "YouTube-AUTO",
         "PROXY",
         "MANUAL",
         "AUTO",
@@ -388,20 +409,20 @@
         "TW-AUTO",
         "SG-AUTO"
       ],
-      "default": "CF-BEST",
+      "default": "YouTube-AUTO",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "TikTok",
       "outbounds": [
-        "TK-VN",
-        "TK-US",
-        "TK-JP",
-        "TK-SG",
-        "TK-TW"
+        "TK-US-AUTO",
+        "TK-JP-AUTO",
+        "TK-VN-AUTO",
+        "TK-SG-AUTO",
+        "TK-TW-AUTO"
       ],
-      "default": "TK-US",
+      "default": "TK-US-AUTO",
       "interrupt_exist_connections": false
     },
     {
@@ -415,7 +436,8 @@
         "SG-AUTO",
         "PROXY",
         "MANUAL",
-        "DIRECT"
+        "AUTO",
+        "CN"
       ],
       "default": "US-AUTO",
       "interrupt_exist_connections": false
@@ -437,6 +459,115 @@
       "interrupt_exist_connections": false
     },
     {
+      "type": "selector",
+      "tag": "Netflix",
+      "outbounds": [
+        "Netflix-AUTO",
+        "PROXY",
+        "MANUAL",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "Netflix-AUTO",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Disney",
+      "outbounds": [
+        "Disney-AUTO",
+        "PROXY",
+        "MANUAL",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "Disney-AUTO",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Apple",
+      "outbounds": [
+        "CN",
+        "PROXY",
+        "MANUAL",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "CN",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Apple-Int",
+      "outbounds": [
+        "PROXY",
+        "MANUAL",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "CN"
+      ],
+      "default": "PROXY",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Bilibili",
+      "outbounds": [
+        "CN",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "CN",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "CN",
+      "outbounds": [
+        "DIRECT",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "DIRECT",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "FINAL",
+      "outbounds": [
+        "PROXY",
+        "MANUAL",
+        "CN",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "PROXY",
+      "interrupt_exist_connections": false
+    },
+    {
       "type": "urltest",
       "tag": "AUTO",
       "outbounds": [
@@ -450,9 +581,9 @@
     },
     {
       "type": "urltest",
-      "tag": "AI-PLUS",
+      "tag": "AI-PLUS-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m0s",
@@ -461,9 +592,9 @@
     },
     {
       "type": "urltest",
-      "tag": "OpenAI",
+      "tag": "OpenAI-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m29s",
@@ -472,9 +603,9 @@
     },
     {
       "type": "urltest",
-      "tag": "Gemini",
+      "tag": "Gemini-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.google.com/generate_204",
       "interval": "5m30s",
@@ -483,9 +614,9 @@
     },
     {
       "type": "urltest",
-      "tag": "Copilot",
+      "tag": "Copilot-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "6m0s",
@@ -494,9 +625,9 @@
     },
     {
       "type": "urltest",
-      "tag": "YouTube",
+      "tag": "YouTube-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
@@ -505,9 +636,31 @@
     },
     {
       "type": "urltest",
-      "tag": "CF-BEST",
+      "tag": "Netflix-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "15m30s",
+      "tolerance": 50,
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "urltest",
+      "tag": "Disney-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "16m0s",
+      "tolerance": 50,
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "urltest",
+      "tag": "CF-BEST-AUTO",
+      "outbounds": [
+        "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "4m3s",
@@ -516,9 +669,9 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-US",
+      "tag": "TK-US-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m4s",
@@ -528,9 +681,9 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-JP",
+      "tag": "TK-JP-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m37s",
@@ -540,9 +693,9 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-VN",
+      "tag": "TK-VN-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m9s",
@@ -552,9 +705,9 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-SG",
+      "tag": "TK-SG-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m38s",
@@ -564,9 +717,9 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-TW",
+      "tag": "TK-TW-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "22m6s",
@@ -578,7 +731,7 @@
       "type": "urltest",
       "tag": "HK-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m3s",
@@ -590,7 +743,7 @@
       "type": "urltest",
       "tag": "TW-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m37s",
@@ -602,7 +755,7 @@
       "type": "urltest",
       "tag": "SG-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m1s",
@@ -614,7 +767,7 @@
       "type": "urltest",
       "tag": "JP-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m39s",
@@ -626,137 +779,12 @@
       "type": "urltest",
       "tag": "US-AUTO",
       "outbounds": [
-        "DIRECT"
+        "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "12m4s",
       "tolerance": 50,
       "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "Apple",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "DIRECT",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "Apple-Int",
-      "outbounds": [
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO",
-        "DIRECT"
-      ],
-      "default": "PROXY",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "OneDrive",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "DIRECT",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "Bilibili",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "DIRECT",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "Netflix",
-      "outbounds": [
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "PROXY",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "CN",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "DIRECT",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "FINAL",
-      "outbounds": [
-        "PROXY",
-        "MANUAL",
-        "DIRECT",
-        "YouTube",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "PROXY",
       "interrupt_exist_connections": false
     }
   ],
@@ -809,46 +837,32 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "geosite/apple-intelligence"
-        ],
+        "rule_set": "geosite/apple-intelligence",
         "outbound": "Apple-Int"
       },
       {
-        "rule_set": [
-          "geosite/apple-tvplus"
-        ],
+        "rule_set": "geosite/apple-tvplus",
         "outbound": "PROXY"
       },
       {
-        "rule_set": [
-          "geosite/apple-cn"
-        ],
+        "rule_set": "geosite/apple-cn",
         "outbound": "CN"
       },
       {
-        "rule_set": [
-          "geosite/openai"
-        ],
-        "outbound": "GPT-Select"
+        "rule_set": "geosite/openai",
+        "outbound": "OpenAI"
       },
       {
-        "rule_set": [
-          "geosite/openai"
-        ],
-        "outbound": "CLAUDE-Select"
+        "rule_set": "geosite/anthropic",
+        "outbound": "Claude"
       },
       {
-        "rule_set": [
-          "Copilot"
-        ],
-        "outbound": "Copilot-Select"
+        "rule_set": "Copilot",
+        "outbound": "Copilot"
       },
       {
-        "rule_set": [
-          "geosite/bing"
-        ],
-        "outbound": "Bing-Select"
+        "rule_set": "geosite/bing",
+        "outbound": "Bing"
       },
       {
         "rule_set": "geosite/twitter",
@@ -861,6 +875,10 @@
       {
         "rule_set": "geosite/netflix",
         "outbound": "Netflix"
+      },
+      {
+        "rule_set": "geosite/disney",
+        "outbound": "Disney"
       },
       {
         "rule_set": "geosite/google",
@@ -997,6 +1015,7 @@
           "geosite/google",
           "geosite/youtube",
           "geosite/netflix",
+          "geosite/disney",
           "geosite/telegram",
           "geosite/twitter",
           "geosite/cloudflare",
