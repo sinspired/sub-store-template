@@ -901,6 +901,10 @@
       },
       {
         "rule_set": "geosite/twitter",
+        "domain_suffix": [
+          "video.twimg.com",
+          "x.com"
+        ],
         "outbound": "Twitter",
         "ip_version": 4
       },
@@ -934,7 +938,8 @@
       },
       {
         "rule_set": "geosite/cloudflare",
-        "outbound": "CF-AUTO"
+        "outbound": "CF-AUTO",
+        "ip_version": 4
       },
       {
         "rule_set": "geosite/github",
@@ -975,7 +980,7 @@
         "rule_set": "geoip/cloudflare",
         "outbound": "CF-AUTO"
       },
-            {
+      {
         "rule_set": [
           "Proxy"
         ],
