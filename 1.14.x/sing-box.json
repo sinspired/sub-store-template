@@ -969,10 +969,6 @@
         "outbound": "Telegram"
       },
       {
-        "rule_set": "geoip/netflix",
-        "outbound": "Netflix"
-      },
-      {
         "rule_set": "geoip/google",
         "outbound": "Google"
       },
