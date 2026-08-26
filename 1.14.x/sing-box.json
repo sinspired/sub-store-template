@@ -901,10 +901,6 @@
       },
       {
         "rule_set": "geosite/twitter",
-        "domain_suffix": [
-          "video.twimg.com",
-          "x.com"
-        ],
         "outbound": "Twitter"
       },
       {
