@@ -283,14 +283,14 @@
       "type": "selector",
       "tag": "AI",
       "outbounds": [
-        "AI-PLUS",
+        "AI-AUTO",
         "OpenAI",
         "Gemini",
         "Copilot",
         "CF-BEST",
         "MANUAL"
       ],
-      "default": "AI-PLUS",
+      "default": "AI-AUTO",
       "interrupt_exist_connections": false
     },
     {
