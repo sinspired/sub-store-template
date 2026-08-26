@@ -905,8 +905,7 @@
           "video.twimg.com",
           "x.com"
         ],
-        "outbound": "Twitter",
-        "ip_version": 4
+        "outbound": "Twitter"
       },
       {
         "rule_set": "geosite/telegram",
@@ -965,8 +964,7 @@
       },
       {
         "rule_set": "geoip/twitter",
-        "outbound": "Twitter",
-        "ip_version": 4
+        "outbound": "Twitter"
       },
       {
         "rule_set": "geoip/telegram",
