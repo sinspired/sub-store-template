@@ -1,30 +1,20 @@
 <#
-  sing-box 规则集（.srs）体积 + 场景命中率检测脚本 v4
-  在 v3 基础上新增：
-    - DNS 解析结果过滤：解析出的 IP 如果落在私有/保留地址段（10/8、172.16/12、192.168/16、
-      127/8、0/8、169.254/16），或命中一份已知 GFW 污染 IP 黑名单（不完全，供参考，可自行扩充），
-      会被判定为"污染/异常"，不会拿去喂 geoip 匹配，避免脏数据污染 Density 统计。
-      污染的原始解析值仍会记录在报告里（RawIP + Polluted 列），方便你自己复核。
-    - 报告顶部新增"污染/异常解析数量"提示。
-
-  v3 已有能力（DNS实际解析测geoip、扩容域名池、域名/IP命中分列）保持不变。
-
   用法：
-    .\ruleset-audit-v4.ps1 <sing-box.exe路径> <config.json路径> [-DnsServers @("223.5.5.5","8.8.8.8")]
+    .\ruleset-check.ps1 <sing-box.exe路径> <config.json路径> [-DnsServers @("223.5.5.5","8.8.8.8")]
 #>
 
 param(
     [string]$SingBoxBin = "sing-box",
     [string]$ConfigPath = "./config.json",
     [string]$RuleSetDir = "./ruleset-cache",
-    [string]$HtmlReportPath = "./ruleset-report-v4.html",
+    [string]$HtmlReportPath = "./ruleset-report.html",
     [string[]]$DnsServers = @("223.5.5.5", "8.8.8.8", "1.1.1.1"),
     [switch]$SkipDownload
 )
 
 $ErrorActionPreference = "Stop"
 
-# ---------- 已知 GFW 污染 IP 黑名单（不完全，仅供参考，可自行追加）----------
+#  已知 GFW 污染 IP 黑名单（不完全，仅供参考，可自行追加）
 $PollutionBlacklist = @(
     "1.2.3.4", "0.0.0.0", "127.0.0.1",
     "4.36.66.178", "8.7.198.45", "37.61.54.158", "46.82.174.68",
@@ -33,7 +23,7 @@ $PollutionBlacklist = @(
     "65.104.202.252", "122.228.243.194", "111.175.221.58"
 )
 
-# ---------- 1. 解析配置 ----------
+#  1. 解析配置 
 if (-not (Test-Path $ConfigPath)) {
     throw "配置文件不存在：$ConfigPath"
 }
@@ -45,7 +35,7 @@ if (-not $remoteRuleSets) {
     throw "配置中未找到 route.rule_set 段。"
 }
 
-# ---------- 2. 构造 tag -> URL 映射 ----------
+#  2. 构造 tag -> URL 映射 
 $RuleSets = [ordered]@{}
 
 foreach ($item in $remoteRuleSets) {
@@ -65,7 +55,7 @@ foreach ($item in $remoteRuleSets) {
 
 Write-Host "== 已解析规则集数量：$($RuleSets.Count) ==" -ForegroundColor Cyan
 
-# ---------- 3. 准备目录 ----------
+#  3. 准备目录 
 if (-not (Test-Path $RuleSetDir)) {
     New-Item -ItemType Directory -Path $RuleSetDir | Out-Null
 }
@@ -75,7 +65,7 @@ function Get-SafeTagName {
     $Tag.Replace("/", "_").Replace("@!", "_").Replace("@", "_").Replace("!", "_")
 }
 
-# ---------- 4. 并行下载 ----------
+#  4. 并行下载 
 if (-not $SkipDownload) {
     Write-Host "`n== 并行下载规则集 ==" -ForegroundColor Cyan
 
@@ -111,7 +101,7 @@ if (-not $SkipDownload) {
     }
 }
 
-# ---------- 5. 场景域名池（与 v3 一致）----------
+#  5. 场景域名池（与 v3 一致）
 $SceneDomains = @{
     "AI"            = @(
         "openai.com", "chatgpt.com", "api.openai.com",
@@ -236,7 +226,7 @@ $SceneDomains = @{
 $TestDomains = $SceneDomains.Values | ForEach-Object { $_ } | Sort-Object -Unique
 Write-Host "`n== 测试域名数量：$($TestDomains.Count) ==" -ForegroundColor Cyan
 
-# ---------- 6. 规则集体积 ----------
+#  6. 规则集体积 
 Write-Host "`n== 规则集体积 ==" -ForegroundColor Cyan
 
 $sizeReport = foreach ($tag in $RuleSets.Keys) {
@@ -252,7 +242,7 @@ $sizeReport = foreach ($tag in $RuleSets.Keys) {
 
 $sizeReport | Sort-Object SizeKB -Descending | Format-Table -AutoSize
 
-# ---------- 7. DNS 实际解析 + 污染过滤（v4 新增过滤）----------
+#  7. DNS 实际解析 + 污染过滤
 Write-Host "`n== 并行 DNS 解析（依次尝试：$($DnsServers -join ', ')）==" -ForegroundColor Cyan
 
 $resolveJobs = @()
@@ -265,13 +255,13 @@ foreach ($domain in $TestDomains) {
             try {
                 if (Get-Command Resolve-DnsName -ErrorAction SilentlyContinue) {
                     $rec = Resolve-DnsName -Name $domain -Type A -Server $server -DnsOnly -ErrorAction Stop |
-                           Where-Object { $_.Type -eq 'A' } | Select-Object -First 1
+                    Where-Object { $_.Type -eq 'A' } | Select-Object -First 1
                     if ($rec) { return $rec.IPAddress }
                     return $null
                 }
                 else {
                     $addrs = [System.Net.Dns]::GetHostAddresses($domain) |
-                             Where-Object { $_.AddressFamily -eq 'InterNetwork' }
+                    Where-Object { $_.AddressFamily -eq 'InterNetwork' }
                     if ($addrs) { return $addrs[0].IPAddressToString }
                     return $null
                 }
@@ -322,11 +312,11 @@ foreach ($domain in $TestDomains) {
         }
 
         [PSCustomObject]@{
-            Domain    = $domain
-            IP        = $cleanIp
-            RawIP     = $rawIp
-            Server    = $usedServer
-            Polluted  = $polluted
+            Domain   = $domain
+            IP       = $cleanIp
+            RawIP    = $rawIp
+            Server   = $usedServer
+            Polluted = $polluted
         }
     } -ArgumentList $domain, $DnsServers, $PollutionBlacklist
 }
@@ -351,7 +341,7 @@ foreach ($r in $resolveResults) {
     if ($r.IP) { $ipLookup[$r.Domain] = $r.IP }
 }
 
-# ---------- 8. 域名匹配（geosite 链路）----------
+#  8. 域名匹配（geosite 链路）
 Write-Host "`n== 并行匹配（域名 -> geosite 链路）==" -ForegroundColor Cyan
 
 $jobs = @()
@@ -391,7 +381,7 @@ Remove-Job $jobs
 
 $results | Format-Table -AutoSize
 
-# ---------- 9. IP 匹配（geoip 链路，只用通过污染过滤的 IP）----------
+#  9. IP 匹配（geoip 链路，只用通过污染过滤的 IP）
 Write-Host "`n== 并行匹配（解析后 IP -> geoip 链路，已排除污染/异常结果）==" -ForegroundColor Cyan
 
 $ipJobs = @()
@@ -439,7 +429,7 @@ else {
 
 $ipResults | Format-Table -AutoSize
 
-# ---------- 10. 命中次数汇总（域名/IP 分开）+ 命中密度 ----------
+#  10. 命中次数汇总（域名/IP 分开）+ 命中密度 
 Write-Host "`n== 命中次数汇总（域名链路 vs IP链路）+ 命中密度 ==" -ForegroundColor Cyan
 
 $domainHitCount = @{}
@@ -474,7 +464,7 @@ $densityReport = foreach ($tag in $RuleSets.Keys) {
 
 $densityReport | Sort-Object SizeKB -Descending | Format-Table -AutoSize
 
-# ---------- 11. 冲突报告（域名链路）----------
+#  11. 冲突报告（域名链路）
 Write-Host "`n== 冲突报告（域名链路）==" -ForegroundColor Cyan
 
 $conflicts = $results | Where-Object {
@@ -488,7 +478,7 @@ else {
     $conflicts | Format-Table Domain, AllMatches -AutoSize
 }
 
-# ---------- 11b. 广告规则集重叠专项分析 ----------
+#  11b. 广告规则集重叠专项分析 
 Write-Host "`n== 广告规则集重叠分析（anti_ad vs category-ads-all）==" -ForegroundColor Cyan
 
 $adsResults = $results | Where-Object { $SceneDomains["Ads"] -contains $_.Domain }
@@ -498,9 +488,9 @@ $onlyCategoryAds = $adsResults | Where-Object { $_.AllMatches -notmatch "anti_ad
 $neitherAd = $adsResults | Where-Object { $_.AllMatches -notmatch "anti_ad" -and $_.AllMatches -notmatch "category-ads-all" }
 
 Write-Host ("同时命中两者：{0} / 仅 anti_ad：{1} / 仅 category-ads-all：{2} / 都未命中：{3}" -f `
-    $bothAdRules.Count, $onlyAntiAd.Count, $onlyCategoryAds.Count, $neitherAd.Count)
+        $bothAdRules.Count, $onlyAntiAd.Count, $onlyCategoryAds.Count, $neitherAd.Count)
 
-# ---------- 12. 覆盖树状图 ----------
+#  12. 覆盖树状图 
 Write-Host "`n== 覆盖树状图 ==" -ForegroundColor Cyan
 
 $coverageTree = [ordered]@{
@@ -522,7 +512,7 @@ foreach ($group in $coverageTree.Keys) {
     }
 }
 
-# ---------- 13. 场景分析（域名 + IP 合并展示）----------
+#  13. 场景分析（域名 + IP 合并展示）
 Write-Host "`n== 场景分析 ==" -ForegroundColor Cyan
 
 $SceneResults = @()
@@ -546,15 +536,15 @@ foreach ($scene in $SceneDomains.Keys) {
 
 $SceneResults | Sort-Object Scene, Domain | Format-Table -AutoSize
 
-# ---------- 14. HTML 报告 ----------
+#  14. HTML 报告 
 Write-Host "`n== 生成 HTML 报告 ==" -ForegroundColor Cyan
 
 $html = @()
-$html += "<html><head><meta charset='utf-8'><title>规则集审计报告 v4</title>"
+$html += "<html><head><meta charset='utf-8'><title>规则集审计报告</title>"
 $html += "<style>body{font-family:Segoe UI;margin:20px;}table{border-collapse:collapse;margin-bottom:20px;}td,th{border:1px solid #ccc;padding:4px 8px;font-size:12px;}h2{margin-top:30px;}.warn{color:#a15c00;}.bad{color:#c0392b;}</style>"
 $html += "</head><body>"
-$html += "<h1>规则集审计报告 v4</h1>"
-$html += "<p class='warn'>v4 新增：DNS 解析结果污染/异常过滤（私有地址段 + 已知污染IP黑名单，命中即丢弃，不参与 geoip 匹配统计）。</p>"
+$html += "<h1>规则集审计报告</h1>"
+$html += "<p class='warn'>DNS 解析结果污染/异常过滤（私有地址段 + 已知污染IP黑名单，命中即丢弃，不参与 geoip 匹配统计）。</p>"
 $html += "<p class='warn'>域名池 $($TestDomains.Count) 个，解析成功且通过过滤：$resolvedCount 个，判定为污染/异常并丢弃：<span class='bad'>$pollutedCount</span> 个。</p>"
 
 $html += "<h2>规则集体积 + 命中次数（域名/IP分开）+ 命中密度</h2><table><tr><th>Tag</th><th>SizeKB</th><th>DomainHits</th><th>IPHits</th><th>TotalHits</th><th>Density</th></tr>"
