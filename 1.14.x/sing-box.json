@@ -255,7 +255,7 @@
       "outbounds": [
         "AUTO",
         "MANUAL",
-        "CF-BEST-AUTO",
+        "CF-AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "TW-AUTO",
@@ -298,10 +298,10 @@
       "tag": "OpenAI",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-PLUS-AUTO",
+        "AI-AUTO",
         "MANUAL",
         "Copilot-AUTO",
-        "CF-BEST-AUTO",
+        "CF-AUTO",
         "Gemini-AUTO"
       ],
       "default": "OpenAI-AUTO",
@@ -312,10 +312,10 @@
       "tag": "Claude",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-PLUS-AUTO",
+        "AI-AUTO",
         "MANUAL",
         "Copilot-AUTO",
-        "CF-BEST-AUTO",
+        "CF-AUTO",
         "Gemini-AUTO"
       ],
       "default": "OpenAI-AUTO",
@@ -326,11 +326,11 @@
       "tag": "Gemini",
       "outbounds": [
         "Gemini-AUTO",
-        "AI-PLUS-AUTO",
+        "AI-AUTO",
         "MANUAL",
         "OpenAI-AUTO",
         "Copilot-AUTO",
-        "CF-BEST-AUTO"
+        "CF-AUTO"
       ],
       "default": "Gemini-AUTO",
       "interrupt_exist_connections": false
@@ -340,11 +340,11 @@
       "tag": "Copilot",
       "outbounds": [
         "Copilot-AUTO",
-        "AI-PLUS-AUTO",
+        "AI-AUTO",
         "MANUAL",
         "OpenAI-AUTO",
         "Gemini-AUTO",
-        "CF-BEST-AUTO"
+        "CF-AUTO"
       ],
       "default": "Copilot-AUTO",
       "interrupt_exist_connections": false
@@ -370,7 +370,7 @@
         "MANUAL",
         "Gemini",
         "YouTube",
-        "CF-BEST-AUTO",
+        "CF-AUTO",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -385,14 +385,14 @@
       "type": "selector",
       "tag": "Twitter",
       "outbounds": [
-        "CF-BEST-AUTO",
-        "AI-PLUS-AUTO",
+        "CF-AUTO",
+        "AI-AUTO",
         "OpenAI",
         "PROXY",
         "MANUAL",
         "AUTO"
       ],
-      "default": "CF-BEST-AUTO",
+      "default": "CF-AUTO",
       "interrupt_exist_connections": false
     },
     {
@@ -581,7 +581,7 @@
     },
     {
       "type": "urltest",
-      "tag": "AI-PLUS-AUTO",
+      "tag": "AI-AUTO",
       "outbounds": [
         "AUTO"
       ],
@@ -658,7 +658,7 @@
     },
     {
       "type": "urltest",
-      "tag": "CF-BEST-AUTO",
+      "tag": "CF-AUTO",
       "outbounds": [
         "AUTO"
       ],

@@ -39,10 +39,10 @@ const AI_RULES = {
   // 匹配 Disney, Disney+, D+ (使用零宽断言防止 + 号破坏单词边界)
   'Disney-AUTO': /(?<!\w)(disney\+?|d\+)(?!\w)/i,
   // gm 加单词边界，避免误中 program / mgmt 等含 "gm" 子串的 tag
-  'AI-PLUS-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
+  'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
   // 裸字母 X 会匹配任意含 x 的 tag（MAX / EXPRESS / NETFLIX...），
   // 加上 \b 限定为独立的 "X" 词
-  'CF-BEST-AUTO': /^(?=.*gpt[⁺+])(?=.*(\bX\b|twitter))/i,
+  'CF-AUTO': /^(?=.*gpt[⁺+])(?=.*(\bX\b|twitter))/i,
 }
 
 // 地区 AUTO 正则
