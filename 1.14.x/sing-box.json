@@ -937,8 +937,7 @@
       },
       {
         "rule_set": "geosite/cloudflare",
-        "outbound": "CF-AUTO",
-        "ip_version": 4
+        "outbound": "CF-AUTO"
       },
       {
         "rule_set": "geosite/github",
