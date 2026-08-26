@@ -845,24 +845,47 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geosite/apple-intelligence",
-        "outbound": "Apple-Int"
+        "rule_set": "geosite/bilibili",
+        "outbound": "Bilibili"
       },
       {
-        "rule_set": "geosite/apple-tvplus",
-        "outbound": "PROXY"
+        "rule_set": [
+          "AliPay",
+          "geosite/private",
+          "geosite/xiaohongshu",
+          "geosite/amap",
+          "geosite/meituan",
+          "geosite/douyin"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": "geosite/apple-intelligence",
+        "outbound": "Apple-Int"
       },
       {
         "rule_set": "geosite/apple-cn",
         "outbound": "CN"
       },
       {
-        "rule_set": "geosite/openai",
-        "outbound": "OpenAI"
+        "rule_set": "geosite/apple",
+        "outbound": "Apple"
+      },
+      {
+        "rule_set": "geosite/apple-tvplus",
+        "outbound": "PROXY"
       },
       {
         "rule_set": "geosite/anthropic",
         "outbound": "Claude"
+      },
+      {
+        "rule_set": "geosite/openai",
+        "outbound": "OpenAI"
+      },
+      {
+        "rule_set": "geosite/google-gemini",
+        "outbound": "Gemini"
       },
       {
         "rule_set": "Copilot",
@@ -889,16 +912,12 @@
         "outbound": "Disney"
       },
       {
-        "rule_set": "geosite/cloudflare",
-        "outbound": "CF-AUTO"
-      },
-      {
         "rule_set": "geosite/tiktok",
         "outbound": "TikTok"
       },
       {
-        "rule_set": "geosite/google-gemini",
-        "outbound": "Gemini"
+        "rule_set": "Spotify",
+        "outbound": "Spotify"
       },
       {
         "rule_set": "geosite/youtube",
@@ -909,31 +928,12 @@
         "outbound": "Google"
       },
       {
-        "rule_set": "Spotify",
-        "outbound": "Spotify"
+        "rule_set": "geosite/cloudflare",
+        "outbound": "CF-AUTO"
       },
       {
         "rule_set": "geosite/github",
         "outbound": "PROXY"
-      },
-      {
-        "rule_set": "geosite/bilibili",
-        "outbound": "Bilibili"
-      },
-      {
-        "rule_set": [
-          "AliPay",
-          "geosite/private",
-          "geosite/xiaohongshu",
-          "geosite/amap",
-          "geosite/meituan",
-          "geosite/douyin"
-        ],
-        "outbound": "DIRECT"
-      },
-      {
-        "rule_set": "geosite/apple",
-        "outbound": "Apple"
       },
       {
         "rule_set": "geosite/cn",
@@ -958,6 +958,10 @@
         "outbound": "DIRECT"
       },
       {
+        "rule_set": "geoip/twitter",
+        "outbound": "Twitter"
+      },
+      {
         "rule_set": "geoip/telegram",
         "outbound": "Telegram"
       },
@@ -966,16 +970,12 @@
         "outbound": "Netflix"
       },
       {
-        "rule_set": "geoip/cloudflare",
-        "outbound": "CF-AUTO"
-      },
-      {
         "rule_set": "geoip/google",
         "outbound": "Google"
       },
       {
-        "rule_set": "geoip/twitter",
-        "outbound": "Twitter"
+        "rule_set": "geoip/cloudflare",
+        "outbound": "CF-AUTO"
       },
       {
         "rule_set": "geoip/cn",
@@ -987,11 +987,11 @@
         "type": "remote",
         "tag": [
           "geoip/private",
-          "geoip/cloudflare",
           "geoip/google",
           "geoip/twitter",
           "geoip/telegram",
           "geoip/netflix",
+          "geoip/cloudflare",
           "geoip/cn"
         ],
         "format": "binary",
@@ -1004,16 +1004,9 @@
         "type": "remote",
         "tag": [
           "geosite/private",
-          "geosite/iqiyi@!cn",
-          "geosite/youku@!cn",
-          "geosite/tencent@!cn",
-          "geosite/bilibili",
-          "geosite/xiaohongshu",
-          "geosite/amap",
-          "geosite/meituan",
-          "geosite/douyin",
-          "geosite/cn",
-          "geosite/tiktok",
+          "geosite/anthropic",
+          "geosite/openai",
+          "geosite/google-gemini",
           "geosite/bing",
           "geosite/apple",
           "geosite/apple-cn",
@@ -1027,12 +1020,19 @@
           "geosite/telegram",
           "geosite/twitter",
           "geosite/cloudflare",
-          "geosite/openai",
-          "geosite/anthropic",
-          "geosite/google-gemini",
+          "geosite/tiktok",
+          "geosite/iqiyi@!cn",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn",
+          "geosite/bilibili",
+          "geosite/xiaohongshu",
+          "geosite/amap",
+          "geosite/meituan",
+          "geosite/douyin",
+          "geosite/category-container",
+          "geosite/cn",
           "geosite/category-porn",
-          "geosite/category-ads-all",
-          "geosite/category-container"
+          "geosite/category-ads-all"
         ],
         "format": "binary",
         "http_client": "http_direct",
