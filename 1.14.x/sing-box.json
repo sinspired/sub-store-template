@@ -203,7 +203,7 @@
         "fe80::/10"
       ],
       "route_exclude_address_set": [
-        "geoip/private",
+        "geosite/private",
         "geoip/cn"
       ],
       "platform": {
@@ -901,7 +901,8 @@
       },
       {
         "rule_set": "geosite/twitter",
-        "outbound": "Twitter"
+        "outbound": "Twitter",
+        "ip_version": 4
       },
       {
         "rule_set": "geosite/telegram",
@@ -958,12 +959,9 @@
         "action": "resolve"
       },
       {
-        "rule_set": "geoip/private",
-        "outbound": "DIRECT"
-      },
-      {
         "rule_set": "geoip/twitter",
-        "outbound": "Twitter"
+        "outbound": "Twitter",
+        "ip_version": 4
       },
       {
         "rule_set": "geoip/telegram",
@@ -990,11 +988,9 @@
       {
         "type": "remote",
         "tag": [
-          "geoip/private",
           "geoip/google",
           "geoip/twitter",
           "geoip/telegram",
-          "geoip/netflix",
           "geoip/cloudflare",
           "geoip/cn"
         ],
