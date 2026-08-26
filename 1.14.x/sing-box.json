@@ -104,7 +104,8 @@
           "geosite/cn"
         ],
         "action": "route",
-        "server": "ali-dns"
+        "server": "ali-dns",
+        "timeout": "3s"
       },
       {
         "inbound": [
@@ -123,13 +124,15 @@
         "rule_set": [
           "geosite/openai",
           "geosite/anthropic",
+          "geosite/twitter",
           "geosite/cloudflare",
           "geosite/telegram",
           "Copilot",
           "Spotify"
         ],
         "action": "route",
-        "server": "cf-dns"
+        "server": "cf-dns",
+        "timeout": "5s"
       },
       {
         "rule_set": [
@@ -150,10 +153,11 @@
           "Proxy"
         ],
         "action": "route",
-        "server": "google-dns"
+        "server": "google-dns",
+        "timeout": "5s"
       }
     ],
-    "final": "cf-dns",
+    "final": "ali-dns",
     "strategy": "prefer_ipv4",
     "timeout": "5s",
     "disable_cache": false,
