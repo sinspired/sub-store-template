@@ -287,7 +287,7 @@
         "OpenAI",
         "Gemini",
         "Copilot",
-        "CF-BEST",
+        "CF-AUTO",
         "MANUAL"
       ],
       "default": "AI-AUTO",
@@ -890,7 +890,7 @@
       },
       {
         "rule_set": "geosite/cloudflare",
-        "outbound": "CF-BEST"
+        "outbound": "CF-AUTO"
       },
       {
         "rule_set": "geosite/tiktok",
@@ -959,7 +959,7 @@
       },
       {
         "rule_set": "geoip/cloudflare",
-        "outbound": "CF-BEST"
+        "outbound": "CF-AUTO"
       },
       {
         "rule_set": "geoip/google",
