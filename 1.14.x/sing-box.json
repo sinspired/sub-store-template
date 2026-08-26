@@ -32,7 +32,7 @@
     "servers": [
       {
         "type": "local",
-        "tag": "local",
+        "tag": "local-dns",
         "neighbor_domain": [
           ".",
           ".lan",
@@ -55,7 +55,7 @@
       },
       {
         "type": "h3",
-        "tag": "ali",
+        "tag": "ali-dns",
         "server": "223.5.5.5"
       },
       {
@@ -69,7 +69,7 @@
       {
         "rule_set": "geosite/private",
         "action": "route",
-        "server": "local",
+        "server": "local-dns",
         "disable_cache": true
       },
       {
@@ -83,7 +83,7 @@
       {
         "clash_mode": "直连",
         "action": "route",
-        "server": "ali"
+        "server": "ali-dns"
       },
       {
         "clash_mode": "全局",
@@ -103,7 +103,7 @@
           "geosite/cn"
         ],
         "action": "route",
-        "server": "ali"
+        "server": "ali-dns"
       },
       {
         "inbound": [
@@ -153,7 +153,7 @@
     ],
     "final": "cf-dns",
     "strategy": "prefer_ipv4",
-    "timeout": "10s",
+    "timeout": "5s",
     "disable_cache": false,
     "disable_expire": false,
     "cache_capacity": 8192,
@@ -188,7 +188,6 @@
       ],
       "auto_route": true,
       "strict_route": true,
-      "endpoint_independent_nat": false,
       "route_exclude_address": [
         "192.168.0.0/16",
         "10.0.0.0/8",
@@ -274,7 +273,6 @@
       "outbounds": [
         "DIRECT"
       ],
-      "default": "DIRECT",
       "interrupt_exist_connections": false
     },
     {
@@ -285,9 +283,38 @@
         "OpenAI",
         "Gemini",
         "Copilot",
-        "CF-BEST"
+        "CF-BEST",
+        "MANUAL"
       ],
       "default": "AI-PLUS",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "GPT-Select",
+      "outbounds": [
+        "AI-PLUS",
+        "OpenAI",
+        "MANUAL",
+        "Copilot",
+        "CF-BEST",
+        "Gemini"
+      ],
+      "default": "OpenAI",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "CLAUDE-Select",
+      "outbounds": [
+        "AI-PLUS",
+        "OpenAI",
+        "MANUAL",
+        "Copilot",
+        "CF-BEST",
+        "Gemini"
+      ],
+      "default": "OpenAI",
       "interrupt_exist_connections": false
     },
     {
@@ -295,12 +322,32 @@
       "tag": "Copilot-Select",
       "outbounds": [
         "AI-PLUS",
+        "Copilot",
+        "MANUAL",
         "OpenAI",
         "Gemini",
-        "Copilot",
         "CF-BEST"
       ],
-      "default": "OpenAI",
+      "default": "Copilot",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Bing-Select",
+      "outbounds": [
+        "Copilot-Select",
+        "DIRECT",
+        "PROXY",
+        "MANUAL",
+        "AI",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "Copilot-Select",
       "interrupt_exist_connections": false
     },
     {
@@ -355,24 +402,6 @@
         "TK-TW"
       ],
       "default": "TK-US",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
-      "tag": "Bing",
-      "outbounds": [
-        "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "AI",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "DIRECT",
       "interrupt_exist_connections": false
     },
     {
@@ -795,21 +824,31 @@
         "rule_set": [
           "geosite/apple-cn"
         ],
-        "outbound": "DIRECT"
+        "outbound": "CN"
       },
       {
         "rule_set": [
-          "geosite/openai",
-          "geosite/anthropic"
+          "geosite/openai"
         ],
-        "outbound": "OpenAI"
+        "outbound": "GPT-Select"
       },
       {
         "rule_set": [
-          "Copilot",
-          "geosite/bing"
+          "geosite/openai"
+        ],
+        "outbound": "CLAUDE-Select"
+      },
+      {
+        "rule_set": [
+          "Copilot"
         ],
         "outbound": "Copilot-Select"
+      },
+      {
+        "rule_set": [
+          "geosite/bing"
+        ],
+        "outbound": "Bing-Select"
       },
       {
         "rule_set": "geosite/twitter",
@@ -1000,7 +1039,7 @@
     ],
     "final": "FINAL",
     "auto_detect_interface": true,
-    "default_domain_resolver": "ali",
+    "default_domain_resolver": "ali-dns",
     "default_http_client": "http_direct"
   },
   "services": [
