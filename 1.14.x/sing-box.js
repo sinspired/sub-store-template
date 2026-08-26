@@ -22,38 +22,39 @@ const RE_TK_TW = /TK-TW/i
 
 // TikTok 主地区标识（严格匹配）
 const TIKTOK_MAIN = {
-  'TIKTOK-US': tag => MAIN_REGION.US.test(tag) || RE_TK_US.test(tag),
-  'TIKTOK-VN': tag => MAIN_REGION.VN.test(tag) || RE_TK_VN.test(tag),
-  'TIKTOK-JP': tag => MAIN_REGION.JP.test(tag) || RE_TK_JP.test(tag),
-  'TIKTOK-SG': tag => MAIN_REGION.SG.test(tag) || RE_TK_SG.test(tag),
-  'TIKTOK-TW': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag),
+  'TK-US': tag => MAIN_REGION.US.test(tag) || RE_TK_US.test(tag),
+  'TK-VN': tag => MAIN_REGION.VN.test(tag) || RE_TK_VN.test(tag),
+  'TK-JP': tag => MAIN_REGION.JP.test(tag) || RE_TK_JP.test(tag),
+  'TK-SG': tag => MAIN_REGION.SG.test(tag) || RE_TK_SG.test(tag),
+  'TK-TW': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag),
 }
 
 // AI / 平台正则
 const AI_RULES = {
-  OpenAI: /openai|chatgpt|gpt⁺/i,
-  Gemini: /\b(gemini|gm)\b/i,
-  Copilot: /\b(copilot|CP)\b/i,
-  Youtube: /\b(youtube|yt)\b/i,
+  'OpenAI': /openai|chatgpt|gpt⁺/i,
+  'Gemini': /\b(gemini|gm)\b/i,
+  'Copilot': /\b(copilot|CP)\b/i,
+  'YouTube': /\b(youtube|yt)\b/i,
   // gm 加单词边界，避免误中 program / mgmt 等含 "gm" 子串的 tag
-  'AI-plus': /^(?=.*gpt⁺)(?=.*\b(gemini|gm)\b)/i,
+  'AI-PLUS': /^(?=.*gpt⁺)(?=.*\b(gemini|gm)\b)/i,
   // 裸字母 X 会匹配任意含 x 的 tag（MAX / EXPRESS / NETFLIX...），
   // 加上 \b 限定为独立的 "X" 词
-  'CF优选': /^(?=.*gpt⁺)(?=.*(\bX\b|twitter))/i,
+  'CF-BEST': /^(?=.*gpt⁺)(?=.*(\bX\b|twitter))/i,
 }
 
 // 地区 AUTO 正则
 const REGIONS = {
-  'HK AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
-  'TW AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
-  'JP AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
-  'SG AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
-  'US AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
+  'HK-AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
+  'TW-AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
+  'JP-AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
+  'SG-AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
+  'US-AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
 }
 
 // 统一分组规则
 const GROUP_RULES = {
   'AUTO': null,
+  'MANUAL': null,
   ...REGIONS,
   ...AI_RULES,
 }
