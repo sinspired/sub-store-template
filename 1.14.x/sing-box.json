@@ -859,7 +859,8 @@
           "geosite/xiaohongshu",
           "geosite/amap",
           "geosite/meituan",
-          "geosite/douyin"
+          "geosite/douyin",
+          "geosite/category-netdisk-cn"
         ],
         "outbound": "DIRECT"
       },
@@ -974,6 +975,10 @@
         "outbound": "CF-AUTO"
       },
       {
+        "rule_set": "geosite/category-ai-!cn",
+        "outbound": "AI"
+      },
+      {
         "rule_set": [
           "Proxy"
         ],
@@ -1007,6 +1012,7 @@
           "geosite/anthropic",
           "geosite/openai",
           "geosite/google-gemini",
+          "geosite/category-ai-!cn",
           "geosite/vercel",
           "geosite/bing",
           "geosite/apple",
@@ -1031,6 +1037,7 @@
           "geosite/meituan",
           "geosite/douyin",
           "geosite/category-container",
+          "geosite/category-netdisk-cn",
           "geosite/cn",
           "geosite/category-porn",
           "geosite/category-ads-all"
