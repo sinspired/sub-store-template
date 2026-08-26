@@ -946,6 +946,7 @@
       },
       {
         "rule_set": [
+          "geosite/vercel",
           "geosite/iqiyi@!cn",
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
@@ -1007,6 +1008,7 @@
           "geosite/anthropic",
           "geosite/openai",
           "geosite/google-gemini",
+          "geosite/vercel",
           "geosite/bing",
           "geosite/apple",
           "geosite/apple-cn",
