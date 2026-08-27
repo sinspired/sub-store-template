@@ -853,6 +853,9 @@
         "outbound": "DIRECT"
       },
       {
+        "inbound": [
+          "tun-in"
+        ],
         "process_path_regex": [
           "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$"
         ],
