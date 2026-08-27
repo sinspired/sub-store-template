@@ -572,7 +572,7 @@
         "SG-AUTO"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
