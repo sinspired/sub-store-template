@@ -31,7 +31,7 @@
     {
       "type": "api",
       "listen": "127.0.0.1",
-      "listen_port": 58909,
+      "listen_port": 60066,
       "secret": "sinspired",
       "detour": "CN",
       "access_control_allow_private_network": true,
@@ -45,23 +45,10 @@
   ],
   "inbounds": [
     {
-      "type": "mixed",
-      "tag": "mixed-in",
-      "listen": "0.0.0.0",
-      "listen_port": 10809,
-      "users": [
-        {
-          "username": "sinspired",
-          "password": "sinspired"
-        }
-      ],
-      "set_system_proxy": true,
-      "udp_fragment": false
-    },
-    {
-      "stack": "mixed",
       "type": "tun",
+      "stack": "mixed",
       "tag": "tun-in",
+      "auto_route": false,
       "address": [
         "10.7.0.1/24",
         "fd00:1:2:3::1/64"
@@ -72,7 +59,6 @@
         "10.7.0.2",
         "fd00:1:2:3::2"
       ],
-      "auto_route": true,
       "strict_route": true,
       "route_exclude_address": [
         "192.168.0.0/16",
@@ -88,9 +74,9 @@
       ],
       "platform": {
         "http_proxy": {
-          "enabled": true,
+          "enabled": false,
           "server": "127.0.0.1",
-          "server_port": 10809,
+          "server_port": 60010,
           "bypass_domain": [
             "*.local",
             "*.lan",
@@ -107,6 +93,24 @@
           ]
         }
       }
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 60011
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in-lan",
+      "listen": "0.0.0.0",
+      "listen_port": 60012,
+      "users": [
+        {
+          "username": "sinspired",
+          "password": "sinspired"
+        }
+      ]
     }
   ],
   "dns": {
@@ -193,7 +197,8 @@
       {
         "inbound": [
           "tun-in",
-          "mixed-in"
+          "mixed-in",
+          "mixed-lan"
         ],
         "query_type": [
           "A",
@@ -1137,7 +1142,7 @@
       "rdrc_timeout": "7d"
     },
     "clash_api": {
-      "external_controller": "127.0.0.1:48909",
+      "external_controller": "127.0.0.1:60067",
       "external_ui": "ui",
       "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "CN",
