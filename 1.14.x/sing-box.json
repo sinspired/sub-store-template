@@ -261,7 +261,7 @@
         "SG-AUTO"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -283,7 +283,7 @@
         "DIRECT"
       ],
       "default": "AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -291,7 +291,7 @@
       "outbounds": [
         "AUTO"
       ],
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -305,7 +305,7 @@
         "MANUAL"
       ],
       "default": "AI-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -319,7 +319,7 @@
         "Gemini-AUTO"
       ],
       "default": "OpenAI-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -333,7 +333,7 @@
         "Gemini-AUTO"
       ],
       "default": "OpenAI-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -347,7 +347,7 @@
         "CF-AUTO"
       ],
       "default": "Gemini-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -361,7 +361,7 @@
         "CF-AUTO"
       ],
       "default": "Copilot-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -374,7 +374,7 @@
         "AUTO"
       ],
       "default": "Copilot",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -393,7 +393,7 @@
         "SG-AUTO"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -407,7 +407,7 @@
         "AUTO"
       ],
       "default": "CF-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -423,7 +423,7 @@
         "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -437,7 +437,7 @@
         "MANUAL"
       ],
       "default": "TK-US-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -454,7 +454,7 @@
         "DIRECT"
       ],
       "default": "US-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -470,7 +470,7 @@
         "PROXY"
       ],
       "default": "AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -487,7 +487,7 @@
         "SG-AUTO"
       ],
       "default": "Netflix-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -504,7 +504,7 @@
         "SG-AUTO"
       ],
       "default": "DIRECT",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -521,7 +521,7 @@
         "DIRECT"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -538,7 +538,7 @@
         "DIRECT"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -555,7 +555,7 @@
         "SG-AUTO"
       ],
       "default": "Disney-AUTO",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -585,7 +585,7 @@
         "AUTO"
       ],
       "default": "DIRECT",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "selector",
@@ -603,7 +603,7 @@
         "SG-AUTO"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": false
+      "interrupt_exist_connections": true
     },
     {
       "type": "urltest",
