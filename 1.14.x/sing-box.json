@@ -50,7 +50,7 @@
     {
       "type": "mixed",
       "tag": "mixed-in",
-      "listen": "127.0.0.1",
+      "listen": "localhost",
       "listen_port": 10809,
       "tcp_fast_open": true,
       "tcp_multi_path": true,
