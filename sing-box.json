@@ -145,7 +145,7 @@
       "tag": "client_direct",
       "engine": "go",
       "version": 2,
-      "detour": "DIRECT",
+      "detour": "CN",
       "connect_timeout": "15s",
       "domain_resolver": "ali-dns",
       "stream_receive_window": 0,
