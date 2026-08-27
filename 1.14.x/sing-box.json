@@ -880,147 +880,147 @@
       {
         "type": "remote",
         "tag": "private_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/private.srs"
       },
       {
         "type": "remote",
         "tag": "apple_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/apple.srs"
       },
       {
         "type": "remote",
         "tag": "apple_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/apple.srs"
       },
       {
         "type": "remote",
         "tag": "bilibili_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/bilibili.srs"
       },
       {
         "type": "remote",
         "tag": "cn_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs"
       },
       {
         "type": "remote",
         "tag": "cn_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cn.srs"
       },
       {
         "type": "remote",
         "tag": "geoip-cn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs"
       },
       {
         "type": "remote",
         "tag": "google_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/google.srs"
       },
       {
         "type": "remote",
         "tag": "google_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/google.srs"
       },
       {
         "type": "remote",
         "tag": "netflix_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/netflix.srs"
       },
       {
         "type": "remote",
         "tag": "netflix_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/netflix.srs"
       },
       {
         "type": "remote",
         "tag": "github_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/github.srs"
       },
       {
         "type": "remote",
         "tag": "cloudflare_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/cloudflare.srs"
       },
       {
         "type": "remote",
         "tag": "cloudflare_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/cloudflare.srs"
       },
       {
         "type": "remote",
         "tag": "openai_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/openai.srs"
       },
       {
         "type": "remote",
         "tag": "gemini_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google-gemini.srs"
       },
       {
         "type": "remote",
         "tag": "claude_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Claude/Claude.srs"
       },
       {
         "type": "remote",
         "tag": "copilot_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Copilot/Copilot.srs"
       },
       {
         "type": "remote",
         "tag": "twitter_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Twitter/Twitter.srs"
       },
       {
         "type": "remote",
         "tag": "tiktok_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/TikTok/TikTok.srs"
       },
       {
         "type": "remote",
         "tag": "spotify_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/Spotify/Spotify.srs"
       },
       {
         "type": "remote",
         "tag": "onedrive_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/OneDrive/OneDrive.srs"
       },
       {
         "type": "remote",
         "tag": "proxy_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs"
       },
       {
         "type": "remote",
         "tag": "category_porn",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-porn.srs"
       },
       {
         "type": "remote",
         "tag": "telegram_ip",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geoip/telegram.srs"
       },
       {
         "type": "remote",
         "tag": "telegram_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/telegram.srs"
       },
       {
         "type": "remote",
         "tag": "youtube_domain",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo-lite/geosite/youtube.srs"
       },
       {
         "type": "remote",
         "tag": "category_ads_all",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/category-ads-all.srs"
       },
       {
         "type": "remote",
         "tag": "anti_ad",
-        "url": "https://ghproxy.net/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs"
+        "url": "https://ghfast.top/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs"
       }
     ],
     "final": "Final",
@@ -1036,7 +1036,7 @@
       "secret": "sinspired",
       "dashboard": {
         "enabled": true,
-        "download_url": "https://ghproxy.net/https://github.com/SagerNet/sing-box-dashboard/archive/refs/heads/gh-pages.zip",
+        "download_url": "https://ghfast.top/https://github.com/SagerNet/sing-box-dashboard/archive/refs/heads/gh-pages.zip",
         "http_client": "http_direct"
       }
     }
@@ -1053,7 +1053,7 @@
     "clash_api": {
       "external_controller": "127.0.0.1:48909",
       "external_ui": "ui",
-      "external_ui_download_url": "https://ghproxy.net/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_url": "https://ghfast.top/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
       "secret": "sinspired",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
