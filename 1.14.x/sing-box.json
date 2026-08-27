@@ -422,9 +422,13 @@
         "CF-AUTO",
         "AI-AUTO",
         "OpenAI",
-        "PROXY",
         "MANUAL",
-        "AUTO"
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
       ],
       "default": "CF-AUTO",
       "interrupt_exist_connections": true
