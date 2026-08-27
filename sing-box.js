@@ -22,44 +22,47 @@ const RE_TK_TW = /TK-TW/i
 
 // TikTok 主地区标识（严格匹配）
 const TIKTOK_MAIN = {
-  'TIKTOK-US': tag => MAIN_REGION.US.test(tag) || RE_TK_US.test(tag),
-  'TIKTOK-VN': tag => MAIN_REGION.VN.test(tag) || RE_TK_VN.test(tag),
-  'TIKTOK-JP': tag => MAIN_REGION.JP.test(tag) || RE_TK_JP.test(tag),
-  'TIKTOK-SG': tag => MAIN_REGION.SG.test(tag) || RE_TK_SG.test(tag),
-  'TIKTOK-TW': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag),
+  'TK-US-AUTO': tag => MAIN_REGION.US.test(tag) || RE_TK_US.test(tag),
+  'TK-VN-AUTO': tag => MAIN_REGION.VN.test(tag) || RE_TK_VN.test(tag),
+  'TK-JP-AUTO': tag => MAIN_REGION.JP.test(tag) || RE_TK_JP.test(tag),
+  'TK-SG-AUTO': tag => MAIN_REGION.SG.test(tag) || RE_TK_SG.test(tag),
+  'TK-TW-AUTO': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag),
 }
 
-// AI / 平台正则
+// AI / 平台正则 (同 JSON 中的 URLTest tag 严格一致)
 const AI_RULES = {
-  OpenAI: /openai|chatgpt|gpt⁺/i,
-  Gemini: /\b(gemini|gm)\b/i,
-  Copilot: /\b(copilot|CP)\b/i,
-  Youtube: /\b(youtube|yt)\b/i,
+  'OpenAI-AUTO': /openai|chatgpt|gpt[⁺+]/i,
+  'Gemini-AUTO': /\b(gemini|gm)\b/i,
+  'Copilot-AUTO': /\b(copilot|CP)\b/i,
+  'YouTube-AUTO': /\b(youtube|yt)\b/i,
+  'Netflix-AUTO': /\b(netflix|nf)\b/i,
+  // 匹配 Disney, Disney+, D+ (使用零宽断言防止 + 号破坏单词边界)
+  'Disney-AUTO': /(?<!\w)(disney\+?|d\+)(?!\w)/i,
   // gm 加单词边界，避免误中 program / mgmt 等含 "gm" 子串的 tag
-  'AI-plus': /^(?=.*gpt⁺)(?=.*\b(gemini|gm)\b)/i,
+  'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
   // 裸字母 X 会匹配任意含 x 的 tag（MAX / EXPRESS / NETFLIX...），
   // 加上 \b 限定为独立的 "X" 词
-  'CF优选': /^(?=.*gpt⁺)(?=.*(\bX\b|twitter))/i,
+  'CF-AUTO': /^(?=.*gpt[⁺+])(?=.*(\bX\b|twitter))/i,
 }
 
 // 地区 AUTO 正则
 const REGIONS = {
-  'HK AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
-  'TW AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
-  'JP AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
-  'SG AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
-  'US AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
+  'HK-AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
+  'TW-AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
+  'JP-AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
+  'SG-AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
+  'US-AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
 }
 
-// 统一分组规则
+// 统一分组规则 (null 代表匹配所有节点)
 const GROUP_RULES = {
   'AUTO': null,
+  'MANUAL': null,
   ...REGIONS,
   ...AI_RULES,
 }
 
 // 解析配置 & 生成节点
-
 let config = JSON.parse($files[0])
 
 let proxies = await produceArtifact({
@@ -73,7 +76,6 @@ let proxies = await produceArtifact({
 config.outbounds.push(...proxies)
 
 // 性能优化：速度缓存 + 全局预排序
-
 const speedCache = new Map()
 
 function parseSpeed(tag) {
@@ -102,27 +104,28 @@ function getTikTokTagsStrict(sortedProxies, tag) {
   return list.slice(0, 100).map(p => p.tag)
 }
 
-// outbounds 归一化 & 智能填充
-
+// outbounds 归一化 & 智能填充 (支持 0 节点安全回退机制)
 function normalizeOutbounds(o, tags) {
-  // 不是 selector / urltest 的出站不处理
   if (o.type !== 'selector' && o.type !== 'urltest') return
 
-  // 没有 outbounds 或不是数组，或空数组 → 视为 ["DIRECT"]
   if (!Array.isArray(o.outbounds) || o.outbounds.length === 0) {
-    o.outbounds = ['DIRECT']
+    o.outbounds = ['AUTO']
   }
 
-  // 如果当前只有一个 DIRECT 且有真实节点 → 用真实节点替换 DIRECT
-  if (o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT' && tags.length > 0) {
-    o.outbounds = tags.slice()
-    return
-  }
-
-  // 否则正常追加 + 去重
-  if (tags.length > 0) {
-    o.outbounds.push(...tags)
-    o.outbounds = [...new Set(o.outbounds)]
+  if (tags && tags.length > 0) {
+    // 如果分组目前只有占位符，执行覆写
+    if (o.outbounds.length === 1 && (o.outbounds[0] === 'AUTO' || o.outbounds[0] === 'DIRECT')) {
+      o.outbounds = tags.slice()
+    } else {
+      // 否则为多级 Selector 执行追加去重
+      o.outbounds.push(...tags)
+      o.outbounds = [...new Set(o.outbounds)]
+    }
+  } else {
+    // 【兜底降级】如果某个分组(尤其是测速组)因为没有节点而只剩 DIRECT，将其强制更改为 AUTO 防止死锁断网
+    if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
+      o.outbounds = ['AUTO']
+    }
   }
 }
 
@@ -131,14 +134,13 @@ function safePush(o, tags) {
 }
 
 // 主逻辑：按 tag 分组填充
-
 for (const o of config.outbounds) {
   if (!o.tag) continue
   if (o.type !== 'selector' && o.type !== 'urltest') continue
 
   const tag = o.tag
 
-  // TikTok 严格匹配（所有地区）
+  // TikTok 严格匹配
   if (TIKTOK_MAIN[tag]) {
     safePush(o, getTikTokTagsStrict(proxiesSortedBySpeed, tag))
     continue
