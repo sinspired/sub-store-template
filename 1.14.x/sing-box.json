@@ -47,8 +47,15 @@
     {
       "type": "mixed",
       "tag": "mixed-in",
-      "listen": "127.0.0.1",
+      "listen": "0.0.0.0",
       "listen_port": 10809,
+      "users": [
+        {
+          "username": "sinspired",
+          "password": "sinspired"
+        }
+      ],
+      "set_system_proxy": true,
       "udp_fragment": false
     },
     {
