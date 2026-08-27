@@ -559,6 +559,23 @@
     },
     {
       "type": "selector",
+      "tag": "Adult",
+      "outbounds": [
+        "PROXY",
+        "CF-AUTO",
+        "AUTO",
+        "MANUAL",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "PROXY",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
       "tag": "CN",
       "outbounds": [
         "DIRECT",
@@ -1038,6 +1055,12 @@
         "outbound": "PROXY"
       },
       {
+        "rule_set": [
+          "geosite/category-porn"
+        ],
+        "outbound": "Adult"
+      },
+      {
         "rule_set": "geosite/cn",
         "outbound": "CN"
       },
@@ -1062,12 +1085,6 @@
       {
         "rule_set": "geoip/cloudflare",
         "outbound": "CF-AUTO"
-      },
-      {
-        "rule_set": [
-          "geosite/category-porn"
-        ],
-        "outbound": "PROXY"
       },
       {
         "rule_set": [
