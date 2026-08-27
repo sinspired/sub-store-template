@@ -8,7 +8,8 @@
     "enabled": true,
     "server": "ntp.aliyun.com",
     "server_port": 123,
-    "interval": "30m"
+    "interval": "30m",
+    "detour": "CN"
   },
   "http_clients": [
     {
@@ -17,6 +18,7 @@
       "connect_timeout": "15s",
       "tcp_fast_open": true,
       "tcp_multi_path": true,
+      "detour": "CN",
       "domain_resolver": "ali-dns"
     },
     {
@@ -1105,16 +1107,17 @@
   "experimental": {
     "cache_file": {
       "enabled": true,
-      "path": "cache_sinspired.db",
-      "cache_id": "ID_for_cache_sinspired",
+      "path": "cache_sinspired_1.14.db",
+      "cache_id": "cache_sinspired_1.14_beta",
       "store_fakeip": true,
       "store_dns": true,
-      "rdrc_timeout": "168h0m0s"
+      "rdrc_timeout": "7d"
     },
     "clash_api": {
-      "external_controller": "127.0.0.1:48909",
+      "external_controller": "0.0.0.0:48909",
       "external_ui": "ui",
       "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
+      "external_ui_download_detour": "CN",
       "secret": "sinspired",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
