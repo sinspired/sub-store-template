@@ -34,7 +34,7 @@
   "services": [
     {
       "type": "api",
-      "listen": "127.0.0.1",
+      "listen": "localhost",
       "listen_port": 58909,
       "secret": "sinspired",
       "access_control_allow_private_network": true,
@@ -1117,7 +1117,7 @@
       "rdrc_timeout": "7d"
     },
     "clash_api": {
-      "external_controller": "0.0.0.0:48909",
+      "external_controller": "localhost:48909",
       "external_ui": "ui",
       "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "CN",
