@@ -31,7 +31,7 @@
     {
       "type": "api",
       "listen": "127.0.0.1",
-      "listen_port": 10020,
+      "listen_port": 60020,
       "secret": "sinspired",
       "detour": "CN",
       "access_control_allow_private_network": true,
@@ -76,7 +76,7 @@
         "http_proxy": {
           "enabled": true,
           "server": "127.0.0.1",
-          "server_port": 10010,
+          "server_port": 60010,
           "bypass_domain": [
             "*.local",
             "*.lan",
@@ -98,14 +98,14 @@
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 10011,
+      "listen_port": 60011,
       "set_system_proxy": false
     },
     {
       "type": "mixed",
       "tag": "mixed-in-lan",
       "listen": "0.0.0.0",
-      "listen_port": 10012,
+      "listen_port": 60012,
       "users": [
         {
           "username": "sinspired",
@@ -1142,7 +1142,7 @@
       "rdrc_timeout": "7d"
     },
     "clash_api": {
-      "external_controller": "127.0.0.1:10021",
+      "external_controller": "127.0.0.1:60021",
       "external_ui": "ui",
       "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "CN",
