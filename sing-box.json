@@ -12,7 +12,7 @@
   },
   "http_clients": [
     {
-      "tag": "http_direct",
+      "tag": "client_direct",
       "engine": "go",
       "connect_timeout": "15s",
       "tcp_fast_open": true,
@@ -20,12 +20,86 @@
       "domain_resolver": "ali-dns"
     },
     {
-      "tag": "http_proxy",
+      "tag": "client_proxy",
       "engine": "go",
       "detour": "PROXY",
       "connect_timeout": "10s",
       "tcp_fast_open": true,
       "tcp_multi_path": true
+    }
+  ],
+  "services": [
+    {
+      "type": "api",
+      "listen": "127.0.0.1",
+      "listen_port": 58909,
+      "secret": "sinspired",
+      "dashboard": {
+        "enabled": true,
+        "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "http_client": "client_direct"
+      }
+    }
+  ],
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 10809,
+      "tcp_fast_open": true,
+      "tcp_multi_path": true,
+      "udp_fragment": false
+    },
+    {
+      "stack": "mixed",
+      "type": "tun",
+      "tag": "tun-in",
+      "address": [
+        "10.7.0.1/24",
+        "fd00:1:2:3::1/64"
+      ],
+      "mtu": 9000,
+      "dns_mode": "hijack",
+      "dns_address": [
+        "10.7.0.2",
+        "fd00:1:2:3::2"
+      ],
+      "auto_route": true,
+      "strict_route": true,
+      "route_exclude_address": [
+        "192.168.0.0/16",
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "169.254.0.0/16",
+        "fc00::/7",
+        "fe80::/10"
+      ],
+      "route_exclude_address_set": [
+        "geosite/private",
+        "geoip/cn"
+      ],
+      "platform": {
+        "http_proxy": {
+          "enabled": true,
+          "server": "127.0.0.1",
+          "server_port": 10809,
+          "bypass_domain": [
+            "*.local",
+            "*.lan",
+            "*.localdomain",
+            "localhost",
+            "127.0.0.1",
+            "*.apple.com",
+            "captive.apple.com",
+            "*.icloud.com"
+          ],
+          "match_domain": [
+            "google.com",
+            "itunes.apple.com"
+          ]
+        }
+      }
     }
   ],
   "dns": {
@@ -96,11 +170,13 @@
           "AliPay",
           "geosite/apple-cn",
           "geosite/apple",
-          "geosite/bilibili",
-          "geosite/xiaohongshu",
-          "geosite/amap",
-          "geosite/meituan",
-          "geosite/douyin",
+          "geosite/bing",
+          "BiliBiliIntl",
+          "BiliBili",
+          "iQIYIIntl",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn",
+          "geosite/category-netdisk-cn",
           "geosite/cn"
         ],
         "action": "route",
@@ -126,7 +202,7 @@
           "geosite/anthropic",
           "geosite/twitter",
           "geosite/cloudflare",
-          "geosite/telegram",
+          "Telegram",
           "Copilot",
           "Spotify"
         ],
@@ -140,15 +216,12 @@
           "geosite/apple-tvplus",
           "geosite/google-gemini",
           "geosite/youtube",
-          "geosite/tiktok",
+          "TikTok",
           "geosite/google",
-          "geosite/twitter",
-          "geosite/netflix",
+          "Netflix",
           "geosite/disney",
           "geosite/github",
-          "geosite/iqiyi@!cn",
-          "geosite/youku@!cn",
-          "geosite/tencent@!cn",
+          "geosite/category-ai-!cn",
           "geosite/category-porn",
           "Proxy"
         ],
@@ -168,67 +241,6 @@
       "timeout": "1d"
     }
   },
-  "inbounds": [
-    {
-      "type": "mixed",
-      "tag": "mixed-in",
-      "listen": "127.0.0.1",
-      "listen_port": 10809,
-      "tcp_fast_open": true,
-      "tcp_multi_path": true,
-      "udp_fragment": false
-    },
-    {
-      "stack": "mixed",
-      "type": "tun",
-      "tag": "tun-in",
-      "address": [
-        "10.7.0.1/24",
-        "fd00:1:2:3::1/64"
-      ],
-      "mtu": 9000,
-      "dns_mode": "hijack",
-      "dns_address": [
-        "10.7.0.2",
-        "fd00:1:2:3::2"
-      ],
-      "auto_route": true,
-      "strict_route": true,
-      "route_exclude_address": [
-        "192.168.0.0/16",
-        "10.0.0.0/8",
-        "172.16.0.0/12",
-        "169.254.0.0/16",
-        "fc00::/7",
-        "fe80::/10"
-      ],
-      "route_exclude_address_set": [
-        "geosite/private",
-        "geoip/cn"
-      ],
-      "platform": {
-        "http_proxy": {
-          "enabled": true,
-          "server": "127.0.0.1",
-          "server_port": 10809,
-          "bypass_domain": [
-            "*.local",
-            "*.lan",
-            "*.localdomain",
-            "localhost",
-            "127.0.0.1",
-            "*.apple.com",
-            "captive.apple.com",
-            "*.icloud.com"
-          ],
-          "match_domain": [
-            "google.com",
-            "itunes.apple.com"
-          ]
-        }
-      }
-    }
-  ],
   "outbounds": [
     {
       "type": "direct",
@@ -479,23 +491,6 @@
     },
     {
       "type": "selector",
-      "tag": "Disney",
-      "outbounds": [
-        "Disney-AUTO",
-        "PROXY",
-        "MANUAL",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "Disney-AUTO",
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "selector",
       "tag": "Apple",
       "outbounds": [
         "DIRECT",
@@ -530,14 +525,36 @@
     },
     {
       "type": "selector",
-      "tag": "Bilibili",
+      "tag": "MediaIntl",
       "outbounds": [
-        "DIRECT",
         "PROXY",
         "MANUAL",
-        "AUTO"
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "DIRECT"
       ],
-      "default": "DIRECT",
+      "default": "PROXY",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "Disney",
+      "outbounds": [
+        "Disney-AUTO",
+        "PROXY",
+        "MANUAL",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO"
+      ],
+      "default": "Disney-AUTO",
       "interrupt_exist_connections": false
     },
     {
@@ -745,6 +762,18 @@
     },
     {
       "type": "urltest",
+      "tag": "US-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "12m4s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "urltest",
       "tag": "TW-AUTO",
       "outbounds": [
         "AUTO"
@@ -778,21 +807,87 @@
       "tolerance": 50,
       "idle_timeout": "30m0s",
       "interrupt_exist_connections": false
-    },
-    {
-      "type": "urltest",
-      "tag": "US-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "12m4s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
     }
   ],
   "route": {
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": [
+          "geoip/google",
+          "geoip/twitter",
+          "geoip/telegram",
+          "geoip/cloudflare",
+          "geoip/cn"
+        ],
+        "format": "binary",
+        "http_client": "client_direct",
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "update_interval": "1d"
+      },
+      {
+        "type": "remote",
+        "tag": [
+          "geosite/private",
+          "geosite/anthropic",
+          "geosite/openai",
+          "geosite/google-gemini",
+          "geosite/category-ai-!cn",
+          "geosite/bing",
+          "geosite/apple-cn",
+          "geosite/apple-intelligence",
+          "geosite/apple-tvplus",
+          "geosite/apple",
+          "geosite/github",
+          "geosite/youtube",
+          "geosite/google",
+          "geosite/twitter",
+          "geosite/cloudflare",
+          "geosite/category-netdisk-cn",
+          "geosite/cn",
+          "geosite/disney",
+          "geosite/category-porn",
+          "geosite/category-ads-all",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn"
+        ],
+        "format": "binary",
+        "http_client": "client_direct",
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "update_interval": "1d"
+      },
+      {
+        "type": "remote",
+        "tag": [
+          "AliPay",
+          "BiliBili",
+          "Copilot",
+          "Telegram",
+          "Spotify",
+          "TikTok",
+          "Netflix",
+          "Proxy",
+          "BiliBiliIntl",
+          "iQIYIIntl"
+        ],
+        "format": "binary",
+        "http_client": "client_direct",
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "update_interval": "1d"
+      },
+      {
+        "type": "remote",
+        "tag": "anti_ad",
+        "format": "binary",
+        "http_client": "client_direct",
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
+        "initial_path": "rules/anti_ad.srs",
+        "update_interval": "1d"
+      }
+    ],
     "rules": [
       {
         "inbound": [
@@ -841,26 +936,8 @@
         "outbound": "DIRECT"
       },
       {
-        "domain_suffix": [
-          "ghproxy.net",
-          "ghproxy.com",
-          "ghfast.top"
-        ],
-        "outbound": "DIRECT"
-      },
-      {
-        "rule_set": "geosite/bilibili",
-        "outbound": "Bilibili"
-      },
-      {
         "rule_set": [
-          "AliPay",
-          "geosite/private",
-          "geosite/xiaohongshu",
-          "geosite/amap",
-          "geosite/meituan",
-          "geosite/douyin",
-          "geosite/category-netdisk-cn"
+          "geosite/private"
         ],
         "outbound": "DIRECT"
       },
@@ -869,16 +946,32 @@
         "outbound": "Apple-Int"
       },
       {
-        "rule_set": "geosite/apple-cn",
+        "rule_set": [
+          "geosite/apple-tvplus",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn",
+          "BiliBiliIntl",
+          "iQIYIIntl"
+        ],
+        "outbound": "MediaIntl"
+      },
+      {
+        "domain_suffix": [
+          "ghproxy.net",
+          "ghproxy.com",
+          "ghfast.top"
+        ],
+        "rule_set": [
+          "AliPay",
+          "geosite/apple-cn",
+          "geosite/category-netdisk-cn",
+          "BiliBili"
+        ],
         "outbound": "CN"
       },
       {
         "rule_set": "geosite/apple",
         "outbound": "Apple"
-      },
-      {
-        "rule_set": "geosite/apple-tvplus",
-        "outbound": "PROXY"
       },
       {
         "rule_set": "geosite/anthropic",
@@ -905,24 +998,24 @@
         "outbound": "Twitter"
       },
       {
-        "rule_set": "geosite/telegram",
+        "rule_set": "geosite/category-ai-!cn",
+        "outbound": "AI"
+      },
+      {
+        "rule_set": "Telegram",
         "outbound": "Telegram"
-      },
-      {
-        "rule_set": "geosite/netflix",
-        "outbound": "Netflix"
-      },
-      {
-        "rule_set": "geosite/disney",
-        "outbound": "Disney"
-      },
-      {
-        "rule_set": "geosite/tiktok",
-        "outbound": "TikTok"
       },
       {
         "rule_set": "Spotify",
         "outbound": "Spotify"
+      },
+      {
+        "rule_set": "Netflix",
+        "outbound": "Netflix"
+      },
+      {
+        "rule_set": "TikTok",
+        "outbound": "TikTok"
       },
       {
         "rule_set": "geosite/youtube",
@@ -931,6 +1024,10 @@
       {
         "rule_set": "geosite/google",
         "outbound": "Google"
+      },
+      {
+        "rule_set": "geosite/disney",
+        "outbound": "Disney"
       },
       {
         "rule_set": "geosite/cloudflare",
@@ -945,17 +1042,6 @@
         "outbound": "CN"
       },
       {
-        "rule_set": [
-          "geosite/vercel",
-          "geosite/iqiyi@!cn",
-          "geosite/youku@!cn",
-          "geosite/tencent@!cn",
-          "geosite/category-container",
-          "geosite/category-porn"
-        ],
-        "outbound": "PROXY"
-      },
-      {
         "action": "resolve"
       },
       {
@@ -963,7 +1049,10 @@
         "outbound": "Twitter"
       },
       {
-        "rule_set": "geoip/telegram",
+        "rule_set": [
+          "geoip/telegram",
+          "Telegram"
+        ],
         "outbound": "Telegram"
       },
       {
@@ -975,8 +1064,10 @@
         "outbound": "CF-AUTO"
       },
       {
-        "rule_set": "geosite/category-ai-!cn",
-        "outbound": "AI"
+        "rule_set": [
+          "geosite/category-porn"
+        ],
+        "outbound": "PROXY"
       },
       {
         "rule_set": [
@@ -989,107 +1080,11 @@
         "outbound": "CN"
       }
     ],
-    "rule_set": [
-      {
-        "type": "remote",
-        "tag": [
-          "geoip/google",
-          "geoip/twitter",
-          "geoip/telegram",
-          "geoip/cloudflare",
-          "geoip/cn"
-        ],
-        "format": "binary",
-        "http_client": "http_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": [
-          "geosite/private",
-          "geosite/anthropic",
-          "geosite/openai",
-          "geosite/google-gemini",
-          "geosite/category-ai-!cn",
-          "geosite/vercel",
-          "geosite/bing",
-          "geosite/apple",
-          "geosite/apple-cn",
-          "geosite/apple-intelligence",
-          "geosite/apple-tvplus",
-          "geosite/github",
-          "geosite/google",
-          "geosite/youtube",
-          "geosite/netflix",
-          "geosite/disney",
-          "geosite/telegram",
-          "geosite/twitter",
-          "geosite/cloudflare",
-          "geosite/tiktok",
-          "geosite/iqiyi@!cn",
-          "geosite/youku@!cn",
-          "geosite/tencent@!cn",
-          "geosite/bilibili",
-          "geosite/xiaohongshu",
-          "geosite/amap",
-          "geosite/meituan",
-          "geosite/douyin",
-          "geosite/category-container",
-          "geosite/category-netdisk-cn",
-          "geosite/cn",
-          "geosite/category-porn",
-          "geosite/category-ads-all"
-        ],
-        "format": "binary",
-        "http_client": "http_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": [
-          "AliPay",
-          "Copilot",
-          "Spotify",
-          "Proxy"
-        ],
-        "format": "binary",
-        "http_client": "http_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": "anti_ad",
-        "format": "binary",
-        "http_client": "http_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
-        "initial_path": "rules/anti_ad.srs",
-        "update_interval": "1d"
-      }
-    ],
     "final": "FINAL",
     "auto_detect_interface": true,
     "default_domain_resolver": "ali-dns",
-    "default_http_client": "http_direct"
+    "default_http_client": "client_direct"
   },
-  "services": [
-    {
-      "type": "api",
-      "listen": "127.0.0.1",
-      "listen_port": 58909,
-      "secret": "sinspired",
-      "dashboard": {
-        "enabled": true,
-        "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/refs/heads/gh-pages.zip",
-        "http_client": "http_direct"
-      }
-    }
-  ],
   "experimental": {
     "cache_file": {
       "enabled": true,
@@ -1102,7 +1097,7 @@
     "clash_api": {
       "external_controller": "127.0.0.1:48909",
       "external_ui": "ui",
-      "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "secret": "sinspired",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
