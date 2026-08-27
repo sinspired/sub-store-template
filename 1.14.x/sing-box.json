@@ -4,117 +4,6 @@
     "level": "error",
     "timestamp": true
   },
-  "ntp": {
-    "enabled": true,
-    "server": "ntp.aliyun.com",
-    "server_port": 123,
-    "interval": "30m",
-    "detour": "CN"
-  },
-  "http_clients": [
-    {
-      "tag": "client_direct",
-      "engine": "go",
-      "detour": "DIRECT",
-      "domain_resolver": "ali-dns",
-      "connect_timeout": "15s"
-    },
-    {
-      "tag": "client_proxy",
-      "engine": "go",
-      "detour": "PROXY",
-      "domain_resolver": "google-dns",
-      "connect_timeout": "10s"
-    }
-  ],
-  "services": [
-    {
-      "type": "api",
-      "listen": "127.0.0.1",
-      "listen_port": 60020,
-      "secret": "sinspired",
-      "detour": "CN",
-      "access_control_allow_private_network": true,
-      "dashboard": {
-        "enabled": true,
-        "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
-        "http_client": "client_direct",
-        "update_interval": "7d"
-      }
-    }
-  ],
-  "inbounds": [
-    {
-      "type": "tun",
-      "stack": "mixed",
-      "tag": "tun-in",
-      "auto_route": true,
-      "strict_route": true,
-      "address": [
-        "10.7.0.1/24",
-        "fd00:1:2:3::1/64"
-      ],
-      "mtu": 9000,
-      "dns_mode": "hijack",
-      "dns_address": [
-        "10.7.0.2",
-        "fd00:1:2:3::2"
-      ],
-      "route_exclude_address": [
-        "192.168.0.0/16",
-        "10.0.0.0/8",
-        "172.16.0.0/12",
-        "169.254.0.0/16",
-        "fc00::/7",
-        "fe80::/10"
-      ],
-      "route_exclude_address_set": [
-        "geosite/private",
-        "geoip/cn"
-      ],
-      "platform": {
-        "http_proxy": {
-          "enabled": true,
-          "server": "127.0.0.1",
-          "server_port": 60010,
-          "bypass_domain": [
-            "*.local",
-            "*.lan",
-            "*.localdomain",
-            "localhost",
-            "127.0.0.1",
-            "*.apple.com",
-            "captive.apple.com",
-            "*.icloud.com"
-          ],
-          "match_domain": [
-            "google.com",
-            "itunes.apple.com"
-          ]
-        }
-      }
-    },
-    {
-      "type": "mixed",
-      "tag": "mixed-in",
-      "listen": "127.0.0.1",
-      "listen_port": 60011,
-      "set_system_proxy": false
-    },
-    {
-      "type": "mixed",
-      "tag": "mixed-in-lan",
-      "listen": "0.0.0.0",
-      "listen_port": 60012,
-      "set_system_proxy": false,
-      "users": [
-        {
-          "username": "sinspired",
-          "password": "sinspired"
-        }
-      ]
-    }
-  ],
   "dns": {
     "servers": [
       {
@@ -156,7 +45,6 @@
     "rules": [
       {
         "rule_set": "geosite/private",
-        "action": "route",
         "server": "local-dns",
         "disable_cache": true
       },
@@ -165,17 +53,14 @@
           "geosite/category-ads-all",
           "anti_ad"
         ],
-        "action": "reject",
-        "method": "default"
+        "action": "reject"
       },
       {
         "clash_mode": "直连",
-        "action": "route",
         "server": "ali-dns"
       },
       {
         "clash_mode": "全局",
-        "action": "route",
         "server": "fakeip"
       },
       {
@@ -192,7 +77,6 @@
           "geosite/category-netdisk-cn",
           "geosite/cn"
         ],
-        "action": "route",
         "server": "ali-dns",
         "timeout": "3s"
       },
@@ -206,7 +90,6 @@
           "A",
           "AAAA"
         ],
-        "action": "route",
         "server": "fakeip"
       },
       {
@@ -219,7 +102,6 @@
           "Copilot",
           "Spotify"
         ],
-        "action": "route",
         "server": "cf-dns",
         "timeout": "5s"
       },
@@ -238,7 +120,6 @@
           "geosite/category-porn",
           "Proxy"
         ],
-        "action": "route",
         "server": "google-dns",
         "timeout": "5s"
       }
@@ -246,14 +127,112 @@
     "final": "ali-dns",
     "strategy": "prefer_ipv4",
     "timeout": "5s",
-    "disable_cache": false,
-    "disable_expire": false,
     "cache_capacity": 8192,
     "optimistic": {
       "enabled": true,
-      "timeout": "1d"
+      "timeout": "24h0m0s"
     }
   },
+  "ntp": {
+    "enabled": true,
+    "interval": "30m0s",
+    "server": "ntp.aliyun.com",
+    "server_port": 123,
+    "detour": "CN"
+  },
+  "http_clients": [
+    {
+      "tag": "client_direct",
+      "engine": "go",
+      "version": 2,
+      "detour": "DIRECT",
+      "connect_timeout": "15s",
+      "domain_resolver": "ali-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
+    },
+    {
+      "tag": "client_proxy",
+      "engine": "go",
+      "version": 2,
+      "detour": "PROXY",
+      "connect_timeout": "10s",
+      "domain_resolver": "google-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
+    }
+  ],
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 60011,
+      "set_system_proxy": true
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in-lan",
+      "listen": "0.0.0.0",
+      "listen_port": 60012,
+      "users": [
+        {
+          "Username": "sinspired",
+          "Password": "sinspired"
+        }
+      ]
+    },
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "mtu": 9000,
+      "address": [
+        "10.7.0.1/24",
+        "fd00:1:2:3::1/64"
+      ],
+      "dns_mode": "hijack",
+      "dns_address": [
+        "10.7.0.2",
+        "fd00:1:2:3::2"
+      ],
+      "auto_route": true,
+      "strict_route": true,
+      "route_exclude_address": [
+        "192.168.0.0/16",
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "169.254.0.0/16",
+        "fc00::/7",
+        "fe80::/10"
+      ],
+      "route_exclude_address_set": [
+        "geosite/private",
+        "geoip/cn"
+      ],
+      "stack": "mixed",
+      "platform": {
+        "http_proxy": {
+          "enabled": true,
+          "server": "127.0.0.1",
+          "server_port": 60011,
+          "bypass_domain": [
+            "*.local",
+            "*.lan",
+            "*.localdomain",
+            "localhost",
+            "127.0.0.1",
+            "*.apple.com",
+            "captive.apple.com",
+            "*.icloud.com"
+          ],
+          "match_domain": [
+            "google.com",
+            "itunes.apple.com"
+          ]
+        }
+      }
+    }
+  ],
   "outbounds": [
     {
       "type": "direct",
@@ -645,8 +624,7 @@
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "1m0s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -656,8 +634,7 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m0s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -667,8 +644,7 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "3m29s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -678,8 +654,7 @@
       ],
       "url": "https://www.google.com/generate_204",
       "interval": "5m30s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -689,8 +664,7 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "6m0s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -700,8 +674,7 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -711,8 +684,7 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m30s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -722,8 +694,7 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "16m0s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -733,8 +704,7 @@
       ],
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "4m3s",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+      "tolerance": 50
     },
     {
       "type": "urltest",
@@ -745,8 +715,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m4s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -757,8 +726,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "20m37s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -769,8 +737,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m9s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -781,8 +748,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "21m38s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -793,8 +759,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "22m6s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -805,8 +770,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m3s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -817,8 +781,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "12m4s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -829,8 +792,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "10m37s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -841,8 +803,7 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m1s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -853,94 +814,16 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "11m39s",
       "tolerance": 50,
-      "idle_timeout": "30m0s",
-      "interrupt_exist_connections": false
+      "idle_timeout": "30m0s"
     }
   ],
   "route": {
-    "rule_set": [
-      {
-        "type": "remote",
-        "tag": [
-          "geoip/google",
-          "geoip/twitter",
-          "geoip/telegram",
-          "geoip/cloudflare",
-          "geoip/cn"
-        ],
-        "format": "binary",
-        "http_client": "client_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": [
-          "geosite/private",
-          "geosite/anthropic",
-          "geosite/openai",
-          "geosite/google-gemini",
-          "geosite/category-ai-!cn",
-          "geosite/bing",
-          "geosite/apple-cn",
-          "geosite/apple-intelligence",
-          "geosite/apple-tvplus",
-          "geosite/apple",
-          "geosite/github",
-          "geosite/youtube",
-          "geosite/google",
-          "geosite/twitter",
-          "geosite/cloudflare",
-          "geosite/category-netdisk-cn",
-          "geosite/cn",
-          "geosite/disney",
-          "geosite/category-porn",
-          "geosite/category-ads-all",
-          "geosite/youku@!cn",
-          "geosite/tencent@!cn"
-        ],
-        "format": "binary",
-        "http_client": "client_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": [
-          "AliPay",
-          "BiliBili",
-          "Copilot",
-          "Telegram",
-          "Spotify",
-          "TikTok",
-          "Netflix",
-          "Proxy",
-          "BiliBiliIntl",
-          "iQIYIIntl"
-        ],
-        "format": "binary",
-        "http_client": "client_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
-        "initial_path": "rules/{tag}.srs",
-        "update_interval": "1d"
-      },
-      {
-        "type": "remote",
-        "tag": "anti_ad",
-        "format": "binary",
-        "http_client": "client_direct",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
-        "initial_path": "rules/anti_ad.srs",
-        "update_interval": "1d"
-      }
-    ],
     "rules": [
       {
         "inbound": [
           "tun-in",
-          "mixed-in"
+          "mixed-in",
+          "mixed-in-lan"
         ],
         "action": "sniff",
         "sniffer": [
@@ -976,17 +859,14 @@
           "geosite/category-ads-all",
           "anti_ad"
         ],
-        "action": "reject",
-        "method": "default"
+        "action": "reject"
       },
       {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "geosite/private"
-        ],
+        "rule_set": "geosite/private",
         "outbound": "DIRECT"
       },
       {
@@ -1086,9 +966,7 @@
         "outbound": "PROXY"
       },
       {
-        "rule_set": [
-          "geosite/category-porn"
-        ],
+        "rule_set": "geosite/category-porn",
         "outbound": "Adult"
       },
       {
@@ -1118,9 +996,7 @@
         "outbound": "Cloudflare"
       },
       {
-        "rule_set": [
-          "Proxy"
-        ],
+        "rule_set": "Proxy",
         "outbound": "PROXY"
       },
       {
@@ -1128,19 +1004,109 @@
         "outbound": "CN"
       }
     ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": [
+          "geoip/google",
+          "geoip/twitter",
+          "geoip/telegram",
+          "geoip/cloudflare",
+          "geoip/cn"
+        ],
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": [
+          "geosite/private",
+          "geosite/anthropic",
+          "geosite/openai",
+          "geosite/google-gemini",
+          "geosite/category-ai-!cn",
+          "geosite/bing",
+          "geosite/apple-cn",
+          "geosite/apple-intelligence",
+          "geosite/apple-tvplus",
+          "geosite/apple",
+          "geosite/github",
+          "geosite/youtube",
+          "geosite/google",
+          "geosite/twitter",
+          "geosite/cloudflare",
+          "geosite/category-netdisk-cn",
+          "geosite/cn",
+          "geosite/disney",
+          "geosite/category-porn",
+          "geosite/category-ads-all",
+          "geosite/youku@!cn",
+          "geosite/tencent@!cn"
+        ],
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": [
+          "AliPay",
+          "BiliBili",
+          "Copilot",
+          "Telegram",
+          "Spotify",
+          "TikTok",
+          "Netflix",
+          "Proxy",
+          "BiliBiliIntl",
+          "iQIYIIntl"
+        ],
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "anti_ad",
+        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
+        "initial_path": "rules/anti_ad.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      }
+    ],
     "final": "FINAL",
     "auto_detect_interface": true,
     "default_domain_resolver": "ali-dns",
     "default_http_client": "client_direct"
   },
+  "services": [
+    {
+      "type": "api",
+      "listen": "127.0.0.1",
+      "listen_port": 60020,
+      "detour": "CN",
+      "secret": "sinspired",
+      "access_control_allow_private_network": true,
+      "dashboard": {
+        "enabled": true,
+        "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "http_client": "client_direct",
+        "update_interval": "168h0m0s"
+      }
+    }
+  ],
   "experimental": {
     "cache_file": {
       "enabled": true,
       "path": "cache_sinspired_1.14.db",
       "cache_id": "cache_sinspired_1.14_beta",
       "store_fakeip": true,
-      "store_dns": true,
-      "rdrc_timeout": "7d"
+      "rdrc_timeout": "168h0m0s",
+      "store_dns": true
     },
     "clash_api": {
       "external_controller": "127.0.0.1:60021",
