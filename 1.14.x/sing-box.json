@@ -24,9 +24,7 @@
       "engine": "go",
       "detour": "PROXY",
       "domain_resolver": "google-dns",
-      "connect_timeout": "10s",
-      "tcp_fast_open": true,
-      "tcp_multi_path": true
+      "connect_timeout": "10s"
     }
   ],
   "services": [
@@ -51,8 +49,6 @@
       "tag": "mixed-in",
       "listen": "127.0.0.1",
       "listen_port": 10809,
-      "tcp_fast_open": true,
-      "tcp_multi_path": true,
       "udp_fragment": false
     },
     {
