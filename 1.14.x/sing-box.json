@@ -275,7 +275,7 @@
       "outbounds": [
         "AUTO",
         "MANUAL",
-        "CF-AUTO",
+        "Cloudflare",
         "HK-AUTO",
         "JP-AUTO",
         "TW-AUTO",
@@ -404,6 +404,20 @@
     {
       "type": "selector",
       "tag": "Twitter",
+      "outbounds": [
+        "CF-AUTO",
+        "AI-AUTO",
+        "OpenAI",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "CF-AUTO",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "Cloudflare",
       "outbounds": [
         "CF-AUTO",
         "AI-AUTO",
@@ -1054,7 +1068,7 @@
       },
       {
         "rule_set": "geosite/cloudflare",
-        "outbound": "CF-AUTO"
+        "outbound": "Cloudflare"
       },
       {
         "rule_set": "geosite/github",
@@ -1090,7 +1104,7 @@
       },
       {
         "rule_set": "geoip/cloudflare",
-        "outbound": "CF-AUTO"
+        "outbound": "Cloudflare"
       },
       {
         "rule_set": [
