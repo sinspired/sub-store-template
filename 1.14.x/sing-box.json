@@ -853,6 +853,12 @@
         "outbound": "DIRECT"
       },
       {
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
         "clash_mode": "全局",
         "outbound": "GLOBAL"
       },
