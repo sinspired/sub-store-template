@@ -167,8 +167,7 @@
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 60011,
-      "set_system_proxy": true
+      "listen_port": 60011
     },
     {
       "type": "mixed",
