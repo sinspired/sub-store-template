@@ -144,22 +144,18 @@
     {
       "tag": "client_direct",
       "engine": "go",
-      "version": 2,
+      "version": 3,
       "detour": "CN",
       "connect_timeout": "15s",
-      "domain_resolver": "ali-dns",
-      "stream_receive_window": 0,
-      "connection_receive_window": 0
+      "domain_resolver": "ali-dns"
     },
     {
       "tag": "client_proxy",
       "engine": "go",
-      "version": 2,
+      "version": 3,
       "detour": "PROXY",
       "connect_timeout": "10s",
-      "domain_resolver": "google-dns",
-      "stream_receive_window": 0,
-      "connection_receive_window": 0
+      "domain_resolver": "google-dns"
     }
   ],
   "inbounds": [
