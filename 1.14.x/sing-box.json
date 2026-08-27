@@ -34,9 +34,10 @@
   "services": [
     {
       "type": "api",
-      "listen": "localhost",
+      "listen": "127.0.0.1",
       "listen_port": 58909,
       "secret": "sinspired",
+      "detour": "CN",
       "access_control_allow_private_network": true,
       "dashboard": {
         "enabled": true,
@@ -50,7 +51,7 @@
     {
       "type": "mixed",
       "tag": "mixed-in",
-      "listen": "localhost",
+      "listen": "127.0.0.1",
       "listen_port": 10809,
       "tcp_fast_open": true,
       "tcp_multi_path": true,
@@ -1117,7 +1118,7 @@
       "rdrc_timeout": "7d"
     },
     "clash_api": {
-      "external_controller": "localhost:48909",
+      "external_controller": "127.0.0.1:48909",
       "external_ui": "ui",
       "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "CN",
