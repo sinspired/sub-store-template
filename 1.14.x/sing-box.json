@@ -201,7 +201,7 @@
         "10.7.0.2",
         "fd00:1:2:3::2"
       ],
-      "auto_route": true,
+      "auto_route": false,
       "strict_route": true,
       "route_exclude_address": [
         "192.168.0.0/16",
