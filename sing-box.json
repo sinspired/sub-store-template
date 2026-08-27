@@ -144,7 +144,7 @@
     {
       "tag": "client_direct",
       "engine": "go",
-      "version": 2,
+      "version": 3,
       "detour": "CN",
       "connect_timeout": "15s",
       "domain_resolver": "ali-dns",
@@ -154,10 +154,23 @@
     {
       "tag": "client_proxy",
       "engine": "go",
-      "version": 2,
+      "version": 3,
       "detour": "PROXY",
       "connect_timeout": "10s",
       "domain_resolver": "google-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
+    },
+    {
+      "tag": "client_insecure",
+      "engine": "go",
+      "version": 3,
+      "tls": {
+        "insecure": true
+      },
+      "detour": "CN",
+      "connect_timeout": "15s",
+      "domain_resolver": "ali-dns",
       "stream_receive_window": 0,
       "connection_receive_window": 0
     }
@@ -846,6 +859,11 @@
         "outbound": "DIRECT"
       },
       {
+        "inbound": "tun-in",
+        "process_path_regex": "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$",
+        "outbound": "DIRECT"
+      },
+      {
         "clash_mode": "全局",
         "outbound": "GLOBAL"
       },
@@ -1013,9 +1031,9 @@
           "geoip/cloudflare",
           "geoip/cn"
         ],
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
+        "http_client": "client_insecure",
         "update_interval": "24h0m0s"
       },
       {
@@ -1044,9 +1062,9 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
+        "http_client": "client_insecure",
         "update_interval": "24h0m0s"
       },
       {
@@ -1063,17 +1081,17 @@
           "BiliBiliIntl",
           "iQIYIIntl"
         ],
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
+        "http_client": "client_insecure",
         "update_interval": "24h0m0s"
       },
       {
         "type": "remote",
         "tag": "anti_ad",
-        "url": "https://axisnow.gh-proxy.org/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
+        "url": "https://ghproxy.net/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
         "initial_path": "rules/anti_ad.srs",
-        "http_client": "client_direct",
+        "http_client": "client_insecure",
         "update_interval": "24h0m0s"
       }
     ],
@@ -1092,8 +1110,8 @@
       "access_control_allow_private_network": true,
       "dashboard": {
         "enabled": true,
-        "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
-        "http_client": "client_direct",
+        "download_url": "https://ghproxy.net/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "http_client": "client_insecure",
         "update_interval": "168h0m0s"
       }
     }
@@ -1110,7 +1128,7 @@
     "clash_api": {
       "external_controller": "127.0.0.1:60021",
       "external_ui": "ui",
-      "external_ui_download_url": "https://axisnow.gh-proxy.org/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
+      "external_ui_download_url": "https://ghproxy.net/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
       "external_ui_download_detour": "CN",
       "secret": "sinspired",
       "default_mode": "规则",

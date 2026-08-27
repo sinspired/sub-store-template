@@ -147,7 +147,9 @@
       "version": 3,
       "detour": "CN",
       "connect_timeout": "15s",
-      "domain_resolver": "ali-dns"
+      "domain_resolver": "ali-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
     },
     {
       "tag": "client_proxy",
@@ -155,18 +157,22 @@
       "version": 3,
       "detour": "PROXY",
       "connect_timeout": "10s",
-      "domain_resolver": "google-dns"
+      "domain_resolver": "google-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
     },
     {
       "tag": "client_insecure",
       "engine": "go",
       "version": 3,
-      "detour": "CN",
       "tls": {
         "insecure": true
       },
+      "detour": "CN",
       "connect_timeout": "15s",
-      "domain_resolver": "ali-dns"
+      "domain_resolver": "ali-dns",
+      "stream_receive_window": 0,
+      "connection_receive_window": 0
     }
   ],
   "inbounds": [
@@ -853,12 +859,8 @@
         "outbound": "DIRECT"
       },
       {
-        "inbound": [
-          "tun-in"
-        ],
-        "process_path_regex": [
-          "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$"
-        ],
+        "inbound": "tun-in",
+        "process_path_regex": "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$",
         "outbound": "DIRECT"
       },
       {
