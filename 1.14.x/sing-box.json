@@ -15,16 +15,17 @@
     {
       "tag": "client_direct",
       "engine": "go",
+      "detour": "CN",
+      "domain_resolver": "ali-dns",
       "connect_timeout": "15s",
       "tcp_fast_open": true,
-      "tcp_multi_path": true,
-      "detour": "CN",
-      "domain_resolver": "ali-dns"
+      "tcp_multi_path": true
     },
     {
       "tag": "client_proxy",
       "engine": "go",
       "detour": "PROXY",
+      "domain_resolver": "google-dns",
       "connect_timeout": "10s",
       "tcp_fast_open": true,
       "tcp_multi_path": true
@@ -36,10 +37,12 @@
       "listen": "127.0.0.1",
       "listen_port": 58909,
       "secret": "sinspired",
+      "access_control_allow_private_network": true,
       "dashboard": {
         "enabled": true,
         "download_url": "https://axisnow.gh-proxy.org/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
-        "http_client": "client_direct"
+        "http_client": "client_direct",
+        "update_interval": "7d"
       }
     }
   ],
