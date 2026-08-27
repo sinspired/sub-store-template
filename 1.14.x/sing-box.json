@@ -15,11 +15,9 @@
     {
       "tag": "client_direct",
       "engine": "go",
-      "detour": "CN",
+      "detour": "DIRECT",
       "domain_resolver": "ali-dns",
-      "connect_timeout": "15s",
-      "tcp_fast_open": true,
-      "tcp_multi_path": true
+      "connect_timeout": "15s"
     },
     {
       "tag": "client_proxy",
