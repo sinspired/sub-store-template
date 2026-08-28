@@ -162,19 +162,6 @@
       "stream_receive_window": "5 MB",
       "connection_receive_window": "5 MB",
       "max_concurrent_streams": 10
-    },
-    {
-      "tag": "client_insecure",
-      "engine": "go",
-      "version": 3,
-      "tls": {
-        "insecure": true
-      },
-      "detour": "CN",
-      "connect_timeout": "15s",
-      "domain_resolver": "ali-dns",
-      "stream_receive_window": 0,
-      "connection_receive_window": 0
     }
   ],
   "inbounds": [
