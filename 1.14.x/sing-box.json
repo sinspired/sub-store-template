@@ -1031,9 +1031,9 @@
           "geoip/cloudflare",
           "geoip/cn"
         ],
-        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_proxy",
+        "http_client": "client_direct",
         "update_interval": "24h0m0s"
       },
       {
@@ -1062,9 +1062,9 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
-        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_proxy",
+        "http_client": "client_direct",
         "update_interval": "24h0m0s"
       },
       {
@@ -1081,17 +1081,17 @@
           "BiliBiliIntl",
           "iQIYIIntl"
         ],
-        "url": "https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "url": "https://github.dpik.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_proxy",
+        "http_client": "client_direct",
         "update_interval": "24h0m0s"
       },
       {
         "type": "remote",
         "tag": "anti_ad",
-        "url": "https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
+        "url": "https://github.dpik.top/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
         "initial_path": "rules/anti_ad.srs",
-        "http_client": "client_proxy",
+        "http_client": "client_direct",
         "update_interval": "24h0m0s"
       }
     ],
@@ -1110,8 +1110,8 @@
       "access_control_allow_private_network": true,
       "dashboard": {
         "enabled": true,
-        "download_url": "https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
-        "http_client": "client_proxy",
+        "download_url": "https://github.dpik.top/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "http_client": "client_direct",
         "update_interval": "168h0m0s"
       }
     }
@@ -1128,8 +1128,8 @@
     "clash_api": {
       "external_controller": "127.0.0.1:60021",
       "external_ui": "ui",
-      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
-      "external_ui_download_detour": "PROXY",
+      "external_ui_download_url": "https://github.dpik.top/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
+      "external_ui_download_detour": "CN",
       "secret": "sinspired",
       "default_mode": "规则",
       "access_control_allow_origin": "*",
