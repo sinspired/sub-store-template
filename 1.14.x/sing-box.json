@@ -155,7 +155,7 @@
     {
       "tag": "client_proxy",
       "engine": "go",
-      "version": 3,
+      "version": 2,
       "detour": "PROXY",
       "connect_timeout": "10s",
       "domain_resolver": "google-dns",
