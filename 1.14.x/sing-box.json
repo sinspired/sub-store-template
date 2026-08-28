@@ -159,8 +159,9 @@
       "detour": "PROXY",
       "connect_timeout": "10s",
       "domain_resolver": "google-dns",
-      "stream_receive_window": 0,
-      "connection_receive_window": 0
+      "stream_receive_window": "5 MB",
+      "connection_receive_window": "5 MB",
+      "max_concurrent_streams": 10
     },
     {
       "tag": "client_insecure",
