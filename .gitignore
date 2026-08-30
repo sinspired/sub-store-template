@@ -1,2 +1,6 @@
 
 .wiki/
+*.srs
+*.html
+*.exe
+*.dll
