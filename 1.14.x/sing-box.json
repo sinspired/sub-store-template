@@ -75,7 +75,7 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
           "geosite/category-netdisk-cn",
-          "geosite/cn"
+          "geosite-cn"
         ],
         "server": "ali-dns",
         "timeout": "3s"
@@ -964,7 +964,7 @@
         "outbound": "Adult"
       },
       {
-        "rule_set": "geosite/cn",
+        "rule_set": "geosite-cn",
         "outbound": "CN"
       },
       {
@@ -1002,6 +1002,16 @@
       {
         "type": "remote",
         "tag": [
+          "geosite-cn"
+        ],
+        "url": "https://github.dpik.top/https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": [
           "geoip/google",
           "geoip/twitter",
           "geoip/telegram",
@@ -1032,7 +1042,6 @@
           "geosite/twitter",
           "geosite/cloudflare",
           "geosite/category-netdisk-cn",
-          "geosite/cn",
           "geosite/disney",
           "geosite/category-porn",
           "geosite/category-ads-all",
