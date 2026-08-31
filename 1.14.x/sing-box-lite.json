@@ -73,7 +73,6 @@
           "iQIYIIntl",
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
-          "geosite/category-netdisk-cn",
           "geosite-cn"
         ],
         "server": "ali-dns",
@@ -833,7 +832,6 @@
         "rule_set": [
           "AliPay",
           "geosite/apple-cn",
-          "geosite/category-netdisk-cn",
           "BiliBili"
         ],
         "outbound": "CN"
@@ -988,7 +986,6 @@
           "geosite/google",
           "geosite/twitter",
           "geosite/cloudflare",
-          "geosite/category-netdisk-cn",
           "geosite/disney",
           "geosite/category-porn",
           "geosite/category-ads-all",
