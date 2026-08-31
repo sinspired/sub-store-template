@@ -9,7 +9,8 @@ param(
     [string]$RuleSetDir = "./ruleset-cache",
     [string]$HtmlReportPath = "./ruleset-report.html",
     [string[]]$DnsServers = @("223.5.5.5", "8.8.8.8", "1.1.1.1"),
-    [switch]$SkipDownload
+    [switch]$SkipDownload,
+    [switch]$OnlySizeReport
 )
 
 $ErrorActionPreference = "Stop"
@@ -190,6 +191,9 @@ $SceneDomains = @{
         "workers.dev", "pages.dev", "cloudflareinsights.com",
         "cloudflarestream.com", "cf-ipfs.com"
     )
+    "PORN"          = @(
+        "pornhub.com", "91porn.com", "91porny.com", "jable.tv", "eporner.com", "bestjavporn.com", "missav.ws"
+    )
     "Ads"           = @(
         "doubleclick.net",
         "googlesyndication.com",
@@ -244,6 +248,11 @@ $sizeReport = foreach ($tag in $RuleSets.Keys) {
 }
 
 $sizeReport | Sort-Object SizeKB -Descending | Format-Table -AutoSize
+
+if ($OnlySizeReport) {
+    Write-Host "`n== 已启用 OnlySizeReport，跳过后续解析 ==" -ForegroundColor Yellow
+    return
+}
 
 #  7. DNS 实际解析 + 污染过滤
 Write-Host "`n== 并行 DNS 解析（依次尝试：$($DnsServers -join ', ')）==" -ForegroundColor Cyan
