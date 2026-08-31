@@ -55,11 +55,11 @@
         "action": "reject"
       },
       {
-        "clash_mode": "直连",
+        "clash_mode": "Direct",
         "server": "ali-dns"
       },
       {
-        "clash_mode": "全局",
+        "clash_mode": "Global",
         "server": "fakeip"
       },
       {
@@ -775,11 +775,11 @@
         "outbound": "DIRECT"
       },
       {
-        "clash_mode": "全局",
+        "clash_mode": "Global",
         "outbound": "GLOBAL"
       },
       {
-        "clash_mode": "直连",
+        "clash_mode": "Direct",
         "outbound": "DIRECT"
       },
       {
@@ -1009,6 +1009,22 @@
     "default_domain_resolver": "ali-dns",
     "default_http_client": "client_proxy"
   },
+  "services": [
+    {
+      "type": "api",
+      "listen": "127.0.0.1",
+      "listen_port": 60020,
+      "detour": "CN",
+      "secret": "sinspired",
+      "access_control_allow_private_network": true,
+      "dashboard": {
+        "enabled": true,
+        "download_url": "https://gh.dev.438250.xyz/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "http_client": "client_direct",
+        "update_interval": "168h0m0s"
+      }
+    }
+  ],
   "experimental": {
     "cache_file": {
       "enabled": true,
@@ -1017,16 +1033,6 @@
       "store_fakeip": true,
       "rdrc_timeout": "168h0m0s",
       "store_dns": true
-    },
-    "clash_api": {
-      "external_controller": "",
-      "external_ui": "ui",
-      "external_ui_download_url": "https://gh.dev.438250.xyz/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
-      "external_ui_download_detour": "CN",
-      "secret": "sinspired",
-      "default_mode": "规则",
-      "access_control_allow_origin": "*",
-      "access_control_allow_private_network": true
     }
   }
 }
