@@ -295,8 +295,6 @@
       "tag": "OpenAI",
       "outbounds": [
         "OpenAI-AUTO",
-        "Gemini",
-        "Copilot",
         "Cloudflare",
         "MANUAL"
       ],
@@ -308,8 +306,6 @@
       "tag": "Claude",
       "outbounds": [
         "OpenAI-AUTO",
-        "Gemini",
-        "Copilot",
         "Cloudflare",
         "MANUAL"
       ],
@@ -321,9 +317,6 @@
       "tag": "Gemini",
       "outbounds": [
         "Gemini-AUTO",
-        "OpenAI",
-        "Claude",
-        "Copilot",
         "Cloudflare",
         "MANUAL"
       ],
@@ -335,9 +328,6 @@
       "tag": "Copilot",
       "outbounds": [
         "Copilot-AUTO",
-        "OpenAI",
-        "Claude",
-        "Gemini",
         "Cloudflare",
         "MANUAL"
       ],
