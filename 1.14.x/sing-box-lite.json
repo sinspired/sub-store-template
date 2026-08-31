@@ -126,7 +126,7 @@
     "final": "ali-dns",
     "strategy": "prefer_ipv4",
     "timeout": "5s",
-    "cache_capacity": 8192,
+    "cache_capacity": 1024,
     "optimistic": {
       "enabled": true,
       "timeout": "10m0s"
@@ -185,7 +185,7 @@
     {
       "type": "tun",
       "tag": "tun-in",
-      "mtu": 9000,
+      "mtu": 1500,
       "address": [
         "10.7.0.1/24",
         "fd00:1:2:3::1/64"
@@ -283,6 +283,7 @@
         "Claude",
         "Gemini",
         "Copilot",
+        "Cloudflare",
         "MANUAL"
       ],
       "default": "AI-AUTO",
