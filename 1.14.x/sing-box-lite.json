@@ -936,7 +936,7 @@
         "tag": [
           "geosite-cn"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -950,7 +950,7 @@
           "geoip/cloudflare",
           "geoip/cn"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -979,7 +979,7 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -998,7 +998,7 @@
           "BiliBiliIntl",
           "iQIYIIntl"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
