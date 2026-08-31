@@ -50,8 +50,7 @@
       },
       {
         "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
+          "geosite/category-ads-all"
         ],
         "action": "reject"
       },
@@ -428,14 +427,16 @@
       "type": "selector",
       "tag": "TikTok",
       "outbounds": [
-        "TK-US-AUTO",
-        "TK-JP-AUTO",
-        "TK-VN-AUTO",
-        "TK-SG-AUTO",
-        "TK-TW-AUTO",
-        "MANUAL"
+        "US-AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
       ],
-      "default": "TK-US-AUTO",
+      "default": "US-AUTO",
       "interrupt_exist_connections": true
     },
     {
@@ -697,61 +698,6 @@
     },
     {
       "type": "urltest",
-      "tag": "TK-US-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m4s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "TK-JP-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m37s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "TK-VN-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m9s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "TK-SG-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m38s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "TK-TW-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "22m6s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
       "tag": "HK-AUTO",
       "outbounds": [
         "AUTO"
@@ -850,8 +796,7 @@
       },
       {
         "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
+          "geosite/category-ads-all"
         ],
         "action": "reject"
       },
@@ -1060,14 +1005,6 @@
         ],
         "url": "https://github.dpik.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
-        "update_interval": "24h0m0s"
-      },
-      {
-        "type": "remote",
-        "tag": "anti_ad",
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
-        "initial_path": "rules/anti_ad.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
       }
