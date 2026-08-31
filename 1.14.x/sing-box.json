@@ -254,18 +254,14 @@
       "tag": "PROXY",
       "outbounds": [
         "AUTO",
-        "MANUAL",
+        "AI",
         "Cloudflare",
+        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "TW-AUTO",
         "SG-AUTO",
         "US-AUTO",
-        "TikTok",
-        "YouTube",
-        "AI",
-        "Gemini",
-        "Copilot",
         "DIRECT"
       ],
       "default": "AUTO",
@@ -285,9 +281,10 @@
       "outbounds": [
         "AI-AUTO",
         "OpenAI",
+        "Claude",
         "Gemini",
         "Copilot",
-        "CF-AUTO",
+        "Cloudflare",
         "MANUAL"
       ],
       "default": "AI-AUTO",
@@ -298,11 +295,12 @@
       "tag": "OpenAI",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "Copilot-AUTO",
-        "CF-AUTO",
-        "Gemini-AUTO"
+        "AI",
+        "Claude",
+        "Gemini",
+        "Copilot",
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "OpenAI-AUTO",
       "interrupt_exist_connections": true
@@ -312,11 +310,11 @@
       "tag": "Claude",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "Copilot-AUTO",
-        "CF-AUTO",
-        "Gemini-AUTO"
+        "OpenAI",
+        "Gemini",
+        "Copilot",
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "OpenAI-AUTO",
       "interrupt_exist_connections": true
@@ -326,11 +324,11 @@
       "tag": "Gemini",
       "outbounds": [
         "Gemini-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "OpenAI-AUTO",
-        "Copilot-AUTO",
-        "CF-AUTO"
+        "OpenAI",
+        "Claude",
+        "Copilot",
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "Gemini-AUTO",
       "interrupt_exist_connections": true
@@ -340,11 +338,11 @@
       "tag": "Copilot",
       "outbounds": [
         "Copilot-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "OpenAI-AUTO",
-        "Gemini-AUTO",
-        "CF-AUTO"
+        "OpenAI",
+        "Claude",
+        "Gemini",
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "Copilot-AUTO",
       "interrupt_exist_connections": true
@@ -355,9 +353,7 @@
       "outbounds": [
         "Copilot",
         "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "AUTO"
+        "PROXY"
       ],
       "default": "Copilot",
       "interrupt_exist_connections": true
@@ -367,10 +363,8 @@
       "tag": "Google",
       "outbounds": [
         "PROXY",
-        "MANUAL",
         "Gemini",
         "YouTube",
-        "CF-AUTO",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -383,37 +377,10 @@
     },
     {
       "type": "selector",
-      "tag": "Twitter",
-      "outbounds": [
-        "CF-AUTO",
-        "AI-AUTO",
-        "OpenAI",
-        "PROXY",
-        "MANUAL",
-        "AUTO"
-      ],
-      "default": "CF-AUTO",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
-      "tag": "Cloudflare",
-      "outbounds": [
-        "CF-AUTO",
-        "AI-AUTO",
-        "OpenAI",
-        "MANUAL",
-        "AUTO"
-      ],
-      "default": "CF-AUTO",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
       "tag": "YouTube",
       "outbounds": [
         "YouTube-AUTO",
-        "MANUAL",
+        "Gemini",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -422,6 +389,36 @@
         "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "Twitter",
+      "outbounds": [
+        "Cloudflare",
+        "AI",
+        "OpenAI",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "Cloudflare",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "Cloudflare",
+      "outbounds": [
+        "CF-AUTO",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "MANUAL"
+      ],
+      "default": "CF-AUTO",
       "interrupt_exist_connections": true
     },
     {
@@ -448,7 +445,6 @@
         "TW-AUTO",
         "SG-AUTO",
         "PROXY",
-        "MANUAL",
         "AUTO",
         "DIRECT"
       ],
@@ -459,14 +455,15 @@
       "type": "selector",
       "tag": "Telegram",
       "outbounds": [
+        "PROXY",
+        "Cloudflare",
         "AUTO",
-        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
-        "PROXY"
+        "MANUAL"
       ],
       "default": "AUTO",
       "interrupt_exist_connections": true
@@ -477,13 +474,14 @@
       "outbounds": [
         "Netflix-AUTO",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "Netflix-AUTO",
       "interrupt_exist_connections": true
@@ -494,13 +492,14 @@
       "outbounds": [
         "DIRECT",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "DIRECT",
       "interrupt_exist_connections": true
@@ -510,13 +509,14 @@
       "tag": "Apple-Int",
       "outbounds": [
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
+        "MANUAL",
         "DIRECT"
       ],
       "default": "PROXY",
@@ -527,13 +527,14 @@
       "tag": "MediaIntl",
       "outbounds": [
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
+        "MANUAL",
         "DIRECT"
       ],
       "default": "PROXY",
@@ -545,13 +546,14 @@
       "outbounds": [
         "Disney-AUTO",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "Disney-AUTO",
       "interrupt_exist_connections": true
@@ -561,14 +563,15 @@
       "tag": "Adult",
       "outbounds": [
         "PROXY",
-        "CF-AUTO",
+        "Cloudflare",
         "AUTO",
-        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
@@ -591,15 +594,15 @@
       "tag": "FINAL",
       "outbounds": [
         "PROXY",
-        "CF-AUTO",
-        "MANUAL",
-        "DIRECT",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
