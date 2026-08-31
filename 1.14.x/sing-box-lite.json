@@ -427,15 +427,14 @@
       "type": "selector",
       "tag": "TikTok",
       "outbounds": [
-        "US-AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "TW-AUTO",
-        "SG-AUTO",
-        "MANUAL",
-        "AUTO"
+        "TK-US-AUTO",
+        "TK-JP-AUTO",
+        "TK-VN-AUTO",
+        "TK-SG-AUTO",
+        "TK-TW-AUTO",
+        "MANUAL"
       ],
-      "default": "US-AUTO",
+      "default": "TK-US-AUTO",
       "interrupt_exist_connections": true
     },
     {
@@ -694,6 +693,61 @@
       "url": "https://cp.cloudflare.com/generate_204",
       "interval": "4m3s",
       "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "TK-US-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "20m4s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TK-JP-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "20m37s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TK-VN-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "21m9s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TK-SG-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "21m38s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
+    },
+    {
+      "type": "urltest",
+      "tag": "TK-TW-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "22m6s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
