@@ -56,11 +56,11 @@
         "action": "reject"
       },
       {
-        "clash_mode": "直连",
+        "clash_mode": "Direct",
         "server": "ali-dns"
       },
       {
-        "clash_mode": "全局",
+        "clash_mode": "Global",
         "server": "fakeip"
       },
       {
@@ -75,7 +75,7 @@
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
           "geosite/category-netdisk-cn",
-          "geosite/cn"
+          "geosite-cn"
         ],
         "server": "ali-dns",
         "timeout": "3s"
@@ -127,7 +127,7 @@
     "final": "ali-dns",
     "strategy": "prefer_ipv4",
     "timeout": "5s",
-    "cache_capacity": 8192,
+    "cache_capacity": 1024,
     "optimistic": {
       "enabled": true,
       "timeout": "10m0s"
@@ -186,7 +186,7 @@
     {
       "type": "tun",
       "tag": "tun-in",
-      "mtu": 9000,
+      "mtu": 1500,
       "address": [
         "10.7.0.1/24",
         "fd00:1:2:3::1/64"
@@ -244,14 +244,7 @@
       "tag": "GLOBAL",
       "outbounds": [
         "DIRECT",
-        "PROXY",
-        "AUTO",
-        "MANUAL",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
+        "PROXY"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
@@ -261,18 +254,14 @@
       "tag": "PROXY",
       "outbounds": [
         "AUTO",
-        "MANUAL",
+        "AI",
         "Cloudflare",
+        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "TW-AUTO",
         "SG-AUTO",
         "US-AUTO",
-        "TikTok",
-        "YouTube",
-        "AI",
-        "Gemini",
-        "Copilot",
         "DIRECT"
       ],
       "default": "AUTO",
@@ -292,9 +281,10 @@
       "outbounds": [
         "AI-AUTO",
         "OpenAI",
+        "Claude",
         "Gemini",
         "Copilot",
-        "CF-AUTO",
+        "Cloudflare",
         "MANUAL"
       ],
       "default": "AI-AUTO",
@@ -305,11 +295,8 @@
       "tag": "OpenAI",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "Copilot-AUTO",
-        "CF-AUTO",
-        "Gemini-AUTO"
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "OpenAI-AUTO",
       "interrupt_exist_connections": true
@@ -319,11 +306,8 @@
       "tag": "Claude",
       "outbounds": [
         "OpenAI-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "Copilot-AUTO",
-        "CF-AUTO",
-        "Gemini-AUTO"
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "OpenAI-AUTO",
       "interrupt_exist_connections": true
@@ -333,11 +317,8 @@
       "tag": "Gemini",
       "outbounds": [
         "Gemini-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "OpenAI-AUTO",
-        "Copilot-AUTO",
-        "CF-AUTO"
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "Gemini-AUTO",
       "interrupt_exist_connections": true
@@ -347,11 +328,8 @@
       "tag": "Copilot",
       "outbounds": [
         "Copilot-AUTO",
-        "AI-AUTO",
-        "MANUAL",
-        "OpenAI-AUTO",
-        "Gemini-AUTO",
-        "CF-AUTO"
+        "Cloudflare",
+        "MANUAL"
       ],
       "default": "Copilot-AUTO",
       "interrupt_exist_connections": true
@@ -362,9 +340,7 @@
       "outbounds": [
         "Copilot",
         "DIRECT",
-        "PROXY",
-        "MANUAL",
-        "AUTO"
+        "PROXY"
       ],
       "default": "Copilot",
       "interrupt_exist_connections": true
@@ -374,10 +350,8 @@
       "tag": "Google",
       "outbounds": [
         "PROXY",
-        "MANUAL",
         "Gemini",
         "YouTube",
-        "CF-AUTO",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -390,42 +364,10 @@
     },
     {
       "type": "selector",
-      "tag": "Twitter",
-      "outbounds": [
-        "CF-AUTO",
-        "AI-AUTO",
-        "OpenAI",
-        "PROXY",
-        "MANUAL",
-        "AUTO"
-      ],
-      "default": "CF-AUTO",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
-      "tag": "Cloudflare",
-      "outbounds": [
-        "CF-AUTO",
-        "AI-AUTO",
-        "OpenAI",
-        "MANUAL",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO"
-      ],
-      "default": "CF-AUTO",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
       "tag": "YouTube",
       "outbounds": [
         "YouTube-AUTO",
-        "MANUAL",
+        "Gemini",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
@@ -434,6 +376,36 @@
         "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "Twitter",
+      "outbounds": [
+        "Cloudflare",
+        "AI",
+        "OpenAI",
+        "PROXY",
+        "MANUAL",
+        "AUTO"
+      ],
+      "default": "Cloudflare",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "Cloudflare",
+      "outbounds": [
+        "CF-AUTO",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "MANUAL"
+      ],
+      "default": "CF-AUTO",
       "interrupt_exist_connections": true
     },
     {
@@ -460,7 +432,6 @@
         "TW-AUTO",
         "SG-AUTO",
         "PROXY",
-        "MANUAL",
         "AUTO",
         "DIRECT"
       ],
@@ -471,14 +442,15 @@
       "type": "selector",
       "tag": "Telegram",
       "outbounds": [
+        "PROXY",
+        "Cloudflare",
         "AUTO",
-        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
-        "PROXY"
+        "MANUAL"
       ],
       "default": "AUTO",
       "interrupt_exist_connections": true
@@ -489,13 +461,14 @@
       "outbounds": [
         "Netflix-AUTO",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "Netflix-AUTO",
       "interrupt_exist_connections": true
@@ -506,13 +479,14 @@
       "outbounds": [
         "DIRECT",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "DIRECT",
       "interrupt_exist_connections": true
@@ -522,13 +496,14 @@
       "tag": "Apple-Int",
       "outbounds": [
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
+        "MANUAL",
         "DIRECT"
       ],
       "default": "PROXY",
@@ -539,13 +514,14 @@
       "tag": "MediaIntl",
       "outbounds": [
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
         "SG-AUTO",
+        "MANUAL",
         "DIRECT"
       ],
       "default": "PROXY",
@@ -557,13 +533,14 @@
       "outbounds": [
         "Disney-AUTO",
         "PROXY",
-        "MANUAL",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL"
       ],
       "default": "Disney-AUTO",
       "interrupt_exist_connections": true
@@ -573,14 +550,15 @@
       "tag": "Adult",
       "outbounds": [
         "PROXY",
-        "CF-AUTO",
+        "Cloudflare",
         "AUTO",
-        "MANUAL",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
@@ -603,15 +581,15 @@
       "tag": "FINAL",
       "outbounds": [
         "PROXY",
-        "CF-AUTO",
-        "MANUAL",
-        "DIRECT",
+        "Cloudflare",
         "AUTO",
         "HK-AUTO",
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
@@ -853,11 +831,11 @@
         "outbound": "DIRECT"
       },
       {
-        "clash_mode": "全局",
+        "clash_mode": "Global",
         "outbound": "GLOBAL"
       },
       {
-        "clash_mode": "直连",
+        "clash_mode": "Direct",
         "outbound": "DIRECT"
       },
       {
@@ -976,7 +954,7 @@
         "outbound": "Adult"
       },
       {
-        "rule_set": "geosite/cn",
+        "rule_set": "geosite-cn",
         "outbound": "CN"
       },
       {
@@ -1014,13 +992,23 @@
       {
         "type": "remote",
         "tag": [
+          "geosite-cn"
+        ],
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/{tag}.srs",
+        "initial_path": "rules/{tag}.srs",
+        "http_client": "client_direct",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": [
           "geoip/google",
           "geoip/twitter",
           "geoip/telegram",
           "geoip/cloudflare",
           "geoip/cn"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -1044,14 +1032,13 @@
           "geosite/twitter",
           "geosite/cloudflare",
           "geosite/category-netdisk-cn",
-          "geosite/cn",
           "geosite/disney",
           "geosite/category-porn",
           "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -1070,7 +1057,7 @@
           "BiliBiliIntl",
           "iQIYIIntl"
         ],
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -1078,7 +1065,7 @@
       {
         "type": "remote",
         "tag": "anti_ad",
-        "url": "https://github.dpik.top/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
+        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
         "initial_path": "rules/anti_ad.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
@@ -1092,14 +1079,14 @@
   "services": [
     {
       "type": "api",
-      "listen": "127.0.0.1",
+      "listen": "0.0.0.0",
       "listen_port": 60020,
       "detour": "CN",
       "secret": "sinspired",
       "access_control_allow_private_network": true,
       "dashboard": {
         "enabled": true,
-        "download_url": "https://github.dpik.top/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
+        "download_url": "https://gh.dev.438250.xyz/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
         "http_client": "client_direct",
         "update_interval": "168h0m0s"
       }
@@ -1113,16 +1100,6 @@
       "store_fakeip": true,
       "rdrc_timeout": "168h0m0s",
       "store_dns": true
-    },
-    "clash_api": {
-      "external_controller": "127.0.0.1:60021",
-      "external_ui": "ui",
-      "external_ui_download_url": "https://github.dpik.top/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
-      "external_ui_download_detour": "CN",
-      "secret": "sinspired",
-      "default_mode": "规则",
-      "access_control_allow_origin": "*",
-      "access_control_allow_private_network": true
     }
   }
 }

@@ -1079,7 +1079,7 @@
   "services": [
     {
       "type": "api",
-      "listen": "127.0.0.1",
+      "listen": "0.0.0.0",
       "listen_port": 60020,
       "detour": "CN",
       "secret": "sinspired",
