@@ -816,7 +816,8 @@
         "domain_suffix": [
           "ghproxy.net",
           "ghproxy.com",
-          "ghfast.top"
+          "ghfast.top",
+          "yfamilys.com"
         ],
         "rule_set": [
           "geosite/apple-cn",
