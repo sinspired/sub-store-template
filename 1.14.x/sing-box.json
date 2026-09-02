@@ -74,7 +74,6 @@
           "iQIYIIntl",
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
-          "geosite/category-netdisk-cn",
           "geosite-cn"
         ],
         "server": "ali-dns",
@@ -475,6 +474,24 @@
     },
     {
       "type": "selector",
+      "tag": "Disney",
+      "outbounds": [
+        "Disney-AUTO",
+        "PROXY",
+        "Cloudflare",
+        "AUTO",
+        "HK-AUTO",
+        "JP-AUTO",
+        "US-AUTO",
+        "TW-AUTO",
+        "SG-AUTO",
+        "MANUAL"
+      ],
+      "default": "Disney-AUTO",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
       "tag": "Apple",
       "outbounds": [
         "DIRECT",
@@ -493,7 +510,7 @@
     },
     {
       "type": "selector",
-      "tag": "Apple-Int",
+      "tag": "Apple-Intl",
       "outbounds": [
         "PROXY",
         "Cloudflare",
@@ -511,7 +528,7 @@
     },
     {
       "type": "selector",
-      "tag": "MediaIntl",
+      "tag": "Media-Intl",
       "outbounds": [
         "PROXY",
         "Cloudflare",
@@ -525,24 +542,6 @@
         "DIRECT"
       ],
       "default": "PROXY",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
-      "tag": "Disney",
-      "outbounds": [
-        "Disney-AUTO",
-        "PROXY",
-        "Cloudflare",
-        "AUTO",
-        "HK-AUTO",
-        "JP-AUTO",
-        "US-AUTO",
-        "TW-AUTO",
-        "SG-AUTO",
-        "MANUAL"
-      ],
-      "default": "Disney-AUTO",
       "interrupt_exist_connections": true
     },
     {
@@ -647,6 +646,16 @@
     },
     {
       "type": "urltest",
+      "tag": "CF-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "4m3s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
       "tag": "YouTube-AUTO",
       "outbounds": [
         "AUTO"
@@ -673,16 +682,6 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "16m0s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "CF-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "4m3s",
       "tolerance": 50
     },
     {
@@ -854,18 +853,20 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geosite/apple-intelligence",
-        "outbound": "Apple-Int"
+        "rule_set": [
+          "geosite/apple-intelligence",
+          "geosite/apple-tvplus"
+        ],
+        "outbound": "Apple-Intl"
       },
       {
         "rule_set": [
-          "geosite/apple-tvplus",
+          "BiliBiliIntl",
           "geosite/youku@!cn",
           "geosite/tencent@!cn",
-          "BiliBiliIntl",
           "iQIYIIntl"
         ],
-        "outbound": "MediaIntl"
+        "outbound": "Media-Intl"
       },
       {
         "domain_suffix": [
@@ -874,9 +875,8 @@
           "ghfast.top"
         ],
         "rule_set": [
-          "AliPay",
           "geosite/apple-cn",
-          "geosite/category-netdisk-cn",
+          "AliPay",
           "BiliBili"
         ],
         "outbound": "CN"
@@ -1031,7 +1031,6 @@
           "geosite/google",
           "geosite/twitter",
           "geosite/cloudflare",
-          "geosite/category-netdisk-cn",
           "geosite/disney",
           "geosite/category-porn",
           "geosite/category-ads-all",
