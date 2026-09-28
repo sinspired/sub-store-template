@@ -742,6 +742,36 @@
   "route": {
     "rules": [
       {
+        "process_name": [
+          "ntrace.exe",
+          "iperf3.exe",
+          "tcping.exe",
+          "mtr.exe",
+          "WinStore.App"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
+        "process_name": [
+          "copilotapp"
+        ],
+        "outbound": "AI"
+      },
+      {
+        "package_name": [
+          "com.sinspired.subs_free"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
+        "inbound": "tun-in",
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$",
+          "(?i)(^|[/\\\\])subs-free(?:-pro(?:-gui)?)?(?:\\.exe)?$"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
         "inbound": [
           "tun-in",
           "mixed-in",
@@ -766,11 +796,6 @@
       },
       {
         "ip_is_private": true,
-        "outbound": "DIRECT"
-      },
-      {
-        "inbound": "tun-in",
-        "process_path_regex": "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$",
         "outbound": "DIRECT"
       },
       {
