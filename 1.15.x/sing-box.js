@@ -1,4 +1,9 @@
-const { type, name } = $arguments
+function log(msg) {
+  console.log(`[📦 节点分组脚本] ${msg}`)
+}
+
+const { type, name, includeUnsupportedProxy } = $arguments
+log(`开始处理参数 name: ${name}, type: ${type}`)
 
 // 地区主标识（避免 GM-US / YT-US / CP-US 这种附属地区）
 const MAIN_REGION = {
@@ -63,20 +68,36 @@ const GROUP_RULES = {
 }
 
 // 解析配置 & 生成节点
-let config = JSON.parse($files[0])
+// 更稳健的 JSON5 解析
+const parser = typeof ProxyUtils !== 'undefined' && ProxyUtils.JSON5 ? ProxyUtils.JSON5 : JSON
+let config
+try {
+  log(`使用 ${parser === JSON ? 'JSON' : 'JSON5'} 解析配置文件`)
+  config = parser.parse($content ?? $files[0])
+} catch (e) {
+  log(`配置文件解析失败: ${e.message ?? e}`)
+  throw new Error(`配置文件不是合法的 JSON/JSON5 格式`)
+}
+
+// 增加容错参数的获取节点
+log(`开始获取订阅节点`)
 
 // 获取并解析生成的节点
 let artifactData = await produceArtifact({
   name,
-  type: /^1$|col/i.test(type) ? 'collection' : 'subscription',
+  type: /^1$|col|组合/i.test(type) ? 'collection' : 'subscription',
   platform: 'sing-box',
   produceType: 'internal',
+  produceOpts: {
+    'include-unsupported-proxy': includeUnsupportedProxy, // 允许包含不支持的节点防报错
+  }
 })
 
 // Sub-Store 为 sing-box 生成的是一个包含 outbounds 和 endpoints 的 JSON
 let artifact = JSON.parse(artifactData)
 let newOutbounds = artifact.outbounds || []
 let newEndpoints = artifact.endpoints || []
+log(`获取到 ${newOutbounds.length} 个常规节点, ${newEndpoints.length} 个 Endpoint`)
 
 // 注入常规节点到 outbounds
 if (!Array.isArray(config.outbounds)) {
@@ -125,6 +146,22 @@ function getTikTokTagsStrict(sortedProxies, tag) {
   return list.slice(0, 100).map(p => p.tag)
 }
 
+// 引入 COMPATIBLE 兜底机制
+const COMPATIBLE_TAG = 'COMPATIBLE'
+let hasCompatible = false
+
+function injectCompatible() {
+  if (!hasCompatible) {
+    // 检查是否已经存在避免重复插入
+    const exist = config.outbounds.some(out => out.tag === COMPATIBLE_TAG)
+    if (!exist) {
+      config.outbounds.push({ tag: COMPATIBLE_TAG, type: 'direct' })
+    }
+    hasCompatible = true
+  }
+  return COMPATIBLE_TAG
+}
+
 // outbounds 归一化 & 智能填充 (支持 0 节点安全回退机制)
 function normalizeOutbounds(o, tags) {
   if (o.type !== 'selector' && o.type !== 'urltest') return
@@ -143,7 +180,7 @@ function normalizeOutbounds(o, tags) {
       o.outbounds = [...new Set(o.outbounds)]
     }
   } else {
-    // 【兜底降级】如果某个分组(尤其是测速组)因为没有节点而只剩 DIRECT，将其强制更改为 AUTO 防止死锁断网
+    // 如果某个分组(尤其是测速组)因为没有节点而只剩 DIRECT，将其强制更改为 AUTO 防止死锁断网
     if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
       o.outbounds = ['AUTO']
     }
@@ -177,8 +214,15 @@ for (const o of config.outbounds) {
 for (const o of config.outbounds) {
   if (o.type === 'selector' || o.type === 'urltest') {
     normalizeOutbounds(o, [])
+
+    // 降级兜底
+    if (!o.outbounds || o.outbounds.length === 0 || (o.outbounds.length === 1 && o.outbounds[0] === o.tag)) {
+      o.outbounds = [injectCompatible()]
+      log(`⚠️ 警告: 策略组 [${o.tag}] 发生空集或死锁，已自动注入 ${COMPATIBLE_TAG} 兜底`)
+    }
   }
 }
 
 // 输出
+log(`🔚 节点分组与合并完成`)
 $content = JSON.stringify(config, null, 2)
