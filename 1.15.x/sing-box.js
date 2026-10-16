@@ -68,16 +68,7 @@ const GROUP_RULES = {
 }
 
 // 解析配置 & 生成节点
-// 更稳健的 JSON5 解析
-const parser = typeof ProxyUtils !== 'undefined' && ProxyUtils.JSON5 ? ProxyUtils.JSON5 : JSON
-let config
-try {
-  log(`使用 ${parser === JSON ? 'JSON' : 'JSON5'} 解析配置文件`)
-  config = parser.parse($content ?? $files[0])
-} catch (e) {
-  log(`配置文件解析失败: ${e.message ?? e}`)
-  throw new Error(`配置文件不是合法的 JSON/JSON5 格式`)
-}
+let config = JSON.parse($files[0])
 
 // 增加容错参数的获取节点
 log(`开始获取订阅节点`)
@@ -93,29 +84,24 @@ let artifactData = await produceArtifact({
   }
 })
 
-// Sub-Store 为 sing-box 生成的是一个包含 outbounds 和 endpoints 的 JSON
-let artifact = JSON.parse(artifactData)
-let newOutbounds = artifact.outbounds || []
-let newEndpoints = artifact.endpoints || []
-log(`获取到 ${newOutbounds.length} 个常规节点, ${newEndpoints.length} 个 Endpoint`)
+// Sub-Store 为 sing-box 生成的是一个包含 outbounds 和 // 解析生成的 JSON 数据（分离 outbounds 和 endpoints）
+let data = JSON.parse(artifactData)
+let outbounds = data.outbounds || []
+let endpoints = data.endpoints || []
 
-// 注入常规节点到 outbounds
-if (!Array.isArray(config.outbounds)) {
-  config.outbounds = []
-}
-config.outbounds.push(...newOutbounds)
+log(`获取到 ${endpoints.length} 个常规节点, ${endpoints.length} 个 Endpoint`)
 
-// 注入 WireGuard/Tailscale 等端点到 endpoints
-if (newEndpoints.length > 0) {
-  if (!Array.isArray(config.endpoints)) {
-    config.endpoints = []
-  }
-  config.endpoints.push(...newEndpoints)
+// 分别注入到对应的配置数组中
+if (!Array.isArray(config.outbounds)) config.outbounds = []
+config.outbounds.push(...outbounds)
+
+if (endpoints.length > 0) {
+  if (!Array.isArray(config.endpoints)) config.endpoints = []
+  config.endpoints.push(...endpoints)
 }
 
-// 将两种节点合并为一个数组，用于后续的 tag 提取和测速筛选
-// sing-box 支持 selector/urltest 里混合包含 outbounds 和 endpoints 的 tag
-let allProxies = [...newOutbounds, ...newEndpoints]
+// 合并节点用于后续分组测速
+let proxies = [...outbounds, ...endpoints]
 
 // 性能优化：速度缓存 + 全局预排序
 const speedCache = new Map()
@@ -129,7 +115,7 @@ function parseSpeed(tag) {
 }
 
 // 只排序这一次，后面所有分组都复用这个结果
-const proxiesSortedBySpeed = allProxies.sort(
+const proxiesSortedBySpeed = [...proxies].sort(
   (a, b) => parseSpeed(b.tag) - parseSpeed(a.tag)
 )
 
@@ -144,22 +130,6 @@ function getTikTokTagsStrict(sortedProxies, tag) {
   const matcher = TIKTOK_MAIN[tag]
   let list = sortedProxies.filter(p => RE_TIKTOK.test(p.tag) && matcher(p.tag))
   return list.slice(0, 100).map(p => p.tag)
-}
-
-// 引入 COMPATIBLE 兜底机制
-const COMPATIBLE_TAG = 'COMPATIBLE'
-let hasCompatible = false
-
-function injectCompatible() {
-  if (!hasCompatible) {
-    // 检查是否已经存在避免重复插入
-    const exist = config.outbounds.some(out => out.tag === COMPATIBLE_TAG)
-    if (!exist) {
-      config.outbounds.push({ tag: COMPATIBLE_TAG, type: 'direct' })
-    }
-    hasCompatible = true
-  }
-  return COMPATIBLE_TAG
 }
 
 // outbounds 归一化 & 智能填充 (支持 0 节点安全回退机制)
@@ -208,6 +178,18 @@ for (const o of config.outbounds) {
   if (rule === undefined) continue
 
   safePush(o, getTags(proxiesSortedBySpeed, rule))
+}
+
+// 终极兜底逻辑：注入 COMPATIBLE (直连)
+const COMPATIBLE_TAG = 'COMPATIBLE'
+let hasCompatible = false
+
+function injectCompatible() {
+  if (!hasCompatible) {
+    config.outbounds.push({ tag: COMPATIBLE_TAG, type: 'direct' })
+    hasCompatible = true
+  }
+  return COMPATIBLE_TAG
 }
 
 // 修复所有仍然异常的 selector/urltest
