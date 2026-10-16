@@ -2,7 +2,7 @@ function log(msg) {
   console.log(`[📦 节点分组脚本] ${msg}`)
 }
 
-const { type, name, includeUnsupportedProxy } = $arguments
+const { type, name } = $arguments
 log(`开始处理参数 name: ${name}, type: ${type}`)
 
 // 地区主标识（避免 GM-US / YT-US / CP-US 这种附属地区）
@@ -74,18 +74,14 @@ let config = JSON.parse($files[0])
 log(`开始获取订阅节点`)
 
 // 获取并解析生成的节点
-let artifactData = await produceArtifact({
+let artifactStr = await produceArtifact({
   name,
-  type: /^1$|col|组合/i.test(type) ? 'collection' : 'subscription',
+  type: /^1$|col/i.test(type) ? 'collection' : 'subscription',
   platform: 'sing-box',
-  produceType: 'internal',
-  produceOpts: {
-    'include-unsupported-proxy': includeUnsupportedProxy, // 允许包含不支持的节点防报错
-  }
 })
 
 // Sub-Store 为 sing-box 生成的是一个包含 outbounds 和 // 解析生成的 JSON 数据（分离 outbounds 和 endpoints）
-let data = JSON.parse(artifactData)
+let data = JSON.parse(artifactStr)
 let outbounds = data.outbounds || []
 let endpoints = data.endpoints || []
 
