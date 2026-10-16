@@ -95,7 +95,7 @@ try {
     type: subType,
     platform: 'sing-box',
     produceType: 'internal',
-    produceOpts: { 'include-unsupported-proxy': true } // 核心参数：保留不支持的协议
+    produceOpts: { 'include-unsupported-proxy': true }
   })
 } catch (e) {
   log(`⚠️ 获取内部原始节点失败: ${e}`)
@@ -112,39 +112,34 @@ if (Array.isArray(rawProxies)) {
   if (openvpnNodes.length > 0) log(`查找到 ${openvpnNodes.length} 个 OpenVPN 原始节点，准备合并注入`)
 
   for (const p of openvpnNodes) {
-    let net = "udp"
-    if (p.network) net = p.network.toLowerCase()
-    else if (p.proto && p.proto.toLowerCase() === 'tcp') net = "tcp"
-    else if (p.udp === false) net = "tcp"
-
-    const endpointNode = {
+    // 核心必填字段
+    const ovpnNode = {
       type: "openvpn-client",
       tag: p.name || "ovpn-client",
       server: p.server,
       server_port: parseInt(p.port, 10),
-      network: net,
-      auth: p.auth || "",
-      cipher: p.cipher || "",
-      data_ciphers: p["data-ciphers"] || [],
-      username: p.username || "",
-      password: p.password || "",
-      tls: {
-        server_name: p.sni || p.server_name || p.peer || p.server,
-        certificate: p.ca ? (Array.isArray(p.ca) ? p.ca : [p.ca.trim()]) : [],
-        client_certificate: p.cert ? (Array.isArray(p.cert) ? p.cert : [p.cert.trim()]) : [],
-        client_key: p.key ? (Array.isArray(p.key) ? p.key : [p.key.trim()]) : []
-      }
+      network: (p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp')) ? 'tcp' : 'udp',
     }
 
-    // 清理空字段，防止 Sing-Box 强校验报错
-    if (!endpointNode.username) delete endpointNode.username
-    if (!endpointNode.password) delete endpointNode.password
-    if (!endpointNode.auth) delete endpointNode.auth
-    if (!endpointNode.cipher) delete endpointNode.cipher
-    if (endpointNode.data_ciphers.length === 0) delete endpointNode.data_ciphers
-    if (endpointNode.tls.certificate.length === 0 && endpointNode.tls.client_certificate.length === 0) delete endpointNode.tls
+    // 选填字段（有值才注入，不生成空字符串，保持配置干净）
+    if (p.auth) ovpnNode.auth = p.auth
+    if (p.cipher) ovpnNode.cipher = p.cipher
+    if (p['data-ciphers'] && p['data-ciphers'].length > 0) ovpnNode.data_ciphers = p['data-ciphers']
+    if (p.username) ovpnNode.username = p.username
+    if (p.password) ovpnNode.password = p.password
 
-    endpoints.push(endpointNode)
+    // TLS 证书部分
+    if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
+      ovpnNode.tls = {}
+      const sni = p.sni || p.server_name || p.peer
+      if (sni) ovpnNode.tls.server_name = sni
+      if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
+      if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
+      if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
+    }
+
+    // 直接推入 outbounds，当做普通节点参与后续路由与测速！
+    outbounds.push(ovpnNode)
   }
 }
 
@@ -154,13 +149,11 @@ log(`成功获取 ${outbounds.length} 个常规节点, ${endpoints.length} 个 E
 if (!Array.isArray(config.outbounds)) config.outbounds = []
 config.outbounds.push(...outbounds)
 
-if (endpoints.length > 0) {
+// Endpoint 依然保留（兼容如 WireGuard 等原生端点）
+if (data.endpoints && data.endpoints.length > 0) {
   if (!Array.isArray(config.endpoints)) config.endpoints = []
-  config.endpoints.push(...endpoints)
+  config.endpoints.push(...data.endpoints)
 }
-
-// 合并节点用于后续分组测速
-let proxies = [...outbounds, ...endpoints]
 
 // 性能优化：速度缓存 + 全局预排序
 const speedCache = new Map()
@@ -174,9 +167,7 @@ function parseSpeed(tag) {
 }
 
 // 只排序这一次，后面所有分组都复用这个结果
-const proxiesSortedBySpeed = [...proxies].sort(
-  (a, b) => parseSpeed(b.tag) - parseSpeed(a.tag)
-)
+const proxiesSortedBySpeed = [...outbounds].sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
 
 // 获取分组 tag 列表（从预排序数组里过滤，最多 100 个）
 function getTags(sortedProxies, regex) {
@@ -200,43 +191,32 @@ function normalizeOutbounds(o, tags) {
   }
 
   if (tags && tags.length > 0) {
-    // 如果分组目前只有占位符，执行覆写
     if (o.outbounds.length === 1 && (o.outbounds[0] === 'AUTO' || o.outbounds[0] === 'DIRECT')) {
       o.outbounds = tags.slice()
     } else {
-      // 否则为多级 Selector 执行追加去重
-      o.outbounds.push(...tags)
-      o.outbounds = [...new Set(o.outbounds)]
+      // 追加并去重
+      o.outbounds = [...new Set([...o.outbounds, ...tags])]
     }
   } else {
-    // 如果某个分组(尤其是测速组)因为没有节点而只剩 DIRECT，将其强制更改为 AUTO 防止死锁断网
+    // 测速组空集时回退
     if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
       o.outbounds = ['AUTO']
     }
   }
 }
 
-function safePush(o, tags) {
-  normalizeOutbounds(o, tags)
-}
-
-// 主逻辑：按 tag 分组填充
 for (const o of config.outbounds) {
-  if (!o.tag) continue
-  if (o.type !== 'selector' && o.type !== 'urltest') continue
+  if (!o.tag || (o.type !== 'selector' && o.type !== 'urltest')) continue
 
-  const tag = o.tag
-
-  // TikTok 严格匹配
-  if (TIKTOK_MAIN[tag]) {
-    safePush(o, getTikTokTagsStrict(proxiesSortedBySpeed, tag))
+  if (TIKTOK_MAIN[o.tag]) {
+    normalizeOutbounds(o, getTikTokTagsStrict(proxiesSortedBySpeed, o.tag))
     continue
   }
 
-  const rule = GROUP_RULES[tag]
-  if (rule === undefined) continue
-
-  safePush(o, getTags(proxiesSortedBySpeed, rule))
+  const rule = GROUP_RULES[o.tag]
+  if (rule !== undefined) {
+    normalizeOutbounds(o, getTags(proxiesSortedBySpeed, rule))
+  }
 }
 
 // 终极兜底逻辑：注入 COMPATIBLE (直连)
@@ -254,16 +234,14 @@ function injectCompatible() {
 // 修复所有仍然异常的 selector/urltest
 for (const o of config.outbounds) {
   if (o.type === 'selector' || o.type === 'urltest') {
-    normalizeOutbounds(o, [])
+    normalizeOutbounds(o, []) // 基础格式校验
 
-    // 降级兜底
     if (!o.outbounds || o.outbounds.length === 0 || (o.outbounds.length === 1 && o.outbounds[0] === o.tag)) {
       o.outbounds = [injectCompatible()]
-      log(`⚠️ 警告: 策略组 [${o.tag}] 发生空集或死锁，已自动注入 ${COMPATIBLE_TAG} 兜底`)
+      log(`⚠️ 警告: 策略组 [${o.tag}] 发生空集或死锁，已自动注入兜底节点`)
     }
   }
 }
 
-// 输出
 log(`🔚 节点分组与合并完成`)
 $content = JSON.stringify(config, null, 2)
