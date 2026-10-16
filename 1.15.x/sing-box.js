@@ -96,11 +96,12 @@ for (const p of openvpnNodes) {
     if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
   }
 
-  // 放入 outbounds 参加统一调度
-  outbounds.push(ovpnNode)
+  // 放入 endpoints 参加统一调度 (已修正: outbounds -> endpoints)
+  endpoints.push(ovpnNode)
 }
 
-log(`当前可用总代理数: ${outbounds.length} 个常规/OVPN出站, ${endpoints.length} 个端点`)
+// 日志提示已相应修改
+log(`当前可用总代理数: ${outbounds.length} 个常规出站, ${endpoints.length} 个端点(含OVPN)`)
 
 //  3. 注入节点与性能排序
 if (!Array.isArray(config.outbounds)) config.outbounds = []
