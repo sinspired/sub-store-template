@@ -73,10 +73,12 @@ let config = JSON.parse($files[0])
 // 增加容错参数的获取节点
 log(`开始获取订阅节点`)
 
-// 获取并解析生成的节点
+const subType = /^1$|col/i.test(type) ? 'collection' : 'subscription'
+
+// 2.1 获取标准 Sing-Box 节点配置
 let artifactStr = await produceArtifact({
   name,
-  type: /^1$|col/i.test(type) ? 'collection' : 'subscription',
+  type: subType,
   platform: 'sing-box',
 })
 
@@ -85,16 +87,37 @@ let data = JSON.parse(artifactStr)
 let outbounds = data.outbounds || []
 let endpoints = data.endpoints || []
 
-if (typeof $proxies !== 'undefined') {
-  // 直接从解析好的原始池子 $proxies 中抓出 OpenVPN
-  const openvpnNodes = $proxies.filter(p => p.type === 'openvpn' || p.type === 'openvpn-client');
+// 2.2 获取原始内部节点，强制提取被丢弃的 OpenVPN 节点
+let rawProxies = []
+try {
+  rawProxies = await produceArtifact({
+    name,
+    type: subType,
+    platform: 'sing-box',
+    produceType: 'internal',
+    produceOpts: { 'include-unsupported-proxy': true } // 核心参数：保留不支持的协议
+  })
+} catch (e) {
+  log(`⚠️ 获取内部原始节点失败: ${e}`)
+}
+
+// 兼容部分旧版本环境
+if (!Array.isArray(rawProxies) && typeof $proxies !== 'undefined') {
+  rawProxies = $proxies
+}
+
+// 2.3 转换并拼装 OpenVPN 端点
+if (Array.isArray(rawProxies)) {
+  const openvpnNodes = rawProxies.filter(p => p.type === 'openvpn' || p.type === 'openvpn-client')
+  if (openvpnNodes.length > 0) log(`查找到 ${openvpnNodes.length} 个 OpenVPN 原始节点，准备合并注入`)
 
   for (const p of openvpnNodes) {
-    let net = "udp";
-    if (p.proto && p.proto.toLowerCase() === 'tcp') net = "tcp";
-    if (p.udp === false) net = "tcp";
+    let net = "udp"
+    if (p.network) net = p.network.toLowerCase()
+    else if (p.proto && p.proto.toLowerCase() === 'tcp') net = "tcp"
+    else if (p.udp === false) net = "tcp"
 
-    endpoints.push({
+    const endpointNode = {
       type: "openvpn-client",
       tag: p.name || "ovpn-client",
       server: p.server,
@@ -103,16 +126,29 @@ if (typeof $proxies !== 'undefined') {
       auth: p.auth || "",
       cipher: p.cipher || "",
       data_ciphers: p["data-ciphers"] || [],
+      username: p.username || "",
+      password: p.password || "",
       tls: {
-        certificate: p.ca ? p.ca.trim() : "",
-        client_certificate: p.cert ? p.cert.trim() : "",
-        client_key: p.key ? p.key.trim() : ""
+        server_name: p.sni || p.server_name || p.peer || p.server,
+        certificate: p.ca ? (Array.isArray(p.ca) ? p.ca : [p.ca.trim()]) : [],
+        client_certificate: p.cert ? (Array.isArray(p.cert) ? p.cert : [p.cert.trim()]) : [],
+        client_key: p.key ? (Array.isArray(p.key) ? p.key : [p.key.trim()]) : []
       }
-    });
+    }
+
+    // 清理空字段，防止 Sing-Box 强校验报错
+    if (!endpointNode.username) delete endpointNode.username
+    if (!endpointNode.password) delete endpointNode.password
+    if (!endpointNode.auth) delete endpointNode.auth
+    if (!endpointNode.cipher) delete endpointNode.cipher
+    if (endpointNode.data_ciphers.length === 0) delete endpointNode.data_ciphers
+    if (endpointNode.tls.certificate.length === 0 && endpointNode.tls.client_certificate.length === 0) delete endpointNode.tls
+
+    endpoints.push(endpointNode)
   }
 }
 
-log(`获取到 ${endpoints.length} 个常规节点, ${endpoints.length} 个 Endpoint`)
+log(`成功获取 ${outbounds.length} 个常规节点, ${endpoints.length} 个 Endpoint 端点`)
 
 // 分别注入到对应的配置数组中
 if (!Array.isArray(config.outbounds)) config.outbounds = []
