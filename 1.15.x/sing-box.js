@@ -65,15 +65,36 @@ const GROUP_RULES = {
 // 解析配置 & 生成节点
 let config = JSON.parse($files[0])
 
-let proxies = await produceArtifact({
+// 获取并解析生成的节点
+let artifactData = await produceArtifact({
   name,
   type: /^1$|col/i.test(type) ? 'collection' : 'subscription',
   platform: 'sing-box',
   produceType: 'internal',
 })
 
-// 注入节点
-config.outbounds.push(...proxies)
+// Sub-Store 为 sing-box 生成的是一个包含 outbounds 和 endpoints 的 JSON
+let artifact = JSON.parse(artifactData)
+let newOutbounds = artifact.outbounds || []
+let newEndpoints = artifact.endpoints || []
+
+// 注入常规节点到 outbounds
+if (!Array.isArray(config.outbounds)) {
+  config.outbounds = []
+}
+config.outbounds.push(...newOutbounds)
+
+// 注入 WireGuard/Tailscale 等端点到 endpoints
+if (newEndpoints.length > 0) {
+  if (!Array.isArray(config.endpoints)) {
+    config.endpoints = []
+  }
+  config.endpoints.push(...newEndpoints)
+}
+
+// 将两种节点合并为一个数组，用于后续的 tag 提取和测速筛选
+// sing-box 支持 selector/urltest 里混合包含 outbounds 和 endpoints 的 tag
+let allProxies = [...newOutbounds, ...newEndpoints]
 
 // 性能优化：速度缓存 + 全局预排序
 const speedCache = new Map()
@@ -87,7 +108,7 @@ function parseSpeed(tag) {
 }
 
 // 只排序这一次，后面所有分组都复用这个结果
-const proxiesSortedBySpeed = [...proxies].sort(
+const proxiesSortedBySpeed = allProxies.sort(
   (a, b) => parseSpeed(b.tag) - parseSpeed(a.tag)
 )
 
