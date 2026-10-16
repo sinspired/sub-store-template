@@ -85,6 +85,33 @@ let data = JSON.parse(artifactStr)
 let outbounds = data.outbounds || []
 let endpoints = data.endpoints || []
 
+if (typeof $proxies !== 'undefined') {
+  // 直接从解析好的原始池子 $proxies 中抓出 OpenVPN
+  const openvpnNodes = $proxies.filter(p => p.type === 'openvpn' || p.type === 'openvpn-client');
+
+  for (const p of openvpnNodes) {
+    let net = "udp";
+    if (p.proto && p.proto.toLowerCase() === 'tcp') net = "tcp";
+    if (p.udp === false) net = "tcp";
+
+    endpoints.push({
+      type: "openvpn-client",
+      tag: p.name || "ovpn-client",
+      server: p.server,
+      server_port: parseInt(p.port, 10),
+      network: net,
+      auth: p.auth || "",
+      cipher: p.cipher || "",
+      data_ciphers: p["data-ciphers"] || [],
+      tls: {
+        certificate: p.ca ? p.ca.trim() : "",
+        client_certificate: p.cert ? p.cert.trim() : "",
+        client_key: p.key ? p.key.trim() : ""
+      }
+    });
+  }
+}
+
 log(`获取到 ${endpoints.length} 个常规节点, ${endpoints.length} 个 Endpoint`)
 
 // 分别注入到对应的配置数组中
