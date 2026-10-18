@@ -1,163 +1,177 @@
+function log(msg) { console.log(`[📦 节点分组脚本] ${msg}`) }
 const { type, name } = $arguments
+log(`开始处理参数 name: ${name}, type: ${type}`)
 
-// 地区主标识（避免 GM-US / YT-US / CP-US 这种附属地区）
-const MAIN_REGION = {
-  US: /(?<!-)\bUS\b/i,
-  VN: /(?<!-)\bVN\b/i,
-  JP: /(?<!-)\bJP\b/i,
-  SG: /(?<!-)\bSG\b/i,
-  TW: /(?<!-)\bTW\b/i,
-}
-
-// TikTok 通用标识
-// 注：裸 TK 会匹配 STK / GTK 等子串
+// 1. 匹配规则
+const MAIN_REGION = { US: /(?<!-)\bUS\b/i, VN: /(?<!-)\bVN\b/i, JP: /(?<!-)\bJP\b/i, SG: /(?<!-)\bSG\b/i, TW: /(?<!-)\bTW\b/i }
 const RE_TIKTOK = /\bTK\b|tiktok/i
-
-// TikTok 各地区严格匹配用的独立正则
-const RE_TK_US = /TK-US/i
-const RE_TK_VN = /TK-VN/i
-const RE_TK_JP = /TK-JP/i
-const RE_TK_SG = /TK-SG/i
-const RE_TK_TW = /TK-TW/i
-
-// TikTok 主地区标识（严格匹配）
+const RE_TK_US = /TK-US/i, RE_TK_VN = /TK-VN/i, RE_TK_JP = /TK-JP/i, RE_TK_SG = /TK-SG/i, RE_TK_TW = /TK-TW/i
 const TIKTOK_MAIN = {
   'TK-US-AUTO': tag => MAIN_REGION.US.test(tag) || RE_TK_US.test(tag),
   'TK-VN-AUTO': tag => MAIN_REGION.VN.test(tag) || RE_TK_VN.test(tag),
   'TK-JP-AUTO': tag => MAIN_REGION.JP.test(tag) || RE_TK_JP.test(tag),
   'TK-SG-AUTO': tag => MAIN_REGION.SG.test(tag) || RE_TK_SG.test(tag),
-  'TK-TW-AUTO': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag),
+  'TK-TW-AUTO': tag => MAIN_REGION.TW.test(tag) || RE_TK_TW.test(tag)
 }
-
-// AI / 平台正则 (同 JSON 中的 URLTest tag 严格一致)
 const AI_RULES = {
   'OpenAI-AUTO': /openai|chatgpt|gpt[⁺+]/i,
   'Gemini-AUTO': /\b(gemini|gm)\b/i,
   'Copilot-AUTO': /\b(copilot|CP)\b/i,
   'YouTube-AUTO': /\b(youtube|yt)\b/i,
   'Netflix-AUTO': /\b(netflix|nf)\b/i,
-  // 匹配 Disney, Disney+, D+ (使用零宽断言防止 + 号破坏单词边界)
-  'Disney-AUTO': /(?<!\w)(disney\+?|d\+)(?!\w)/i,
-  // gm 加单词边界，避免误中 program / mgmt 等含 "gm" 子串的 tag
+  'Disney-AUTO': /(?<!\w)(?:disney\+?|d\+)(?!\w)/i,
   'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
-  // 裸字母 X 会匹配任意含 x 的 tag（MAX / EXPRESS / NETFLIX...），
-  // 加上 \b 限定为独立的 "X" 词
-  'CF-AUTO': /^(?=.*gpt[⁺+])(?=.*(\bX\b|twitter))/i,
+  'CF-AUTO': /^(?=.*gpt[⁺+])(?=.*(?:\bX\b|twitter))/i
 }
-
-// 地区 AUTO 正则
 const REGIONS = {
-  'HK-AUTO': /(?:^|[^-])\b(?:HK|港|Hong\s?Kong)\b/i,
-  'TW-AUTO': /(?:^|[^-])\b(?:TW|台|taiwan)\b/i,
-  'JP-AUTO': /(?:^|[^-])\b(?:JP|日|japan)\b/i,
-  'SG-AUTO': /(?:^|[^-])\b(?:SG|新|singapore)\b/i,
-  'US-AUTO': /(?:^|[^-])\b(?:US|美|american)\b/i,
+  'HK-AUTO': /(?:^|[^A-Za-z0-9-])(?:HK|港|Hong\s?Kong)(?=$|[^A-Za-z0-9])/i,
+  'TW-AUTO': /(?:^|[^A-Za-z0-9-])(?:TW|台|taiwan)(?=$|[^A-Za-z0-9])/i,
+  'JP-AUTO': /(?:^|[^A-Za-z0-9-])(?:JP|日|japan)(?=$|[^A-Za-z0-9])/i,
+  'SG-AUTO': /(?:^|[^A-Za-z0-9-])(?:SG|新|singapore)(?=$|[^A-Za-z0-9])/i,
+  'US-AUTO': /(?:^|[^A-Za-z0-9-])(?:US|美|american)(?=$|[^A-Za-z0-9])/i
 }
+const GROUP_RULES = { AUTO: null, MANUAL: null, ...REGIONS, ...AI_RULES }
 
-// 统一分组规则 (null 代表匹配所有节点)
-const GROUP_RULES = {
-  'AUTO': null,
-  'MANUAL': null,
-  ...REGIONS,
-  ...AI_RULES,
-}
-
-// 解析配置 & 生成节点
+// 2. 解析配置并统一 Endpoint
 let config = JSON.parse($files[0])
+if (!Array.isArray(config.outbounds)) config.outbounds = []
+if (!Array.isArray(config.endpoints)) config.endpoints = []
+const subType = /^1$|col/i.test(type) ? 'collection' : 'subscription'
+const isOpenVPN = node => node && (node.type === 'openvpn-client' || node.type === 'openvpn-server')
 
-let proxies = await produceArtifact({
-  name,
-  type: /^1$|col/i.test(type) ? 'collection' : 'subscription',
-  platform: 'sing-box',
-  produceType: 'internal',
-})
+// TLS 模式使用 data_ciphers，cipher 仅用于 static_key 模式
+function fixOpenVPN(node) {
+  if (isOpenVPN(node) && node.mode !== 'static_key' && node.cipher) {
+    const cipher = node.cipher.toUpperCase()
+    if (!node.data_ciphers?.length) node.data_ciphers = [cipher]
+    if (!node.data_ciphers_fallback) node.data_ciphers_fallback = cipher
+    delete node.cipher
+  }
+  return node
+}
 
-// 注入节点
-config.outbounds.push(...proxies)
+// 按 tag 合并 Endpoint，避免重复注入
+function mergeEndpoints(target, nodes) {
+  const tags = new Set(target.map(node => node.tag).filter(Boolean))
+  for (const node of nodes) {
+    fixOpenVPN(node)
+    if (node.tag && tags.has(node.tag)) continue
+    target.push(node)
+    if (node.tag) tags.add(node.tag)
+  }
+}
 
-// 性能优化：速度缓存 + 全局预排序
+config.endpoints.forEach(fixOpenVPN)
+mergeEndpoints(config.endpoints, config.outbounds.filter(isOpenVPN))
+config.outbounds = config.outbounds.filter(node => !isOpenVPN(node))
+
+// 3. 获取标准 Sing-Box 节点
+const artifactStr = await produceArtifact({ name, type: subType, platform: 'sing-box' })
+const data = JSON.parse(artifactStr)
+let outbounds = data.outbounds || [], endpoints = data.endpoints || []
+mergeEndpoints(endpoints, outbounds.filter(isOpenVPN))
+outbounds = outbounds.filter(node => !isOpenVPN(node))
+endpoints.forEach(fixOpenVPN)
+
+// 4. 借用 ClashMeta 引擎提取 OpenVPN
+let metaProxies = []
+try {
+  metaProxies = await produceArtifact({ name, type: subType, platform: 'ClashMeta', produceType: 'internal' })
+} catch (e) {
+  log(`⚠️ 获取 ClashMeta 引擎节点失败: ${e}`)
+}
+const openvpnNodes = metaProxies.filter(p => p.type === 'openvpn')
+if (openvpnNodes.length) log(`🔥 成功通过 Meta 引擎拦截到 ${openvpnNodes.length} 个 OpenVPN 节点`)
+
+// 5. 转换 OpenVPN 并加入 endpoints
+for (const p of openvpnNodes) {
+  const ovpnNode = {
+    type: 'openvpn-client', tag: p.name || 'ovpn-client', server: p.server,
+    server_port: parseInt(p.port, 10), network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
+  }
+  if (p.auth) ovpnNode.auth = p.auth
+  const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
+  if (dataCiphers.length) ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(cipher => cipher.trim().toUpperCase())
+  if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
+  if (p.username) ovpnNode.username = p.username
+  if (p.password) ovpnNode.password = p.password
+  if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
+    ovpnNode.tls = {}
+    const sni = p.sni || p.server_name || p.peer
+    if (sni) ovpnNode.tls.server_name = sni
+    if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
+    if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
+    if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
+  }
+  mergeEndpoints(endpoints, [ovpnNode])
+}
+log(`当前可用总代理数: ${outbounds.length} 个常规出站, ${endpoints.length} 个端点(含 OVPN)`)
+
+// 6. 注入配置，确保 OpenVPN 只进入 endpoints
+config.outbounds.push(...outbounds.filter(node => !isOpenVPN(node)))
+mergeEndpoints(config.endpoints, endpoints)
+config.outbounds = config.outbounds.filter(node => !isOpenVPN(node))
+
+// 7. 合并节点并按速度排序
+const proxyMap = new Map([...outbounds, ...config.endpoints].filter(node => node.tag).map(node => [node.tag, node]))
 const speedCache = new Map()
-
 function parseSpeed(tag) {
-  if (speedCache.has(tag)) return speedCache.get(tag)
-  const match = tag.match(/\|([\d.]+)MB\/s\|/)
-  const speed = match ? parseFloat(match[1]) : 0
-  speedCache.set(tag, speed)
-  return speed
+  if (!speedCache.has(tag)) {
+    const match = tag.match(/\|([\d.]+)MB\/s\|/i)
+    speedCache.set(tag, match ? parseFloat(match[1]) : 0)
+  }
+  return speedCache.get(tag)
 }
+const proxiesSortedBySpeed = [...proxyMap.values()].sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
 
-// 只排序这一次，后面所有分组都复用这个结果
-const proxiesSortedBySpeed = [...proxies].sort(
-  (a, b) => parseSpeed(b.tag) - parseSpeed(a.tag)
-)
-
-// 获取分组 tag 列表（从预排序数组里过滤，最多 100 个）
 function getTags(sortedProxies, regex) {
-  let list = regex ? sortedProxies.filter(p => regex.test(p.tag)) : sortedProxies
-  return list.slice(0, 100).map(p => p.tag)
+  return (regex ? sortedProxies.filter(p => regex.test(p.tag)) : sortedProxies).slice(0, 100).map(p => p.tag)
 }
-
-// TikTok 严格匹配（所有地区），同样复用预排序数组
 function getTikTokTagsStrict(sortedProxies, tag) {
   const matcher = TIKTOK_MAIN[tag]
-  let list = sortedProxies.filter(p => RE_TIKTOK.test(p.tag) && matcher(p.tag))
-  return list.slice(0, 100).map(p => p.tag)
+  return matcher ? sortedProxies.filter(p => RE_TIKTOK.test(p.tag) && matcher(p.tag)).slice(0, 100).map(p => p.tag) : []
 }
 
-// outbounds 归一化 & 智能填充 (支持 0 节点安全回退机制)
+// 8. 智能分组与回退
 function normalizeOutbounds(o, tags) {
   if (o.type !== 'selector' && o.type !== 'urltest') return
-
-  if (!Array.isArray(o.outbounds) || o.outbounds.length === 0) {
+  if (!Array.isArray(o.outbounds) || !o.outbounds.length) o.outbounds = ['AUTO']
+  if (tags.length) {
+    if (o.outbounds.length === 1 && ['AUTO', 'DIRECT'].includes(o.outbounds[0])) o.outbounds = tags.slice()
+    else o.outbounds = [...new Set([...o.outbounds, ...tags])]
+  } else if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
     o.outbounds = ['AUTO']
   }
-
-  if (tags && tags.length > 0) {
-    // 如果分组目前只有占位符，执行覆写
-    if (o.outbounds.length === 1 && (o.outbounds[0] === 'AUTO' || o.outbounds[0] === 'DIRECT')) {
-      o.outbounds = tags.slice()
-    } else {
-      // 否则为多级 Selector 执行追加去重
-      o.outbounds.push(...tags)
-      o.outbounds = [...new Set(o.outbounds)]
-    }
-  } else {
-    // 【兜底降级】如果某个分组(尤其是测速组)因为没有节点而只剩 DIRECT，将其强制更改为 AUTO 防止死锁断网
-    if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
-      o.outbounds = ['AUTO']
-    }
-  }
 }
-
-function safePush(o, tags) {
-  normalizeOutbounds(o, tags)
-}
-
-// 主逻辑：按 tag 分组填充
 for (const o of config.outbounds) {
-  if (!o.tag) continue
-  if (o.type !== 'selector' && o.type !== 'urltest') continue
-
-  const tag = o.tag
-
-  // TikTok 严格匹配
-  if (TIKTOK_MAIN[tag]) {
-    safePush(o, getTikTokTagsStrict(proxiesSortedBySpeed, tag))
+  if (!o.tag || (o.type !== 'selector' && o.type !== 'urltest')) continue
+  if (TIKTOK_MAIN[o.tag]) {
+    normalizeOutbounds(o, getTikTokTagsStrict(proxiesSortedBySpeed, o.tag))
     continue
   }
-
-  const rule = GROUP_RULES[tag]
-  if (rule === undefined) continue
-
-  safePush(o, getTags(proxiesSortedBySpeed, rule))
+  const rule = GROUP_RULES[o.tag]
+  if (rule !== undefined) normalizeOutbounds(o, getTags(proxiesSortedBySpeed, rule))
 }
 
-// 修复所有仍然异常的 selector/urltest
+// 9. 无可用节点时回退到 COMPATIBLE
+const COMPATIBLE_TAG = 'COMPATIBLE'
+let hasCompatible = config.outbounds.some(o => o.tag === COMPATIBLE_TAG)
+function injectCompatible() {
+  if (!hasCompatible) {
+    config.outbounds.push({ tag: COMPATIBLE_TAG, type: 'direct' })
+    hasCompatible = true
+  }
+  return COMPATIBLE_TAG
+}
 for (const o of config.outbounds) {
-  if (o.type === 'selector' || o.type === 'urltest') {
-    normalizeOutbounds(o, [])
+  if (o.type !== 'selector' && o.type !== 'urltest') continue
+  normalizeOutbounds(o, [])
+  if (!o.outbounds.length || (o.outbounds.length === 1 && o.outbounds[0] === o.tag)) {
+    o.outbounds = [injectCompatible()]
+    log(`⚠️ 策略组 [${o.tag}] 触发兜底`)
   }
 }
 
-// 输出
+log(`🔎 最终检查：outbounds ${config.outbounds.length} 个，endpoints ${config.endpoints.length} 个`)
+log('🔚 节点分组与合并完成')
 $content = JSON.stringify(config, null, 2)

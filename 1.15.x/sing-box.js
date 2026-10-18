@@ -1,8 +1,11 @@
-function log(msg) { console.log(`[📦 节点分组脚本] ${msg}`) }
+function log(msg) { console.log(`[📦 Sing-Box 分组] ${msg}`) }
 const { type, name } = $arguments
-log(`开始处理参数 name: ${name}, type: ${type}`)
 
-// 1. 匹配规则
+// 1. 解析参数
+const subType = /^1$|col|组合/i.test(type) ? 'collection' : 'subscription'
+log(`📥 开始处理 [${name}] | 参数 type: ${type} -> 判定为: ${subType}`)
+
+// 2. 匹配规则
 const MAIN_REGION = { US: /(?<!-)\bUS\b/i, VN: /(?<!-)\bVN\b/i, JP: /(?<!-)\bJP\b/i, SG: /(?<!-)\bSG\b/i, TW: /(?<!-)\bTW\b/i }
 const RE_TIKTOK = /\bTK\b|tiktok/i
 const RE_TK_US = /TK-US/i, RE_TK_VN = /TK-VN/i, RE_TK_JP = /TK-JP/i, RE_TK_SG = /TK-SG/i, RE_TK_TW = /TK-TW/i
@@ -32,14 +35,13 @@ const REGIONS = {
 }
 const GROUP_RULES = { AUTO: null, MANUAL: null, ...REGIONS, ...AI_RULES }
 
-// 2. 解析配置并统一 Endpoint
+// 3. 解析配置并统一 Endpoint
 let config = JSON.parse($files[0])
 if (!Array.isArray(config.outbounds)) config.outbounds = []
 if (!Array.isArray(config.endpoints)) config.endpoints = []
-const subType = /^1$|col/i.test(type) ? 'collection' : 'subscription'
+
 const isOpenVPN = node => node && (node.type === 'openvpn-client' || node.type === 'openvpn-server')
 
-// TLS 模式使用 data_ciphers，cipher 仅用于 static_key 模式
 function fixOpenVPN(node) {
   if (isOpenVPN(node) && node.mode !== 'static_key' && node.cipher) {
     const cipher = node.cipher.toUpperCase()
@@ -50,7 +52,6 @@ function fixOpenVPN(node) {
   return node
 }
 
-// 按 tag 合并 Endpoint，避免重复注入
 function mergeEndpoints(target, nodes) {
   const tags = new Set(target.map(node => node.tag).filter(Boolean))
   for (const node of nodes) {
@@ -65,7 +66,7 @@ config.endpoints.forEach(fixOpenVPN)
 mergeEndpoints(config.endpoints, config.outbounds.filter(isOpenVPN))
 config.outbounds = config.outbounds.filter(node => !isOpenVPN(node))
 
-// 3. 获取标准 Sing-Box 节点
+// 4. 获取标准 Sing-Box 节点
 const artifactStr = await produceArtifact({ name, type: subType, platform: 'sing-box' })
 const data = JSON.parse(artifactStr)
 let outbounds = data.outbounds || [], endpoints = data.endpoints || []
@@ -73,41 +74,42 @@ mergeEndpoints(endpoints, outbounds.filter(isOpenVPN))
 outbounds = outbounds.filter(node => !isOpenVPN(node))
 endpoints.forEach(fixOpenVPN)
 
-// 4. 借用 ClashMeta 引擎提取 OpenVPN
+// 5. 借用 ClashMeta 引擎提取 OpenVPN
 let metaProxies = []
 try {
   metaProxies = await produceArtifact({ name, type: subType, platform: 'ClashMeta', produceType: 'internal' })
+  const openvpnNodes = metaProxies.filter(p => p.type === 'openvpn')
+  if (openvpnNodes.length) {
+    log(`🔧 借用 Meta 引擎成功拦截提取 ${openvpnNodes.length} 个 OpenVPN 节点`)
+    for (const p of openvpnNodes) {
+      const ovpnNode = {
+        type: 'openvpn-client', tag: p.name || 'ovpn-client', server: p.server,
+        server_port: parseInt(p.port, 10), network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
+      }
+      if (p.auth) ovpnNode.auth = p.auth
+      const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
+      if (dataCiphers.length) ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(cipher => cipher.trim().toUpperCase())
+      if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
+      if (p.username) ovpnNode.username = p.username
+      if (p.password) ovpnNode.password = p.password
+      if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
+        ovpnNode.tls = {}
+        const sni = p.sni || p.server_name || p.peer
+        if (sni) ovpnNode.tls.server_name = sni
+        if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
+        if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
+        if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
+      }
+      mergeEndpoints(endpoints, [ovpnNode])
+    }
+  }
 } catch (e) {
-  log(`⚠️ 获取 ClashMeta 引擎节点失败: ${e}`)
+  log(`❌ 获取 ClashMeta 引擎节点失败: ${e.message || e}`)
 }
-const openvpnNodes = metaProxies.filter(p => p.type === 'openvpn')
-if (openvpnNodes.length) log(`🔥 成功通过 Meta 引擎拦截到 ${openvpnNodes.length} 个 OpenVPN 节点`)
 
-// 5. 转换 OpenVPN 并加入 endpoints
-for (const p of openvpnNodes) {
-  const ovpnNode = {
-    type: 'openvpn-client', tag: p.name || 'ovpn-client', server: p.server,
-    server_port: parseInt(p.port, 10), network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
-  }
-  if (p.auth) ovpnNode.auth = p.auth
-  const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
-  if (dataCiphers.length) ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(cipher => cipher.trim().toUpperCase())
-  if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
-  if (p.username) ovpnNode.username = p.username
-  if (p.password) ovpnNode.password = p.password
-  if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
-    ovpnNode.tls = {}
-    const sni = p.sni || p.server_name || p.peer
-    if (sni) ovpnNode.tls.server_name = sni
-    if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
-    if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
-    if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
-  }
-  mergeEndpoints(endpoints, [ovpnNode])
-}
-log(`当前可用总代理数: ${outbounds.length} 个常规出站, ${endpoints.length} 个端点(含 OVPN)`)
+log(`📊 节点获取完成 | 常规出站: ${outbounds.length} 个 | 端点(含OVPN): ${endpoints.length} 个`)
 
-// 6. 注入配置，确保 OpenVPN 只进入 endpoints
+// 6. 注入配置
 config.outbounds.push(...outbounds.filter(node => !isOpenVPN(node)))
 mergeEndpoints(config.endpoints, endpoints)
 config.outbounds = config.outbounds.filter(node => !isOpenVPN(node))
@@ -143,6 +145,7 @@ function normalizeOutbounds(o, tags) {
     o.outbounds = ['AUTO']
   }
 }
+
 for (const o of config.outbounds) {
   if (!o.tag || (o.type !== 'selector' && o.type !== 'urltest')) continue
   if (TIKTOK_MAIN[o.tag]) {
@@ -163,15 +166,21 @@ function injectCompatible() {
   }
   return COMPATIBLE_TAG
 }
+
+const fallbackGroups = [] // 收集触发兜底的策略组名称
 for (const o of config.outbounds) {
   if (o.type !== 'selector' && o.type !== 'urltest') continue
   normalizeOutbounds(o, [])
   if (!o.outbounds.length || (o.outbounds.length === 1 && o.outbounds[0] === o.tag)) {
     o.outbounds = [injectCompatible()]
-    log(`⚠️ 策略组 [${o.tag}] 触发兜底`)
+    fallbackGroups.push(o.tag) // 存入数组，不直接打印
   }
 }
 
-log(`🔎 最终检查：outbounds ${config.outbounds.length} 个，endpoints ${config.endpoints.length} 个`)
-log('🔚 节点分组与合并完成')
+// 聚合打印兜底警告
+if (fallbackGroups.length > 0) {
+  log(`⚠️ 触发直连兜底: 发现 ${fallbackGroups.length} 个策略组无可用节点 (${fallbackGroups.join(', ')})`)
+}
+
+log(`✅ 处理完成 | 最终生成出站(outbounds): ${config.outbounds.length} 个 | 端点(endpoints): ${config.endpoints.length} 个`)
 $content = JSON.stringify(config, null, 2)
