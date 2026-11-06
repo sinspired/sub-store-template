@@ -357,7 +357,7 @@
         "TW-AUTO",
         "SG-AUTO"
       ],
-      "default": "PROXY",
+      "default": "YouTube",
       "interrupt_exist_connections": true
     },
     {
@@ -371,7 +371,8 @@
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO"
+        "SG-AUTO",
+        "YouTube-CN"
       ],
       "default": "YouTube-AUTO",
       "interrupt_exist_connections": true
@@ -656,6 +657,16 @@
     {
       "type": "urltest",
       "tag": "YouTube-AUTO",
+      "outbounds": [
+        "AUTO"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "15m0s",
+      "tolerance": 50
+    },
+        {
+      "type": "urltest",
+      "tag": "YouTube-CN",
       "outbounds": [
         "AUTO"
       ],
