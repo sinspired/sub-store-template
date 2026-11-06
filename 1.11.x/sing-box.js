@@ -61,6 +61,27 @@ const isUnsupported = p => p.type === 'anytls' || p.type === 'openvpn' || p.type
 let validOutbounds = sourceOutbounds.filter(p => !isUnsupported(p))
 let validEndpoints = sourceEndpoints.filter(p => !isUnsupported(p))
 
+// 5. 按速度解析与缓存优化（从 Tag 提取测速数据）
+const speedCache = new Map()
+function parseSpeed(tag) {
+  if (typeof tag !== 'string') return 0
+  if (!speedCache.has(tag)) {
+    const match = tag.match(/\|([\d.]+)MB\/s\|/i)
+    speedCache.set(tag, match ? parseFloat(match[1]) : 0)
+  }
+  return speedCache.get(tag)
+}
+
+// ⚠️ iOS 内存保护逻辑：限制 endpoints 数量至 10 个，防止爆 Apple Network Extension 的 50MB 内存上限
+const MAX_ENDPOINTS = 10
+if (validEndpoints.length > MAX_ENDPOINTS) {
+  const beforeCount = validEndpoints.length
+  // 截取前优先按照测速速率大小进行降序，保证丢弃的都是低速/未测速节点
+  validEndpoints.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
+  validEndpoints = validEndpoints.slice(0, MAX_ENDPOINTS)
+  log(`✂️ 触发 iOS 内存保护：Endpoints 数量从 ${beforeCount} 截断至 ${MAX_ENDPOINTS} 个 (防崩溃)`)
+}
+
 log(`节点解析完成: ${validOutbounds.length} 个出站, ${validEndpoints.length} 个端点`)
 
 // 注入节点与端点
@@ -70,16 +91,7 @@ config.endpoints.push(...validEndpoints)
 // 合并起来用于提取 Tag 和策略组关联
 const allValidNodes = [...validOutbounds, ...validEndpoints]
 
-// 5. 按速度排序与缓存优化（从 Tag 提取测速数据）
-const speedCache = new Map()
-function parseSpeed(tag) {
-  if (!speedCache.has(tag)) {
-    const match = tag.match(/\|([\d.]+)MB\/s\|/i)
-    speedCache.set(tag, match ? parseFloat(match[1]) : 0)
-  }
-  return speedCache.get(tag)
-}
-
+// 这里仍需对所有节点排序以保证各策略组中的节点也是按速度从优排列的
 const proxiesSortedBySpeed = allValidNodes.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
 
 function getTags(sortedProxies, regex) {

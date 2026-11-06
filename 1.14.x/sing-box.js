@@ -114,16 +114,28 @@ config.outbounds.push(...outbounds.filter(node => !isOpenVPN(node)))
 mergeEndpoints(config.endpoints, endpoints)
 config.outbounds = config.outbounds.filter(node => !isOpenVPN(node))
 
-// 7. 合并节点并按速度排序
-const proxyMap = new Map([...outbounds, ...config.endpoints].filter(node => node.tag).map(node => [node.tag, node]))
+// 7. 解析速度、内存保护限制与节点排序
 const speedCache = new Map()
 function parseSpeed(tag) {
+  if (typeof tag !== 'string') return 0
   if (!speedCache.has(tag)) {
     const match = tag.match(/\|([\d.]+)MB\/s\|/i)
     speedCache.set(tag, match ? parseFloat(match[1]) : 0)
   }
   return speedCache.get(tag)
 }
+
+// ⚠️ iOS 内存保护逻辑：限制 endpoints 数量至 10 个，防止爆 Apple Network Extension 的 50MB 内存上限
+const MAX_ENDPOINTS = 10
+if (config.endpoints.length > MAX_ENDPOINTS) {
+  const beforeCount = config.endpoints.length
+  // 截取前优先按照测速速率大小进行降序，保证丢弃的都是低速/未测速节点
+  config.endpoints.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
+  config.endpoints = config.endpoints.slice(0, MAX_ENDPOINTS)
+  log(`✂️ 触发 iOS 内存保护：Endpoints 数量从 ${beforeCount} 截断至 ${MAX_ENDPOINTS} 个 (防崩溃)`)
+}
+
+const proxyMap = new Map([...outbounds, ...config.endpoints].filter(node => node.tag).map(node => [node.tag, node]))
 const proxiesSortedBySpeed = [...proxyMap.values()].sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
 
 function getTags(sortedProxies, regex) {
