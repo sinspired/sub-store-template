@@ -792,14 +792,32 @@
           "com.baidu.netdisk",
           "com.quark.browser"
         ],
+        "package_name_regex": [
+          "(?i)^com\\.sinspired\\.subs_free.*",
+          "(?i)^com\\.tencent\\.mm.*",
+          "(?i)^com\\.tencent\\.mobileqq.*",
+          "(?i)^com\\.eg\\.android\\.AlipayGphone.*",
+          "(?i)^com\\.taobao\\.taobao.*",
+          "(?i)^com\\.jingdong\\.app\\.mall.*",
+          "(?i)^com\\.sankuai\\.meituan.*",
+          "(?i)^com\\.xunlei\\.downloadprovider.*",
+          "(?i)^com\\.baidu\\.netdisk.*",
+          "(?i)^com\\.quark\\.browser.*"
+        ],
         "outbound": "DIRECT"
       },
       {
         "process_name": [
           "ChatGPT.exe"
         ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])chatgpt(?:\\.exe)?$"
+        ],
         "package_name": [
           "com.openai.chatgpt"
+        ],
+        "package_name_regex": [
+          "(?i)^com\\.openai\\.chatgpt.*"
         ],
         "outbound": "OpenAI"
       },
@@ -807,14 +825,23 @@
         "process_name": [
           "Claude.exe"
         ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])claude(?:\\.exe)?$"
+        ],
         "package_name": [
           "com.anthropic.claude"
+        ],
+        "package_name_regex": [
+          "(?i)^com\\.anthropic\\.claude.*"
         ],
         "outbound": "Claude"
       },
       {
         "package_name": [
           "com.google.android.apps.bard"
+        ],
+        "package_name_regex": [
+          "(?i)^com\\.google\\.android\\.apps\\.bard.*"
         ],
         "outbound": "Gemini"
       },
@@ -823,8 +850,14 @@
           "copilotapp",
           "copilotapphost"
         ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])copilot(?:app|apphost)?(?:\\.exe)?$"
+        ],
         "package_name": [
           "com.microsoft.copilot"
+        ],
+        "package_name_regex": [
+          "(?i)^com\\.microsoft\\.copilot.*"
         ],
         "outbound": "Copilot"
       },
@@ -833,9 +866,17 @@
           "Poe.exe",
           "Notion.exe"
         ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])poe(?:\\.exe)?$",
+          "(?i)(^|[/\\\\])notion(?:\\.exe)?$"
+        ],
         "package_name": [
           "com.quora.poe.android",
           "ai.perplexity"
+        ],
+        "package_name_regex": [
+          "(?i)^com\\.quora\\.poe\\.android.*",
+          "(?i)^ai\\.perplexity.*"
         ],
         "outbound": "AI"
       },
