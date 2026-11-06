@@ -20,7 +20,9 @@ const AI_RULES = {
   'OpenAI-AUTO': /openai|chatgpt|gpt[⁺+]/i,
   'Gemini-AUTO': /\b(gemini|gm)\b/i,
   'Copilot-AUTO': /\b(copilot|CP)\b/i,
-  'YouTube-AUTO': /\b(youtube|yt)\b/i,
+  'YouTube-AUTO': /^(?!.*(?:CN|RU|IR)).*\b(youtube|yt)\b/i,
+  'YouTube-CN': /^(?=.*(?:CN|RU|IR)).*\b(youtube|yt)\b/i,
+
   'Netflix-AUTO': /\b(netflix|nf)\b/i,
   'Disney-AUTO': /(?<!\w)(?:disney\+?|d\+)(?!\w)/i,
   'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
@@ -33,7 +35,13 @@ const REGIONS = {
   'SG-AUTO': /(?:^|[^A-Za-z0-9-])(?:SG|新|singapore)(?=$|[^A-Za-z0-9])/i,
   'US-AUTO': /(?:^|[^A-Za-z0-9-])(?:US|美|american)(?=$|[^A-Za-z0-9])/i
 }
-const GROUP_RULES = { AUTO: null, MANUAL: null, ...REGIONS, ...AI_RULES }
+
+const GROUP_RULES = {
+  AUTO: /^(?!.*(?:CN|RU|IR)).*/i,
+  MANUAL: null,
+  ...REGIONS,
+  ...AI_RULES
+}
 
 // 3. 解析配置并统一 Endpoint
 let config = JSON.parse($files[0])
