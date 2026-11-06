@@ -664,7 +664,7 @@
       "interval": "15m0s",
       "tolerance": 50
     },
-        {
+    {
       "type": "urltest",
       "tag": "YouTube-CN",
       "outbounds": [
@@ -813,21 +813,85 @@
           "iperf3.exe",
           "tcping.exe",
           "mtr.exe",
-          "WinStore.App"
+          "WinStore.App",
+          "quark_cloud_drive",
+          "quark_cloud_drive.exe",
+          "Thunder.exe",
+          "qBittorrent.exe",
+          "uTorrent.exe",
+          "BitTorrent.exe",
+          "aria2c.exe",
+          "BaiduNetdisk.exe",
+          "BaiduNetdiskHost.exe",
+          "WeChat.exe",
+          "WeChatApp.exe",
+          "QQ.exe",
+          "DingTalk.exe",
+          "WeMeet.exe",
+          "AliWangWang.exe"
+        ],
+        "outbound": "DIRECT"
+      },
+      {
+        "package_name": [
+          "com.sinspired.subs_free",
+          "com.tencent.mm",
+          "com.tencent.mobileqq",
+          "com.eg.android.AlipayGphone",
+          "com.taobao.taobao",
+          "com.jingdong.app.mall",
+          "com.sankuai.meituan",
+          "com.sankuai.meituan.takeoutnew",
+          "com.xunlei.downloadprovider",
+          "com.baidu.netdisk",
+          "com.quark.browser"
         ],
         "outbound": "DIRECT"
       },
       {
         "process_name": [
-          "copilotapp"
+          "ChatGPT.exe"
         ],
-        "outbound": "AI"
+        "package_name": [
+          "com.openai.chatgpt"
+        ],
+        "outbound": "OpenAI"
+      },
+      {
+        "process_name": [
+          "Claude.exe"
+        ],
+        "package_name": [
+          "com.anthropic.claude"
+        ],
+        "outbound": "Claude"
       },
       {
         "package_name": [
-          "com.sinspired.subs_free"
+          "com.google.android.apps.bard"
         ],
-        "outbound": "DIRECT"
+        "outbound": "Gemini"
+      },
+      {
+        "process_name": [
+          "copilotapp",
+          "copilotapphost"
+        ],
+        "package_name": [
+          "com.microsoft.copilot"
+        ],
+        "outbound": "Copilot"
+      },
+      {
+        "process_name": [
+          "Poe.exe",
+          "Notion.exe"
+        ],
+        "package_name": [
+          "com.quora.poe.android",
+          "ai.perplexity"
+        ],
+        "outbound": "AI"
       },
       {
         "inbound": "tun-in",
