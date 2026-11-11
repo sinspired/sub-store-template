@@ -37,7 +37,7 @@ const REGIONS = {
 
 const GROUP_RULES = {
   AUTO: /^(?!.*(?:CN|RU|IR)).*/i,
-  MANUAL: null, // null 代表无条件全量接收
+  MANUAL: null, // null 代表无条件全量接收（池内所有节点）
   ...REGIONS,
   ...AI_RULES
 }
@@ -147,7 +147,6 @@ const structuralTypes = new Set(['selector', 'urltest', 'direct', 'block', 'dns'
 const structuralTags = new Set(config.outbounds.filter(o => structuralTypes.has(o.type)).map(o => o.tag).filter(Boolean))
 
 const allProxies = [...config.outbounds, ...config.endpoints].filter(node => node.tag && !structuralTypes.has(node.type))
-
 // 全局速度降序
 allProxies.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
 
@@ -164,34 +163,74 @@ for (const p of allProxies) {
 }
 log(`🔄 去重清洗: 原始节点 ${allProxies.length} -> 独立物理服务器 ${uniqueProxies.length} 个`)
 
-// 8. 🌟 建立【全局安全池】 (彻底解决分组缺节点的问题)
-const GLOBAL_MAX_PROXIES = 100 // 全局总节点数上限 (确保总内存安全)
-const MAX_ENDPOINTS = 10       // 端点节点上限 (严控 WG/OVPN 等内存大户)
+// 8. 🌟 建立【全局安全池】 (彻底解决分组缺节点的问题，同时死守内存防线)
+const GLOBAL_MAX_PROXIES = 100 // 基础容量（前 100 名最快节点）
+const MIN_REGION_NODES = 10    // 地区分组最低保底数量
+const MAX_ENDPOINTS = 10       // 严格死守 WG/OVPN 等内存大户
 const endpointTagSet = new Set(config.endpoints.map(n => n.tag).filter(Boolean))
 
 const safePool = []
+const safeTags = new Set()
 let currentEndpointCount = 0
 
-// 统一筛选出 100 个最优节点构成“弹药库”
-for (const p of uniqueProxies) {
-  if (safePool.length >= GLOBAL_MAX_PROXIES) break
+function addNodeToPool(p, bypassLimit = false) {
+  if (!bypassLimit && safePool.length >= GLOBAL_MAX_PROXIES) return false
+  if (safeTags.has(p.tag)) return true // 已添加过
 
   const isEndpoint = endpointTagSet.has(p.tag)
-  if (isEndpoint && currentEndpointCount >= MAX_ENDPOINTS) continue
+  // 无论是否是保底索取，重型节点死守封顶上限
+  if (isEndpoint && currentEndpointCount >= MAX_ENDPOINTS) return true
 
   safePool.push(p)
+  safeTags.add(p.tag)
   if (isEndpoint) currentEndpointCount++
+  return true
+}
+
+// 阶段 1: 绝对速度优先。无条件先取全网测速最快的前 100 个节点入池。
+for (const p of uniqueProxies) {
+  if (safePool.length >= GLOBAL_MAX_PROXIES) break
+  addNodeToPool(p)
+}
+
+// 阶段 2: 地区保底补充。如果某些地区/流媒体在前 100 里的数量太少，则向 100 名外索取。
+const diversityRules = [...Object.values(TIKTOK_MAIN), ...Object.values(REGIONS)]
+for (const rule of diversityRules) {
+  if (!rule) continue
+
+  // 统计当前池子里该规则节点数量
+  let currentCount = 0
+  for (const p of safePool) {
+    const isMatch = rule.test ? rule.test(p.tag) : rule(p.tag)
+    if (isMatch) currentCount++
+  }
+
+  // 如果不足保底值，从 100 名以外遍历强行补充进来
+  if (currentCount < MIN_REGION_NODES) {
+    let needed = MIN_REGION_NODES - currentCount
+    for (const p of uniqueProxies) {
+      if (needed <= 0) break
+      if (safeTags.has(p.tag)) continue
+
+      const isMatch = rule.test ? rule.test(p.tag) : rule(p.tag)
+      if (isMatch) {
+        const beforeSize = safeTags.size
+        addNodeToPool(p, true) // bypassLimit = true, 允许总池子突破 100 的限制
+        if (safeTags.size > beforeSize) needed--
+      }
+    }
+  }
 }
 
 const retainedTags = new Set(safePool.map(p => p.tag))
-log(`🛡️ 全局安全池已建立: 共提取 ${safePool.length} 个顶级节点 (含重负载端点 ${currentEndpointCount}/${MAX_ENDPOINTS})`)
+log(`🛡️ 全局安全池已建立: 共萃取 ${safePool.length} 个顶级节点 (包含重度端点 ${currentEndpointCount}/${MAX_ENDPOINTS})`)
 
-// 9. 无限制分发装填 (释放测速潜力)
+// 9. 无限制全量分发装填 (释放所有节点的并发测速潜力)
 function getMatchedTags(matcher, isRegex = true) {
-  // 如果规则是 null (比如 MANUAL)，直接把安全池里的全部节点梭哈进去！
+  // 💡 如果是 MANUAL (匹配规则为 null)，直接全量返回池子里的所有 100+ 节点！
   if (!matcher) return safePool.map(p => p.tag)
 
-  // 只要在这个安全的 100 个节点池里，符合正则的统统塞进对应分组，不设上限！
+  // 💡 其他地区与 AUTO 分组，不设数量上限，全量返回安全池中所有满足条件的节点
   let matched = isRegex
     ? safePool.filter(p => matcher.test(p.tag))
     : safePool.filter(p => RE_TIKTOK.test(p.tag) && matcher(p.tag))
@@ -200,16 +239,14 @@ function getMatchedTags(matcher, isRegex = true) {
 
 function normalizeOutbounds(o, tags) {
   if (o.type !== 'selector' && o.type !== 'urltest') return
-  if (!Array.isArray(o.outbounds) || !o.outbounds.length) o.outbounds = ['AUTO']
+  if (!Array.isArray(o.outbounds)) o.outbounds = []
   if (tags.length) {
-    if (o.outbounds.length === 1 && ['AUTO', 'DIRECT'].includes(o.outbounds[0])) o.outbounds = tags.slice()
-    else o.outbounds = [...new Set([...o.outbounds, ...tags])]
-  } else if (o.type === 'urltest' && o.outbounds.length === 1 && o.outbounds[0] === 'DIRECT') {
-    o.outbounds = ['AUTO']
+    // 核心修复：直接去重拼接，完美保留原有的 AUTO/DIRECT 等结构，且追加全部匹配到的节点
+    o.outbounds = [...new Set([...o.outbounds, ...tags])]
   }
 }
 
-// 给所有分组发配节点
+// 给所有分组按需分发节点
 for (const o of config.outbounds) {
   if (!o.tag || (o.type !== 'selector' && o.type !== 'urltest')) continue
 
@@ -230,7 +267,7 @@ config.endpoints = config.endpoints.filter(node => retainedTags.has(node.tag))
 config.outbounds = config.outbounds.filter(node => structuralTypes.has(node.type) || retainedTags.has(node.tag))
 
 const retainedOutboundsProxies = config.outbounds.filter(n => !structuralTypes.has(n.type)).length
-log(`✂️ 内存精简清理: 重负载端点 [${beforeEndpointsCount} -> ${config.endpoints.length}] | 常规代理 [${beforeOutboundsCount - config.outbounds.filter(n => structuralTypes.has(n.type)).length} -> ${retainedOutboundsProxies}]`)
+log(`✂️ 内存精简清理: 重度端点 [${beforeEndpointsCount} -> ${config.endpoints.length}] | 常规代理 [${beforeOutboundsCount - config.outbounds.filter(n => structuralTypes.has(n.type)).length} -> ${retainedOutboundsProxies}]`)
 
 // 11. 智能兜底与死链清理
 const COMPATIBLE_TAG = 'COMPATIBLE'
@@ -263,5 +300,5 @@ if (fallbackGroups.length > 0) {
   log(`⚠️ 触发直连兜底: 发现 ${fallbackGroups.length} 个策略组无可用节点 (${fallbackGroups.join(', ')})`)
 }
 
-log(`✅ 完美装填完毕 | 分组组配与出站总数: ${config.outbounds.length} 个 | 端点总数: ${config.endpoints.length} 个 | 全局唯一代理: ${retainedTags.size} 个`)
+log(`✅ 完美装填完毕 | 生成出站总数: ${config.outbounds.length} 个 | 重负载端点数: ${config.endpoints.length} 个 | 实体代理总数: ${retainedTags.size} 个`)
 $content = JSON.stringify(config, null, 2)
