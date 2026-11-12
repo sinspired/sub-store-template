@@ -240,9 +240,21 @@ function getMatchedTags(matcher, isRegex = true) {
 function normalizeOutbounds(o, tags) {
   if (o.type !== 'selector' && o.type !== 'urltest') return
   if (!Array.isArray(o.outbounds)) o.outbounds = []
+
   if (tags.length) {
-    // 核心修复：直接去重拼接，完美保留原有的 AUTO/DIRECT 等结构，且追加全部匹配到的节点
-    o.outbounds = [...new Set([...o.outbounds, ...tags])]
+    if (o.type === 'urltest') {
+      o.outbounds = tags
+    } else {
+      // 如果原有出站仅有1个占位符 (如 "DIRECT" 或 "AUTO")，纯粹为了防空载，直接替换。
+      if (o.outbounds.length <= 1) {
+        o.outbounds = tags
+      } else {
+        // 如果原有出站有多个结构 (例如用户故意留的 ["AUTO", "DIRECT"] 手动菜单)
+        // 则保留原有的复合菜单选项，并追加新节点，同时过滤掉同名占位防止死循环。
+        const original = o.outbounds.filter(t => t !== o.tag)
+        o.outbounds = [...new Set([...original, ...tags])]
+      }
+    }
   }
 }
 
