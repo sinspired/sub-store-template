@@ -24,6 +24,8 @@ function log(msg, level = 'INFO') {
   else console.log(text)
 }
 
+const startTime = Date.now()
+
 function parseIntArg(val, fallback, allowZero = false) {
   if (val === undefined || val === null || val === '') return fallback
   const num = Number(val)
@@ -592,10 +594,13 @@ for (const node of config.outbounds) {
 }
 const finalEpStats = countClientEndpoints(config.endpoints)
 
+const elapsed = ((Date.now() - startTime) / 1000).toFixed(2)
+
 log(
   `✅ ${endTarget}：普通代理 (outbounds) ${finalProxyCount} 个，端点 (endpoints) ${finalEpStats.total} 个` +
   (finalEpStats.total ? `（OpenVPN ${finalEpStats.ovpn} / 其他 ${finalEpStats.total - finalEpStats.ovpn}）` : '') +
-  ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）`
+  ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）` +
+  ` | 耗时 ${elapsed}s`
 )
 
 $content = JSON.stringify(config, null, 2)
