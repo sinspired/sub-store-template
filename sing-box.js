@@ -1,12 +1,126 @@
-function log(msg) { console.log(`[📦 Sing-Box 分组] ${msg}`) }
-const { type, name } = $arguments
 
-// 1. 解析参数
-const subType = /^1$|col|组合/i.test(type) ? 'collection' : 'subscription'
-log(`📥 开始处理 [${name}] | 参数 type: ${type} -> 判定为: ${subType}`)
+// Sub-Store Sing-Box 节点优选与分组脚本
+/**
+ * 基础用法（通常只需传 name 和 type 两个参数）：
+ *   #name=sub&type=0
+ * 参数说明：
+ *   - name：订阅名称（必填）
+ *   - type：订阅类型（支持中文）；0 / sub / 订阅 = 单订阅（默认），1 / col / 组合 / 合集 = 组合订阅
+ *
+ * 可选数量参数（不传则按默认值生效）：
+ *   #name=sub&type=0&maxNodes=100&minRegion=5&minEndpoints=5&maxEndpoints=15&maxOpenVPN=5
+ *   - maxNodes / max_nodes：全局测速优选容量上限（默认 100）
+ *   - minRegion / min_region：地区与 TikTok 分组最低保底（默认 5）
+ *   - minEndpoints / min_endpoints：端点独立保底数量（默认 5）
+ *   - maxEndpoints / max_endpoints：端点总上限（默认 15）
+ *   - maxOpenVPN / max_openvpn：OpenVPN 客户端上限（默认 5）
+ */
 
-// 2. 匹配规则
-const MAIN_REGION = { US: /(?<!-)\bUS\b/i, VN: /(?<!-)\bVN\b/i, JP: /(?<!-)\bJP\b/i, SG: /(?<!-)\bSG\b/i, TW: /(?<!-)\bTW\b/i }
+function log(msg, level = 'INFO') {
+  const badge = level === 'ERROR' ? '❌ ' : level === 'WARN' ? '⚠️ ' : ''
+  const text = `[Sing-Box-分组] ${badge}${msg}`
+  if (level === 'ERROR' && typeof console.error === 'function') console.error(text)
+  else if (level === 'WARN' && typeof console.warn === 'function') console.warn(text)
+  else console.log(text)
+}
+
+function parseIntArg(val, fallback, allowZero = false) {
+  if (val === undefined || val === null || val === '') return fallback
+  const num = Number(val)
+  if (!Number.isFinite(num)) return fallback
+  const intVal = Math.floor(num)
+  return allowZero ? (intVal >= 0 ? intVal : fallback) : (intVal > 0 ? intVal : fallback)
+}
+
+const args = (typeof $arguments !== 'undefined' && $arguments) || {}
+const { type, name } = args
+
+const GLOBAL_MAX_NODES = parseIntArg(args.maxNodes ?? args.max_nodes ?? args.max, 100)
+const MIN_REGION_NODES = parseIntArg(args.minRegion ?? args.min_region ?? args.regionMin, 5, true)
+const MAX_ENDPOINTS = parseIntArg(args.maxEndpoints ?? args.max_endpoints ?? args.epMax, 15, true)
+const MIN_ENDPOINTS = Math.min(
+  parseIntArg(args.minEndpoints ?? args.min_endpoints ?? args.epMin, 5, true),
+  MAX_ENDPOINTS
+)
+const MAX_OPENVPN = Math.min(
+  parseIntArg(args.maxOpenVPN ?? args.max_openvpn ?? args.ovpnMax, 5, true),
+  MAX_ENDPOINTS
+)
+
+// 1. 解析参数与模板配置
+const subType = /^1$|col|组合|合集/i.test(String(type || '')) ? 'collection' : 'subscription'
+const sourceLabel = subType === 'collection' ? '组合订阅' : '订阅'
+const subDesc = `${sourceLabel}「${name || '未命名'}」`
+
+const fileName = (() => {
+  const req = typeof $options !== 'undefined' ? $options?._req : undefined
+  const raw =
+    req?.params?.name ||
+    (req?.path || req?.url || '').match(/\/api\/file\/([^/?#]+)/)?.[1] ||
+    req?.body?.name ||
+    ''
+  if (!raw) return ''
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return String(raw)
+  }
+})()
+
+const startTarget = fileName ? `文件「${fileName}」（${subDesc}）` : subDesc
+const endTarget = fileName ? `文件「${fileName}」处理完成（引用${subDesc}）` : `${subDesc}处理完成`
+
+log(
+  `🚀 开始处理${startTarget} | ` +
+  `总优选 ${GLOBAL_MAX_NODES} / 地区保底 ${MIN_REGION_NODES} / 端点保底 ${MIN_ENDPOINTS} / 端点上限 ${MAX_ENDPOINTS} / OpenVPN上限 ${MAX_OPENVPN}`
+)
+
+const jsonParser = (typeof ProxyUtils !== 'undefined' && ProxyUtils.JSON5) ? ProxyUtils.JSON5 : JSON
+let config
+try {
+  config = jsonParser.parse($content ?? $files[0])
+} catch (e) {
+  log(`模板配置解析失败：${e?.message || e}`, 'ERROR')
+  throw e
+}
+if (!Array.isArray(config.outbounds)) config.outbounds = []
+if (!Array.isArray(config.endpoints)) config.endpoints = []
+
+// 策略组与内置功能出站（含 sing-box 1.14+ 的 bridge），不计入普通代理节点
+const STRUCTURAL_TYPES = new Set(['selector', 'urltest', 'direct', 'bridge', 'block', 'dns', 'bypass'])
+// 客户端端点（可作为出站被 selector / urltest 引用）与服务端端点（仅做保留，不参与代理筛选）
+const CLIENT_ENDPOINT_TYPES = new Set(['wireguard', 'tailscale', 'openconnect', 'openvpn-client', 'masque-client'])
+const SERVER_ENDPOINT_TYPES = new Set(['openvpn-server', 'masque-server'])
+const isAnyEndpoint = node => node && (CLIENT_ENDPOINT_TYPES.has(node.type) || SERVER_ENDPOINT_TYPES.has(node.type))
+
+function countProxyOutbounds(nodes) {
+  let count = 0
+  for (const node of nodes) {
+    if (node?.tag && !STRUCTURAL_TYPES.has(node.type)) count++
+  }
+  return count
+}
+
+function countClientEndpoints(nodes) {
+  let total = 0
+  let ovpn = 0
+  for (const node of nodes) {
+    if (node?.tag && !SERVER_ENDPOINT_TYPES.has(node.type)) {
+      total++
+      if (node.type === 'openvpn-client') ovpn++
+    }
+  }
+  return { total, ovpn }
+}
+
+// 2. 节点匹配规则
+const MAIN_REGION = {
+  US: /(?<!-)\bUS\b/i,
+  VN: /(?<!-)\bVN\b/i,
+  JP: /(?<!-)\bJP\b/i,
+  SG: /(?<!-)\bSG\b/i,
+  TW: /(?<!-)\bTW\b/i
+}
 const RE_TIKTOK = /\bTK\b|tiktok/i
 const RE_TK_US = /TK-US/i, RE_TK_VN = /TK-VN/i, RE_TK_JP = /TK-JP/i, RE_TK_SG = /TK-SG/i, RE_TK_TW = /TK-TW/i
 const TIKTOK_MAIN = {
@@ -34,26 +148,14 @@ const REGIONS = {
   'SG-AUTO': /(?:^|[^A-Za-z0-9-])(?:SG|新|singapore)(?=$|[^A-Za-z0-9])/i,
   'US-AUTO': /(?:^|[^A-Za-z0-9-])(?:US|美|american)(?=$|[^A-Za-z0-9])/i
 }
-
 const GROUP_RULES = {
   AUTO: /^(?!.*(?:CN|RU|IR)).*/i,
-  MANUAL: null, // null 代表无条件全量接收（池内所有节点）
+  MANUAL: null,
   ...REGIONS,
   ...AI_RULES
 }
 
-// 3. 🛡️ 拦截兜底逻辑：全面定义 Sing-Box 重负载端点类型
-const HEAVY_ENDPOINTS = new Set([
-  'wireguard', 'tailscale', 'openconnect',
-  'openvpn-client', 'openvpn-server',
-  'masque-client', 'masque-server'
-])
-const isHeavyNode = node => node && HEAVY_ENDPOINTS.has(node.type)
-
-let config = JSON.parse($files[0])
-if (!Array.isArray(config.outbounds)) config.outbounds = []
-if (!Array.isArray(config.endpoints)) config.endpoints = []
-
+// 3. 端点迁移与 OpenVPN 字段兼容修正
 function fixOpenVPN(node) {
   if (node && (node.type === 'openvpn-client' || node.type === 'openvpn-server') && node.mode !== 'static_key' && node.cipher) {
     const cipher = node.cipher.toUpperCase()
@@ -65,43 +167,84 @@ function fixOpenVPN(node) {
 }
 
 function mergeEndpoints(target, nodes) {
-  const tags = new Set(target.map(node => node.tag).filter(Boolean))
+  const tags = new Set()
+  for (const n of target) {
+    if (n?.tag) tags.add(n.tag)
+  }
+  let added = 0
   for (const node of nodes) {
     fixOpenVPN(node)
     if (node.tag && tags.has(node.tag)) continue
     target.push(node)
+    added++
     if (node.tag) tags.add(node.tag)
   }
+  return added
 }
 
-// 兜底一：把所有重型节点强行集中到 endpoints 统一看管
+// 将模板 outbounds 中属于端点协议的节点迁移至 endpoints
 config.endpoints.forEach(fixOpenVPN)
-mergeEndpoints(config.endpoints, config.outbounds.filter(isHeavyNode))
-config.outbounds = config.outbounds.filter(node => !isHeavyNode(node))
+const templateEndpointsInOut = []
+const templateCleanOut = []
+for (const node of config.outbounds) {
+  if (isAnyEndpoint(node)) templateEndpointsInOut.push(node)
+  else templateCleanOut.push(node)
+}
+if (templateEndpointsInOut.length) {
+  mergeEndpoints(config.endpoints, templateEndpointsInOut)
+  config.outbounds = templateCleanOut
+}
 
-// 4. 获取标准 Sing-Box 节点
-const artifactStr = await produceArtifact({ name, type: subType, platform: 'sing-box' })
-const data = JSON.parse(artifactStr)
-let outbounds = data.outbounds || [], endpoints = data.endpoints || []
-mergeEndpoints(endpoints, outbounds.filter(isHeavyNode))
-outbounds = outbounds.filter(node => !isHeavyNode(node))
+// 4. 并发拉取 Sing-Box 完整产物 与 ClashMeta OpenVPN 补充节点
+const [singboxRes, metaRes] = await Promise.allSettled([
+  produceArtifact({ name, type: subType, platform: 'sing-box' }),
+  produceArtifact({ type: subType, name, platform: 'ClashMeta', produceType: 'internal' })
+])
+
+if (singboxRes.status === 'rejected') {
+  throw singboxRes.reason
+}
+
+const artifactRaw = singboxRes.value
+const data = typeof artifactRaw === 'string' ? JSON.parse(artifactRaw) : artifactRaw
+if (!data || typeof data !== 'object' || Array.isArray(data)) {
+  throw new Error('Sing-Box 产物格式异常：未返回完整配置对象')
+}
+
+const outbounds = []
+const endpoints = Array.isArray(data.endpoints) ? [...data.endpoints] : []
 endpoints.forEach(fixOpenVPN)
 
-// 5. 借用 Meta 引擎补充 Sub-Store 缺失的 OpenVPN
-let metaProxies = []
-try {
-  metaProxies = await produceArtifact({ name, type: subType, platform: 'ClashMeta', produceType: 'internal' })
-  const openvpnNodes = metaProxies.filter(p => p.type === 'openvpn')
-  if (openvpnNodes.length) {
-    log(`🔧 成功拦截补充 ${openvpnNodes.length} 个 OpenVPN 节点`)
-    for (const p of openvpnNodes) {
+if (Array.isArray(data.outbounds)) {
+  const extraEndpoints = []
+  for (const node of data.outbounds) {
+    if (isAnyEndpoint(node)) extraEndpoints.push(node)
+    else outbounds.push(node)
+  }
+  if (extraEndpoints.length) mergeEndpoints(endpoints, extraEndpoints)
+}
+
+// 5. 处理 ClashMeta 引擎补充的 OpenVPN 客户端端点
+if (metaRes.status === 'fulfilled') {
+  try {
+    const metaProxies = metaRes.value
+    if (!Array.isArray(metaProxies)) throw new Error('ClashMeta internal 未返回节点数组')
+
+    const ovpnCandidates = []
+    for (const p of metaProxies) {
+      if (p.type !== 'openvpn') continue
       const ovpnNode = {
-        type: 'openvpn-client', tag: p.name || 'ovpn-client', server: p.server,
-        server_port: parseInt(p.port, 10), network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
+        type: 'openvpn-client',
+        tag: p.name || 'ovpn-client',
+        server: p.server,
+        server_port: parseInt(p.port, 10),
+        network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
       }
       if (p.auth) ovpnNode.auth = p.auth
       const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
-      if (dataCiphers.length) ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(cipher => cipher.trim().toUpperCase())
+      if (dataCiphers.length) {
+        ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(c => c.trim().toUpperCase())
+      }
       if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
       if (p.username) ovpnNode.username = p.username
       if (p.password) ovpnNode.password = p.password
@@ -113,177 +256,298 @@ try {
         if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
         if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
       }
-      mergeEndpoints(endpoints, [ovpnNode])
+      ovpnCandidates.push(ovpnNode)
     }
+
+    if (ovpnCandidates.length) {
+      const metaOpenVPNAdded = mergeEndpoints(endpoints, ovpnCandidates)
+      log(`🔧 补充 OpenVPN 客户端端点 (ClashMeta)：发现 ${ovpnCandidates.length} 个，新增 ${metaOpenVPNAdded} 个`)
+    }
+  } catch (e) {
+    log(`OpenVPN 客户端端点补充失败：${e?.message || e}`, 'WARN')
   }
-} catch (e) {
-  log(`❌ 获取 Meta OpenVPN 节点失败: ${e.message || e}`)
+} else {
+  log(`OpenVPN 客户端端点补充失败：${metaRes.reason?.message || metaRes.reason}`, 'WARN')
 }
 
-// 统一合并至总配置
+// 合并至总配置
 config.outbounds.push(...outbounds)
 mergeEndpoints(config.endpoints, endpoints)
-log(`📊 节点初始获取: 常规出站 ${config.outbounds.length} 个 | 重负载端点 ${config.endpoints.length} 个`)
 
-// 6. 速度解析与节点裂变提取
-const speedCache = new Map()
+const initialProxyCount = countProxyOutbounds(config.outbounds)
+const initialEpStats = countClientEndpoints(config.endpoints)
+log(
+  `📥 载入节点：普通代理 (outbounds) ${initialProxyCount} 个，端点 (endpoints) ${initialEpStats.total} 个` +
+  (initialEpStats.total ? `（OpenVPN ${initialEpStats.ovpn} / 其他 ${initialEpStats.total - initialEpStats.ovpn}）` : '')
+)
+
+// 记录模板原有策略组与内置出站 tag
+const structuralTags = new Set()
+for (const o of config.outbounds) {
+  if (o?.tag && STRUCTURAL_TYPES.has(o.type)) structuralTags.add(o.tag)
+}
+
+// 6. 测速解析、预计算并排序去重
+const RE_SPEED = /\|([\d.]+)\s*(MB|KB)\/s\|/i
+const RE_STRIP_SPEED = /\|[\d.]+\s*(?:MB|KB)\/s\|/gi
+const RE_STRIP_IDX = /\|\+\d+$/i
+const RE_STRIP_SPLIT = /\|已裂变$/i
+
 function parseSpeed(tag) {
-  if (typeof tag !== 'string') return 0
-  if (!speedCache.has(tag)) {
-    const match = tag.match(/\|([\d.]+)MB\/s\|/i)
-    speedCache.set(tag, match ? parseFloat(match[1]) : 0)
-  }
-  return speedCache.get(tag)
+  const match = RE_SPEED.exec(tag)
+  if (!match) return 0
+  const val = parseFloat(match[1])
+  return match[2].toUpperCase() === 'MB' ? val : val / 1024
 }
 
 function getBaseName(tag) {
-  if (typeof tag !== 'string') return tag
-  let base = tag.replace(/\|[\d.]+MB\/s\|/gi, '').trim()
-  base = base.replace(/\|\+\d+$/i, '').replace(/\|已裂变$/i, '').trim()
-  return base
+  return tag
+    .replace(RE_STRIP_SPEED, '')
+    .trim()
+    .replace(RE_STRIP_IDX, '')
+    .replace(RE_STRIP_SPLIT, '')
+    .trim()
 }
 
-const structuralTypes = new Set(['selector', 'urltest', 'direct', 'block', 'dns', 'bypass'])
-const structuralTags = new Set(config.outbounds.filter(o => structuralTypes.has(o.type)).map(o => o.tag).filter(Boolean))
-
-const allProxies = [...config.outbounds, ...config.endpoints].filter(node => node.tag && !structuralTypes.has(node.type))
-// 全局速度降序
-allProxies.sort((a, b) => parseSpeed(b.tag) - parseSpeed(a.tag))
-
-// 7. 裂变去重
-const uniqueProxies = []
-const seenBaseNames = new Set()
-
-for (const p of allProxies) {
-  const baseName = getBaseName(p.tag)
-  if (!seenBaseNames.has(baseName)) {
-    seenBaseNames.add(baseName)
-    uniqueProxies.push(p)
+const rawProxies = []
+for (const node of config.outbounds) {
+  if (node?.tag && !STRUCTURAL_TYPES.has(node.type)) {
+    rawProxies.push({ node, tag: node.tag, speed: parseSpeed(node.tag), isEndpoint: false, isOpenVPN: false })
   }
 }
-log(`🔄 去重清洗: 原始节点 ${allProxies.length} -> 独立物理服务器 ${uniqueProxies.length} 个`)
+for (const node of config.endpoints) {
+  if (node?.tag && !SERVER_ENDPOINT_TYPES.has(node.type)) {
+    rawProxies.push({
+      node,
+      tag: node.tag,
+      speed: parseSpeed(node.tag),
+      isEndpoint: true,
+      isOpenVPN: node.type === 'openvpn-client'
+    })
+  }
+}
 
-// 8. 🌟 建立【全局安全池】 (彻底解决分组缺节点的问题，同时死守内存防线)
-const GLOBAL_MAX_PROXIES = 100 // 基础容量（前 100 名最快节点）
-const MIN_REGION_NODES = 10    // 地区分组最低保底数量
-const MAX_ENDPOINTS = 10       // 严格死守 WG/OVPN 等内存大户
-const endpointTagSet = new Set(config.endpoints.map(n => n.tag).filter(Boolean))
+rawProxies.sort((a, b) => b.speed - a.speed)
 
+const uniqueProxies = []
+const seenBaseNames = new Set()
+let uniqueOutboundsCount = 0
+let uniqueEndpointsCount = 0
+
+for (const item of rawProxies) {
+  const baseName = getBaseName(item.tag)
+  if (!seenBaseNames.has(baseName)) {
+    seenBaseNames.add(baseName)
+    uniqueProxies.push(item)
+    if (item.isEndpoint) uniqueEndpointsCount++
+    else uniqueOutboundsCount++
+  }
+}
+
+const dupOutRemoved = initialProxyCount - uniqueOutboundsCount
+const dupEpRemoved = initialEpStats.total - uniqueEndpointsCount
+log(
+  `🧹 节点去重：${rawProxies.length} → ${uniqueProxies.length} 个` +
+  `（同名移除：普通代理 ${dupOutRemoved} 个，端点 ${dupEpRemoved} 个）`
+)
+
+// 7. 建立全局节点池（速度优先 + 端点独立保底 + 地区/TikTok 单遍保底）
 const safePool = []
 const safeTags = new Set()
+const safeOutboundTags = new Set()
+const safeEndpointTags = new Set()
 let currentEndpointCount = 0
+let currentOpenVPNCount = 0
 
-function addNodeToPool(p, bypassLimit = false) {
-  if (!bypassLimit && safePool.length >= GLOBAL_MAX_PROXIES) return false
-  if (safeTags.has(p.tag)) return true // 已添加过
+function addItemToPool(item, bypassGlobalLimit = false) {
+  if (!bypassGlobalLimit && safePool.length >= GLOBAL_MAX_NODES) return false
+  if (safeTags.has(item.tag)) return false
+  if (item.isEndpoint) {
+    if (currentEndpointCount >= MAX_ENDPOINTS) return false
+    if (item.isOpenVPN && currentOpenVPNCount >= MAX_OPENVPN) return false
+  }
 
-  const isEndpoint = endpointTagSet.has(p.tag)
-  // 无论是否是保底索取，重型节点死守封顶上限
-  if (isEndpoint && currentEndpointCount >= MAX_ENDPOINTS) return true
-
-  safePool.push(p)
-  safeTags.add(p.tag)
-  if (isEndpoint) currentEndpointCount++
+  safePool.push(item)
+  safeTags.add(item.tag)
+  if (item.isEndpoint) {
+    safeEndpointTags.add(item.tag)
+    currentEndpointCount++
+    if (item.isOpenVPN) currentOpenVPNCount++
+  } else {
+    safeOutboundTags.add(item.tag)
+  }
   return true
 }
 
-// 阶段 1: 绝对速度优先。无条件先取全网测速最快的前 100 个节点入池。
-for (const p of uniqueProxies) {
-  if (safePool.length >= GLOBAL_MAX_PROXIES) break
-  addNodeToPool(p)
+// 第一轮：绝对速度优先（受总优选上限与端点/OpenVPN 上限约束）
+for (const item of uniqueProxies) {
+  if (safePool.length >= GLOBAL_MAX_NODES) break
+  addItemToPool(item, false)
 }
 
-// 阶段 2: 地区保底补充。如果某些地区/流媒体在前 100 里的数量太少，则向 100 名外索取。
-const diversityRules = [...Object.values(TIKTOK_MAIN), ...Object.values(REGIONS)]
+// 第二轮：端点独立保底（避免高测速普通代理把优质 WireGuard 等端点全部挤出池外）
+let endpointAddedCount = 0
+if (currentEndpointCount < MIN_ENDPOINTS) {
+  for (const item of uniqueProxies) {
+    if (currentEndpointCount >= MIN_ENDPOINTS) break
+    if (!item.isEndpoint || safeTags.has(item.tag)) continue
+    if (addItemToPool(item, true)) endpointAddedCount++
+  }
+}
+
+// 第三轮：地区与 TikTok 单遍统计缺口并保底补充
+const diversityRules = MIN_REGION_NODES > 0
+  ? [...Object.values(TIKTOK_MAIN).map(fn => tag => RE_TIKTOK.test(tag) && fn(tag)), ...Object.values(REGIONS)]
+  : []
+
+const ruleNeeds = []
 for (const rule of diversityRules) {
-  if (!rule) continue
-
-  // 统计当前池子里该规则节点数量
-  let currentCount = 0
-  for (const p of safePool) {
-    const isMatch = rule.test ? rule.test(p.tag) : rule(p.tag)
-    if (isMatch) currentCount++
+  let count = 0
+  const isReg = Boolean(rule.test)
+  for (const item of safePool) {
+    if ((isReg ? rule.test(item.tag) : rule(item.tag)) && ++count >= MIN_REGION_NODES) break
   }
+  if (count < MIN_REGION_NODES) {
+    ruleNeeds.push({ rule, isReg, needed: MIN_REGION_NODES - count })
+  }
+}
 
-  // 如果不足保底值，从 100 名以外遍历强行补充进来
-  if (currentCount < MIN_REGION_NODES) {
-    let needed = MIN_REGION_NODES - currentCount
-    for (const p of uniqueProxies) {
-      if (needed <= 0) break
-      if (safeTags.has(p.tag)) continue
+let regionAddedCount = 0
+if (ruleNeeds.length) {
+  for (const item of uniqueProxies) {
+    if (safeTags.has(item.tag)) continue
+    if (item.isEndpoint && (currentEndpointCount >= MAX_ENDPOINTS || (item.isOpenVPN && currentOpenVPNCount >= MAX_OPENVPN))) {
+      continue
+    }
 
-      const isMatch = rule.test ? rule.test(p.tag) : rule(p.tag)
-      if (isMatch) {
-        const beforeSize = safeTags.size
-        addNodeToPool(p, true) // bypassLimit = true, 允许总池子突破 100 的限制
-        if (safeTags.size > beforeSize) needed--
+    let hitsAny = false
+    for (const r of ruleNeeds) {
+      if (r.needed > 0 && (r.isReg ? r.rule.test(item.tag) : r.rule(item.tag))) {
+        hitsAny = true
+        break
       }
+    }
+    if (!hitsAny) continue
+
+    if (addItemToPool(item, true)) {
+      regionAddedCount++
+      let remainingAll = 0
+      for (const r of ruleNeeds) {
+        if (r.needed > 0) {
+          if (r.isReg ? r.rule.test(item.tag) : r.rule(item.tag)) r.needed--
+          if (r.needed > 0) remainingAll++
+        }
+      }
+      if (remainingAll === 0) break
     }
   }
 }
 
-const retainedTags = new Set(safePool.map(p => p.tag))
-log(`🛡️ 全局安全池已建立: 共萃取 ${safePool.length} 个顶级节点 (包含重度端点 ${currentEndpointCount}/${MAX_ENDPOINTS})`)
+const safeProxyCount = safePool.length - currentEndpointCount
+const supplementParts = []
+if (endpointAddedCount) supplementParts.push(`端点保底 +${endpointAddedCount}`)
+if (regionAddedCount) supplementParts.push(`地区/TikTok +${regionAddedCount}`)
 
-// 9. 无限制全量分发装填 (释放所有节点的并发测速潜力)
+log(
+  `🎯 优选节点池：普通代理 ${safeProxyCount} 个，端点 ${currentEndpointCount} 个（OpenVPN ${currentOpenVPNCount}），共 ${safePool.length} 个` +
+  (supplementParts.length ? `（${supplementParts.join('，')}）` : '')
+)
+
+// 8. 策略组分发（客户端端点同样可作为 selector / urltest 候选出站）
+const safePoolTags = safePool.map(item => item.tag)
+const tikTokPoolTags = safePoolTags.filter(tag => RE_TIKTOK.test(tag))
+
 function getMatchedTags(matcher, isRegex = true) {
-  // 💡 如果是 MANUAL (匹配规则为 null)，直接全量返回池子里的所有 100+ 节点！
-  if (!matcher) return safePool.map(p => p.tag)
-
-  // 💡 其他地区与 AUTO 分组，不设数量上限，全量返回安全池中所有满足条件的节点
-  let matched = isRegex
-    ? safePool.filter(p => matcher.test(p.tag))
-    : safePool.filter(p => RE_TIKTOK.test(p.tag) && matcher(p.tag))
-  return matched.map(p => p.tag)
+  if (!matcher) return safePoolTags.slice()
+  return isRegex
+    ? safePoolTags.filter(tag => matcher.test(tag))
+    : tikTokPoolTags.filter(tag => matcher(tag))
 }
 
-function normalizeOutbounds(o, tags) {
-  if (o.type !== 'selector' && o.type !== 'urltest') return
-  if (!Array.isArray(o.outbounds)) o.outbounds = []
+function normalizeOutbounds(outbound, tags) {
+  if (!Array.isArray(outbound.outbounds)) outbound.outbounds = []
+  if (!tags.length) return
 
-  if (tags.length) {
-    if (o.type === 'urltest') {
-      o.outbounds = tags
-    } else {
-      // 如果原有出站仅有1个占位符 (如 "DIRECT" 或 "AUTO")，纯粹为了防空载，直接替换。
-      if (o.outbounds.length <= 1) {
-        o.outbounds = tags
-      } else {
-        // 如果原有出站有多个结构 (例如用户故意留的 ["AUTO", "DIRECT"] 手动菜单)
-        // 则保留原有的复合菜单选项，并追加新节点，同时过滤掉同名占位防止死循环。
-        const original = o.outbounds.filter(t => t !== o.tag)
-        o.outbounds = [...new Set([...original, ...tags])]
-      }
-    }
+  if (outbound.type === 'urltest' || outbound.outbounds.length <= 1) {
+    outbound.outbounds = tags
+    return
   }
+
+  const original = outbound.outbounds.filter(tag => tag !== outbound.tag)
+  outbound.outbounds = [...new Set([...original, ...tags])]
 }
 
-// 给所有分组按需分发节点
-for (const o of config.outbounds) {
-  if (!o.tag || (o.type !== 'selector' && o.type !== 'urltest')) continue
+const updatedGroups = { selector: 0, urltest: 0 }
+for (const outbound of config.outbounds) {
+  if (!outbound.tag || (outbound.type !== 'selector' && outbound.type !== 'urltest')) continue
 
   let tagsToInject = []
-  if (TIKTOK_MAIN[o.tag]) {
-    tagsToInject = getMatchedTags(TIKTOK_MAIN[o.tag], false)
-  } else if (GROUP_RULES[o.tag] !== undefined) {
-    tagsToInject = getMatchedTags(GROUP_RULES[o.tag], true)
+  if (TIKTOK_MAIN[outbound.tag]) {
+    tagsToInject = getMatchedTags(TIKTOK_MAIN[outbound.tag], false)
+  } else if (GROUP_RULES[outbound.tag] !== undefined) {
+    tagsToInject = getMatchedTags(GROUP_RULES[outbound.tag], true)
   }
-  normalizeOutbounds(o, tagsToInject)
+
+  if (!tagsToInject.length) continue
+  normalizeOutbounds(outbound, tagsToInject)
+  updatedGroups[outbound.type]++
+}
+log(`📂 策略组更新：选择器 (selector) ${updatedGroups.selector} 个，自动测速 (urltest) ${updatedGroups.urltest} 个`)
+
+// 9. 清理未入选节点，并统计精简原因
+let epDroppedOvpnCap = 0
+let epDroppedMaxCap = 0
+let epDroppedSpeedRank = 0
+for (const item of uniqueProxies) {
+  if (!item.isEndpoint || safeEndpointTags.has(item.tag)) continue
+  if (item.isOpenVPN && currentOpenVPNCount >= MAX_OPENVPN) epDroppedOvpnCap++
+  else if (currentEndpointCount >= MAX_ENDPOINTS) epDroppedMaxCap++
+  else epDroppedSpeedRank++
 }
 
-// 10. 🧹 物理节点彻底瘦身 (剥离未进入安全池的废弃节点，释放内存)
-const beforeEndpointsCount = config.endpoints.length
-const beforeOutboundsCount = config.outbounds.length
+const seenEndpointTags = new Set(structuralTags)
+config.endpoints = config.endpoints.filter(node => {
+  if (!node?.tag) return false
+  if (SERVER_ENDPOINT_TYPES.has(node.type)) {
+    seenEndpointTags.add(node.tag)
+    return true
+  }
+  if (!safeEndpointTags.has(node.tag) || seenEndpointTags.has(node.tag)) return false
+  seenEndpointTags.add(node.tag)
+  return true
+})
 
-config.endpoints = config.endpoints.filter(node => retainedTags.has(node.tag))
-config.outbounds = config.outbounds.filter(node => structuralTypes.has(node.type) || retainedTags.has(node.tag))
+const seenOutTags = new Set(structuralTags)
+config.outbounds = config.outbounds.filter(node => {
+  if (STRUCTURAL_TYPES.has(node.type)) return true
+  if (!node?.tag || !safeOutboundTags.has(node.tag) || seenOutTags.has(node.tag) || seenEndpointTags.has(node.tag)) {
+    return false
+  }
+  seenOutTags.add(node.tag)
+  return true
+})
 
-const retainedOutboundsProxies = config.outbounds.filter(n => !structuralTypes.has(n.type)).length
-log(`✂️ 内存精简清理: 重度端点 [${beforeEndpointsCount} -> ${config.endpoints.length}] | 常规代理 [${beforeOutboundsCount - config.outbounds.filter(n => structuralTypes.has(n.type)).length} -> ${retainedOutboundsProxies}]`)
+const afterProxyCount = countProxyOutbounds(config.outbounds)
+const afterEpStats = countClientEndpoints(config.endpoints)
+const rankOutRemoved = Math.max(0, uniqueOutboundsCount - afterProxyCount)
 
-// 11. 智能兜底与死链清理
+const epDropReasons = []
+if (dupEpRemoved) epDropReasons.push(`去重 ${dupEpRemoved}`)
+if (epDroppedOvpnCap) epDropReasons.push(`OpenVPN上限 ${epDroppedOvpnCap}`)
+if (epDroppedMaxCap) epDropReasons.push(`端点上限 ${epDroppedMaxCap}`)
+if (epDroppedSpeedRank) epDropReasons.push(`节点速度未进前序 ${epDroppedSpeedRank}`)
+
+log(
+  `✂️ 内存精简：普通代理 ${initialProxyCount} → ${afterProxyCount}（去重 ${dupOutRemoved} / 节点速度淘汰 ${rankOutRemoved}），` +
+  `端点 (endpoints) ${initialEpStats.total} → ${afterEpStats.total}` +
+  (epDropReasons.length ? `（${epDropReasons.join(' / ')}）` : '')
+)
+
+// 10. 清理失效引用，空分组兜底并校验 selector.default
 const COMPATIBLE_TAG = 'COMPATIBLE'
-let hasCompatible = config.outbounds.some(o => o.tag === COMPATIBLE_TAG)
+const RESERVED_TAGS = new Set(['DIRECT', 'REJECT', COMPATIBLE_TAG])
+let hasCompatible = config.outbounds.some(outbound => outbound.tag === COMPATIBLE_TAG)
+
 function injectCompatible() {
   if (!hasCompatible) {
     config.outbounds.push({ tag: COMPATIBLE_TAG, type: 'direct' })
@@ -293,24 +557,45 @@ function injectCompatible() {
 }
 
 const fallbackGroups = []
-for (const o of config.outbounds) {
-  if (!structuralTypes.has(o.type) || (o.type !== 'selector' && o.type !== 'urltest')) continue
+for (const outbound of config.outbounds) {
+  if (outbound.type !== 'selector' && outbound.type !== 'urltest') continue
 
-  o.outbounds = o.outbounds.filter(t =>
-    retainedTags.has(t) ||
-    structuralTags.has(t) ||
-    ['DIRECT', 'REJECT', 'COMPATIBLE'].includes(t)
+  outbound.outbounds = (Array.isArray(outbound.outbounds) ? outbound.outbounds : []).filter(tag =>
+    safeTags.has(tag) || structuralTags.has(tag) || RESERVED_TAGS.has(tag)
   )
 
-  if (!o.outbounds.length || (o.outbounds.length === 1 && o.outbounds[0] === o.tag)) {
-    o.outbounds = [injectCompatible()]
-    fallbackGroups.push(o.tag)
+  if (!outbound.outbounds.length || (outbound.outbounds.length === 1 && outbound.outbounds[0] === outbound.tag)) {
+    outbound.outbounds = [injectCompatible()]
+    fallbackGroups.push(outbound.tag)
+  }
+
+  if (outbound.type === 'selector' && outbound.default && !outbound.outbounds.includes(outbound.default)) {
+    delete outbound.default
   }
 }
 
-if (fallbackGroups.length > 0) {
-  log(`⚠️ 触发直连兜底: 发现 ${fallbackGroups.length} 个策略组无可用节点 (${fallbackGroups.join(', ')})`)
+if (fallbackGroups.length) {
+  log(`${fallbackGroups.length} 个策略组无可用出站，已设为直连兜底 (${COMPATIBLE_TAG})：${fallbackGroups.join(', ')}`, 'WARN')
 }
 
-log(`✅ 完美装填完毕 | 生成出站总数: ${config.outbounds.length} 个 | 重负载端点数: ${config.endpoints.length} 个 | 实体代理总数: ${retainedTags.size} 个`)
+// 11. 单遍汇总最终配置统计
+let finalProxyCount = 0
+let finalSelectorCount = 0
+let finalURLTestCount = 0
+let otherOutboundCount = 0
+
+for (const node of config.outbounds) {
+  if (node.type === 'selector') finalSelectorCount++
+  else if (node.type === 'urltest') finalURLTestCount++
+  else if (STRUCTURAL_TYPES.has(node.type)) otherOutboundCount++
+  else if (node?.tag) finalProxyCount++
+}
+const finalEpStats = countClientEndpoints(config.endpoints)
+
+log(
+  `✅ ${endTarget}：普通代理 (outbounds) ${finalProxyCount} 个，端点 (endpoints) ${finalEpStats.total} 个` +
+  (finalEpStats.total ? `（OpenVPN ${finalEpStats.ovpn} / 其他 ${finalEpStats.total - finalEpStats.ovpn}）` : '') +
+  ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）`
+)
+
 $content = JSON.stringify(config, null, 2)

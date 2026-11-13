@@ -1,5 +1,6 @@
+
+// Sub-Store Sing-Box 节点优选与分组脚本
 /**
- * Sub-Store Sing-Box 节点优选与分组脚本
  * 基础用法（通常只需传 name 和 type 两个参数）：
  *   #name=sub&type=0
  * 参数说明：
@@ -17,10 +18,9 @@
 
 function log(msg, level = 'INFO') {
   const badge = level === 'ERROR' ? '❌ ' : level === 'WARN' ? '⚠️ ' : ''
-  const text = `[Sing-Box-Script] ${badge}${msg}`
+  const text = `[Sing-Box-分组] ${badge}${msg}`
   if (level === 'ERROR' && typeof console.error === 'function') console.error(text)
   else if (level === 'WARN' && typeof console.warn === 'function') console.warn(text)
-  else if (level === 'INFO' && typeof console.info === 'function') console.info(text)
   else console.log(text)
 }
 
@@ -32,26 +32,47 @@ function parseIntArg(val, fallback, allowZero = false) {
   return allowZero ? (intVal >= 0 ? intVal : fallback) : (intVal > 0 ? intVal : fallback)
 }
 
-const { type, name } = $arguments
+const args = (typeof $arguments !== 'undefined' && $arguments) || {}
+const { type, name } = args
 
-const GLOBAL_MAX_NODES = parseIntArg($arguments.maxNodes ?? $arguments.max_nodes ?? $arguments.max, 100)
-const MIN_REGION_NODES = parseIntArg($arguments.minRegion ?? $arguments.min_region ?? $arguments.regionMin, 5, true)
-const MAX_ENDPOINTS = parseIntArg($arguments.maxEndpoints ?? $arguments.max_endpoints ?? $arguments.epMax, 15, true)
+const GLOBAL_MAX_NODES = parseIntArg(args.maxNodes ?? args.max_nodes ?? args.max, 100)
+const MIN_REGION_NODES = parseIntArg(args.minRegion ?? args.min_region ?? args.regionMin, 5, true)
+const MAX_ENDPOINTS = parseIntArg(args.maxEndpoints ?? args.max_endpoints ?? args.epMax, 15, true)
 const MIN_ENDPOINTS = Math.min(
-  parseIntArg($arguments.minEndpoints ?? $arguments.min_endpoints ?? $arguments.epMin, 5, true),
+  parseIntArg(args.minEndpoints ?? args.min_endpoints ?? args.epMin, 5, true),
   MAX_ENDPOINTS
 )
 const MAX_OPENVPN = Math.min(
-  parseIntArg($arguments.maxOpenVPN ?? $arguments.max_openvpn ?? $arguments.ovpnMax, 5, true),
+  parseIntArg(args.maxOpenVPN ?? args.max_openvpn ?? args.ovpnMax, 5, true),
   MAX_ENDPOINTS
 )
 
 // 1. 解析参数与模板配置
 const subType = /^1$|col|组合|合集/i.test(String(type || '')) ? 'collection' : 'subscription'
 const sourceLabel = subType === 'collection' ? '组合订阅' : '订阅'
+const subDesc = `${sourceLabel}「${name || '未命名'}」`
+
+const fileName = (() => {
+  const req = typeof $options !== 'undefined' ? $options?._req : undefined
+  const raw =
+    req?.params?.name ||
+    (req?.path || req?.url || '').match(/\/api\/file\/([^/?#]+)/)?.[1] ||
+    req?.body?.name ||
+    ''
+  if (!raw) return ''
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return String(raw)
+  }
+})()
+
+const startTarget = fileName ? `文件「${fileName}」（${subDesc}）` : subDesc
+const endTarget = fileName ? `文件「${fileName}」处理完成（引用${subDesc}）` : `${subDesc}处理完成`
+
 log(
-  `🚀 开始处理${sourceLabel}「${name || '未命名'}」| 任务：筛选优质节点，节点裂变去重、端点保底、策略组分发与精简` +
-  `（总优选 ${GLOBAL_MAX_NODES} / 地区保底 ${MIN_REGION_NODES} / 端点保底 ${MIN_ENDPOINTS} / 端点上限 ${MAX_ENDPOINTS} / OpenVPN上限 ${MAX_OPENVPN}）`
+  `🚀 开始处理${startTarget} | ` +
+  `总优选 ${GLOBAL_MAX_NODES} / 地区保底 ${MIN_REGION_NODES} / 端点保底 ${MIN_ENDPOINTS} / 端点上限 ${MAX_ENDPOINTS} / OpenVPN上限 ${MAX_OPENVPN}`
 )
 
 const jsonParser = (typeof ProxyUtils !== 'undefined' && ProxyUtils.JSON5) ? ProxyUtils.JSON5 : JSON
@@ -257,7 +278,7 @@ const initialProxyCount = countProxyOutbounds(config.outbounds)
 const initialEpStats = countClientEndpoints(config.endpoints)
 log(
   `📥 载入节点：普通代理 (outbounds) ${initialProxyCount} 个，端点 (endpoints) ${initialEpStats.total} 个` +
-  (initialEpStats.total ? `（OpenVPN ${initialEpStats.ovpn} / 其他端点 ${initialEpStats.total - initialEpStats.ovpn}）` : '')
+  (initialEpStats.total ? `（OpenVPN ${initialEpStats.ovpn} / 其他 ${initialEpStats.total - initialEpStats.ovpn}）` : '')
 )
 
 // 记录模板原有策略组与内置出站 tag
@@ -572,7 +593,7 @@ for (const node of config.outbounds) {
 const finalEpStats = countClientEndpoints(config.endpoints)
 
 log(
-  `✅ Sing-Box 订阅处理完成：普通代理 (outbounds) ${finalProxyCount} 个，端点 (endpoints) ${finalEpStats.total} 个` +
+  `✅ ${endTarget}：普通代理 (outbounds) ${finalProxyCount} 个，端点 (endpoints) ${finalEpStats.total} 个` +
   (finalEpStats.total ? `（OpenVPN ${finalEpStats.ovpn} / 其他 ${finalEpStats.total - finalEpStats.ovpn}）` : '') +
   ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）`
 )
