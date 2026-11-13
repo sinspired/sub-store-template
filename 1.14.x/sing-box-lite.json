@@ -49,9 +49,7 @@
         "disable_cache": true
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all"
-        ],
+        "rule_set": "geosite/category-ads-all",
         "action": "reject"
       },
       {
@@ -162,6 +160,7 @@
       "max_concurrent_streams": 10
     }
   ],
+  "endpoints": [],
   "inbounds": [
     {
       "type": "mixed",
@@ -176,8 +175,8 @@
       "listen_port": 60012,
       "users": [
         {
-          "Username": "sinspired",
-          "Password": "sinspired"
+          "username": "sinspired",
+          "password": "sinspired"
         }
       ]
     },
@@ -807,42 +806,22 @@
         "outbound": "DIRECT"
       },
       {
-        "process_name": [
-          "ChatGPT.exe"
-        ],
-        "process_path_regex": [
-          "(?i)(^|[/\\\\])chatgpt(?:\\.exe)?$"
-        ],
-        "package_name": [
-          "com.openai.chatgpt"
-        ],
-        "package_name_regex": [
-          "(?i)^com\\.openai\\.chatgpt.*"
-        ],
+        "process_name": "ChatGPT.exe",
+        "process_path_regex": "(?i)(^|[/\\\\])chatgpt(?:\\.exe)?$",
+        "package_name": "com.openai.chatgpt",
+        "package_name_regex": "(?i)^com\\.openai\\.chatgpt.*",
         "outbound": "OpenAI"
       },
       {
-        "process_name": [
-          "Claude.exe"
-        ],
-        "process_path_regex": [
-          "(?i)(^|[/\\\\])claude(?:\\.exe)?$"
-        ],
-        "package_name": [
-          "com.anthropic.claude"
-        ],
-        "package_name_regex": [
-          "(?i)^com\\.anthropic\\.claude.*"
-        ],
+        "process_name": "Claude.exe",
+        "process_path_regex": "(?i)(^|[/\\\\])claude(?:\\.exe)?$",
+        "package_name": "com.anthropic.claude",
+        "package_name_regex": "(?i)^com\\.anthropic\\.claude.*",
         "outbound": "Claude"
       },
       {
-        "package_name": [
-          "com.google.android.apps.bard"
-        ],
-        "package_name_regex": [
-          "(?i)^com\\.google\\.android\\.apps\\.bard.*"
-        ],
+        "package_name": "com.google.android.apps.bard",
+        "package_name_regex": "(?i)^com\\.google\\.android\\.apps\\.bard.*",
         "outbound": "Gemini"
       },
       {
@@ -850,15 +829,9 @@
           "copilotapp",
           "copilotapphost"
         ],
-        "process_path_regex": [
-          "(?i)(^|[/\\\\])copilot(?:app|apphost)?(?:\\.exe)?$"
-        ],
-        "package_name": [
-          "com.microsoft.copilot"
-        ],
-        "package_name_regex": [
-          "(?i)^com\\.microsoft\\.copilot.*"
-        ],
+        "process_path_regex": "(?i)(^|[/\\\\])copilot(?:app|apphost)?(?:\\.exe)?$",
+        "package_name": "com.microsoft.copilot",
+        "package_name_regex": "(?i)^com\\.microsoft\\.copilot.*",
         "outbound": "Copilot"
       },
       {
@@ -924,9 +897,7 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all"
-        ],
+        "rule_set": "geosite/category-ads-all",
         "action": "reject"
       },
       {
@@ -1077,9 +1048,7 @@
     "rule_set": [
       {
         "type": "remote",
-        "tag": [
-          "geosite-cn"
-        ],
+        "tag": "geosite-cn",
         "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
         "http_client": "client_direct",
