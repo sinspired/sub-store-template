@@ -1,4 +1,3 @@
-
 // Sub-Store Sing-Box 节点优选与分组脚本
 /**
  * 基础用法（通常只需传 name 和 type 两个参数）：
@@ -13,7 +12,10 @@
  *   - minRegion / min_region：地区与 TikTok 分组最低保底（默认 5）
  *   - minEndpoints / min_endpoints：端点独立保底数量（默认 5）
  *   - maxEndpoints / max_endpoints：端点总上限（默认 15）
- *   - maxOpenVPN / max_openvpn：OpenVPN 客户端上限（默认 5）
+ *   - maxOpenVPN / max_openvpn：OpenVPN 客户端上限（默认 5；设为 0 可关闭提取，直接拉取原生 sing-box 产物）
+ *
+ * 兼容模式参数（一般无需传）：
+ *   - dualFetch / dual_fetch：是否开启双路并发拉取；0 / false = 关闭（默认，单遍拉取更快且保留 OpenVPN），1 / true = 开启（仅当订阅内专门针对 sing-box 与 ClashMeta 配置了不同条件操作时使用）
  */
 
 function log(msg, level = 'INFO') {
@@ -23,6 +25,8 @@ function log(msg, level = 'INFO') {
   else if (level === 'WARN' && typeof console.warn === 'function') console.warn(text)
   else console.log(text)
 }
+
+const startTime = Date.now()
 
 function parseIntArg(val, fallback, allowZero = false) {
   if (val === undefined || val === null || val === '') return fallback
@@ -195,18 +199,84 @@ if (templateEndpointsInOut.length) {
   config.outbounds = templateCleanOut
 }
 
-// 4. 并发拉取 Sing-Box 完整产物 与 ClashMeta OpenVPN 补充节点
-const [singboxRes, metaRes] = await Promise.allSettled([
-  produceArtifact({ name, type: subType, platform: 'sing-box' }),
-  produceArtifact({ type: subType, name, platform: 'ClashMeta', produceType: 'internal' })
-])
-
-if (singboxRes.status === 'rejected') {
-  throw singboxRes.reason
+function extractOpenVPNCandidates(metaProxies) {
+  const ovpnCandidates = []
+  for (const p of metaProxies) {
+    if (p?.type !== 'openvpn') continue
+    const ovpnNode = {
+      type: 'openvpn-client',
+      tag: p.name || 'ovpn-client',
+      server: p.server,
+      server_port: parseInt(p.port, 10),
+      network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
+    }
+    if (p.auth) ovpnNode.auth = p.auth
+    const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
+    if (dataCiphers.length) {
+      ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(c => c.trim().toUpperCase())
+    }
+    if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
+    if (p.username) ovpnNode.username = p.username
+    if (p.password) ovpnNode.password = p.password
+    if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
+      ovpnNode.tls = {}
+      const sni = p.sni || p.server_name || p.peer
+      if (sni) ovpnNode.tls.server_name = sni
+      if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
+      if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
+      if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
+    }
+    ovpnCandidates.push(ovpnNode)
+  }
+  return ovpnCandidates
 }
 
-const artifactRaw = singboxRes.value
-const data = typeof artifactRaw === 'string' ? JSON.parse(artifactRaw) : artifactRaw
+// 4. 拉取 Sing-Box 产物与 OpenVPN 补充节点
+const useDualFetch = /^(1|true|yes|on)$/i.test(String(args.dualFetch ?? args.dual_fetch ?? ''))
+
+let data
+let ovpnCandidates = []
+
+if (MAX_OPENVPN === 0) {
+  const artifactRaw = await produceArtifact({ name, type: subType, platform: 'sing-box' })
+  data = typeof artifactRaw === 'string' ? JSON.parse(artifactRaw) : artifactRaw
+} else if (!useDualFetch) {
+  const internalProxies = await produceArtifact({
+    type: subType,
+    name,
+    platform: 'ClashMeta',
+    produceType: 'internal'
+  })
+  if (!Array.isArray(internalProxies)) {
+    throw new Error('ClashMeta internal 未返回节点数组')
+  }
+  ovpnCandidates = extractOpenVPNCandidates(internalProxies)
+  const artifactRaw = ProxyUtils.produce(internalProxies, 'sing-box')
+  data = typeof artifactRaw === 'string' ? JSON.parse(artifactRaw) : artifactRaw
+} else {
+  const [singboxRes, metaRes] = await Promise.allSettled([
+    produceArtifact({ name, type: subType, platform: 'sing-box' }),
+    produceArtifact({ type: subType, name, platform: 'ClashMeta', produceType: 'internal' })
+  ])
+  if (singboxRes.status === 'rejected') {
+    throw singboxRes.reason
+  }
+  const artifactRaw = singboxRes.value
+  data = typeof artifactRaw === 'string' ? JSON.parse(artifactRaw) : artifactRaw
+  if (metaRes.status === 'fulfilled' && Array.isArray(metaRes.value)) {
+    try {
+      ovpnCandidates = extractOpenVPNCandidates(metaRes.value)
+    } catch (e) {
+      log(`OpenVPN 客户端端点补充失败：${e?.message || e}`, 'WARN')
+    }
+  } else {
+    const errMsg = metaRes.status === 'rejected'
+      ? (metaRes.reason?.message || metaRes.reason)
+      : 'ClashMeta internal 未返回节点数组'
+    log(`OpenVPN 客户端端点补充失败：${errMsg}`, 'WARN')
+  }
+}
+
 if (!data || typeof data !== 'object' || Array.isArray(data)) {
   throw new Error('Sing-Box 产物格式异常：未返回完整配置对象')
 }
@@ -224,50 +294,10 @@ if (Array.isArray(data.outbounds)) {
   if (extraEndpoints.length) mergeEndpoints(endpoints, extraEndpoints)
 }
 
-// 5. 处理 ClashMeta 引擎补充的 OpenVPN 客户端端点
-if (metaRes.status === 'fulfilled') {
-  try {
-    const metaProxies = metaRes.value
-    if (!Array.isArray(metaProxies)) throw new Error('ClashMeta internal 未返回节点数组')
-
-    const ovpnCandidates = []
-    for (const p of metaProxies) {
-      if (p.type !== 'openvpn') continue
-      const ovpnNode = {
-        type: 'openvpn-client',
-        tag: p.name || 'ovpn-client',
-        server: p.server,
-        server_port: parseInt(p.port, 10),
-        network: p.udp === false || (p.proto && p.proto.toLowerCase() === 'tcp') ? 'tcp' : 'udp'
-      }
-      if (p.auth) ovpnNode.auth = p.auth
-      const dataCiphers = p['data-ciphers'] || (p.cipher ? [p.cipher] : [])
-      if (dataCiphers.length) {
-        ovpnNode.data_ciphers = (Array.isArray(dataCiphers) ? dataCiphers : dataCiphers.split(/[,;]+/)).map(c => c.trim().toUpperCase())
-      }
-      if (p.cipher) ovpnNode.data_ciphers_fallback = p.cipher.toUpperCase()
-      if (p.username) ovpnNode.username = p.username
-      if (p.password) ovpnNode.password = p.password
-      if (p.ca || p.cert || p.key || p.sni || p.server_name || p.peer) {
-        ovpnNode.tls = {}
-        const sni = p.sni || p.server_name || p.peer
-        if (sni) ovpnNode.tls.server_name = sni
-        if (p.ca) ovpnNode.tls.certificate = Array.isArray(p.ca) ? p.ca : [p.ca.trim()]
-        if (p.cert) ovpnNode.tls.client_certificate = Array.isArray(p.cert) ? p.cert : [p.cert.trim()]
-        if (p.key) ovpnNode.tls.client_key = Array.isArray(p.key) ? p.key : [p.key.trim()]
-      }
-      ovpnCandidates.push(ovpnNode)
-    }
-
-    if (ovpnCandidates.length) {
-      const metaOpenVPNAdded = mergeEndpoints(endpoints, ovpnCandidates)
-      log(`🔧 补充 OpenVPN 客户端端点 (ClashMeta)：发现 ${ovpnCandidates.length} 个，新增 ${metaOpenVPNAdded} 个`)
-    }
-  } catch (e) {
-    log(`OpenVPN 客户端端点补充失败：${e?.message || e}`, 'WARN')
-  }
-} else {
-  log(`OpenVPN 客户端端点补充失败：${metaRes.reason?.message || metaRes.reason}`, 'WARN')
+// 5. 补充提取到的 OpenVPN 客户端端点
+if (ovpnCandidates.length) {
+  const metaOpenVPNAdded = mergeEndpoints(endpoints, ovpnCandidates)
+  log(`🔧 补充 OpenVPN 客户端端点 (ClashMeta)：发现 ${ovpnCandidates.length} 个，新增 ${metaOpenVPNAdded} 个`)
 }
 
 // 合并至总配置
@@ -592,10 +622,13 @@ for (const node of config.outbounds) {
 }
 const finalEpStats = countClientEndpoints(config.endpoints)
 
+const elapsed = ((Date.now() - startTime) / 1000).toFixed(2)
+
 log(
   `✅ ${endTarget}：普通代理 (outbounds) ${finalProxyCount} 个，端点 (endpoints) ${finalEpStats.total} 个` +
   (finalEpStats.total ? `（OpenVPN ${finalEpStats.ovpn} / 其他 ${finalEpStats.total - finalEpStats.ovpn}）` : '') +
-  ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）`
+  ` | 出站配置 ${config.outbounds.length} 项（selector ${finalSelectorCount} / urltest ${finalURLTestCount} / 其他 ${otherOutboundCount}）` +
+  ` | 耗时 ${elapsed}s`
 )
 
 $content = JSON.stringify(config, null, 2)
