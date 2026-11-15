@@ -2,7 +2,7 @@
 /**
  * 基础用法（通常只需传 name 和 type 两个参数）：
  *   #name=sub&type=0
- * 参数说明：
+ * 参数说明（大小写与下划线/短横线容错）：
  *   - name：订阅名称（必填）
  *   - type：订阅类型（支持中文）；0 / sub / 订阅 = 单订阅（默认），1 / col / 组合 / 合集 = 组合订阅
  *
@@ -14,8 +14,18 @@
  *   - maxEndpoints / max_endpoints：端点总上限（默认 15）
  *   - maxOpenVPN / max_openvpn：OpenVPN 客户端上限（默认 5；设为 0 可关闭提取，直接拉取原生 sing-box 产物）
  *
- * 兼容模式参数（一般无需传）：
- *   - dualFetch / dual_fetch：是否开启双路并发拉取；0 / false = 关闭（默认，单遍拉取更快且保留 OpenVPN），1 / true = 开启（仅当订阅内专门针对 sing-box 与 ClashMeta 配置了不同条件操作时使用）
+ * 兼容与字段剔除参数（按需传）：
+ *   #name=sub&type=0&version=1.14&drop=certificate_sha256
+ *
+ *   - version / ver / v / sbVersion / sb_version：
+ *       目标 sing-box 版本（如 1.14、v1.14、1.15-pre）；低于 1.15 自动移除 certificate_sha256、client_certificate_sha256
+ *   - drop / dropField / dropFields / drop_fields / remove / exclude：
+ *       需要移除的不支持字段，多个用逗号/空格分隔（支持自动去引号，支持纯字段名如 certificate_sha256 或点分路径如 tls.certificate_sha256、route.default_http_client）
+ *   - insecure / fallbackInsecure / fallback_insecure：
+ *       0 / false = 关闭（默认），1 / true = 移除 certificate_sha256 时自动补全 tls.insecure = true（仅自签证书节点需要）
+ *
+ *   - dualFetch / dual_fetch：
+ *       是否开启双路并发拉取；0 / false = 关闭（默认，单遍拉取更快且保留 OpenVPN），1 / true = 开启（仅当订阅内专门针对 sing-box 与 ClashMeta 配置了不同条件操作时使用）
  */
 
 function log(msg, level = 'INFO') {
@@ -28,28 +38,91 @@ function log(msg, level = 'INFO') {
 
 const startTime = Date.now()
 
+const args = (typeof $arguments !== 'undefined' && $arguments) || {}
+let normalizedArgs = null
+
+function getArg(...names) {
+  for (const key of names) {
+    const val = args[key]
+    if (val !== undefined && val !== null && val !== '') return val
+  }
+  if (!normalizedArgs) {
+    normalizedArgs = Object.create(null)
+    for (const [k, v] of Object.entries(args)) {
+      if (v === undefined || v === null || v === '') continue
+      const norm = k.toLowerCase().replace(/[_-]/g, '')
+      if (!(norm in normalizedArgs)) normalizedArgs[norm] = v
+    }
+  }
+  for (const key of names) {
+    const norm = key.toLowerCase().replace(/[_-]/g, '')
+    if (norm in normalizedArgs) return normalizedArgs[norm]
+  }
+  return undefined
+}
+
 function parseIntArg(val, fallback, allowZero = false) {
   if (val === undefined || val === null || val === '') return fallback
-  const num = Number(val)
+  const num = Number(String(val).trim())
   if (!Number.isFinite(num)) return fallback
   const intVal = Math.floor(num)
   return allowZero ? (intVal >= 0 ? intVal : fallback) : (intVal > 0 ? intVal : fallback)
 }
 
-const args = (typeof $arguments !== 'undefined' && $arguments) || {}
-const { type, name } = args
+function parseBoolArg(val) {
+  return /^(1|true|yes|on)$/i.test(String(val ?? '').trim())
+}
 
-const GLOBAL_MAX_NODES = parseIntArg(args.maxNodes ?? args.max_nodes ?? args.max, 100)
-const MIN_REGION_NODES = parseIntArg(args.minRegion ?? args.min_region ?? args.regionMin, 5, true)
-const MAX_ENDPOINTS = parseIntArg(args.maxEndpoints ?? args.max_endpoints ?? args.epMax, 15, true)
+function parseMajorMinor(ver) {
+  if (ver === undefined || ver === null || ver === '') return null
+  const m = String(ver).trim().match(/^v?(\d+)\.(\d+)/i)
+  return m ? { major: Number(m[1]), minor: Number(m[2]) } : null
+}
+
+function parseListArg(val) {
+  if (val === undefined || val === null || val === '') return []
+  const items = Array.isArray(val) ? val : [val]
+  const out = []
+  for (const item of items) {
+    if (item === undefined || item === null) continue
+    let text = String(item)
+    try {
+      text = decodeURIComponent(text)
+    } catch { }
+    for (const part of text.split(/[,，、;；|\s]+/)) {
+      const cleaned = part.trim().replace(/^["'`]+|["'`]+$/g, '').trim()
+      if (cleaned) out.push(cleaned)
+    }
+  }
+  return out
+}
+
+const type = getArg('type')
+const name = getArg('name')
+
+const GLOBAL_MAX_NODES = parseIntArg(getArg('maxNodes', 'max'), 100)
+const MIN_REGION_NODES = parseIntArg(getArg('minRegion', 'regionMin'), 5, true)
+const MAX_ENDPOINTS = parseIntArg(getArg('maxEndpoints', 'epMax'), 15, true)
 const MIN_ENDPOINTS = Math.min(
-  parseIntArg(args.minEndpoints ?? args.min_endpoints ?? args.epMin, 5, true),
+  parseIntArg(getArg('minEndpoints', 'epMin'), 5, true),
   MAX_ENDPOINTS
 )
 const MAX_OPENVPN = Math.min(
-  parseIntArg(args.maxOpenVPN ?? args.max_openvpn ?? args.ovpnMax, 5, true),
+  parseIntArg(getArg('maxOpenVPN', 'ovpnMax'), 5, true),
   MAX_ENDPOINTS
 )
+
+const rawVersion = getArg('version', 'ver', 'v', 'sbVersion')
+const SB_VERSION = parseMajorMinor(rawVersion)
+const CERT_PIN_INSECURE = parseBoolArg(getArg('insecure', 'fallbackInsecure'))
+const dropFieldSet = new Set(
+  parseListArg(getArg('drop', 'dropField', 'dropFields', 'remove', 'exclude'))
+)
+if (SB_VERSION && (SB_VERSION.major < 1 || (SB_VERSION.major === 1 && SB_VERSION.minor < 15))) {
+  dropFieldSet.add('certificate_sha256')
+  dropFieldSet.add('client_certificate_sha256')
+}
+const dropFieldsList = [...dropFieldSet]
 
 // 1. 解析参数与模板配置
 const subType = /^1$|col|组合|合集/i.test(String(type || '')) ? 'collection' : 'subscription'
@@ -74,10 +147,20 @@ const fileName = (() => {
 const startTarget = fileName ? `文件「${fileName}」（${subDesc}）` : subDesc
 const endTarget = fileName ? `文件「${fileName}」处理完成（引用${subDesc}）` : `${subDesc}处理完成`
 
+const compatParts = []
+if (SB_VERSION) compatParts.push(`sing-box ${SB_VERSION.major}.${SB_VERSION.minor}`)
+if (dropFieldsList.length) compatParts.push(`剔除 [${dropFieldsList.join(', ')}]`)
+if (CERT_PIN_INSECURE) compatParts.push('insecure=true')
+
 log(
   `🚀 开始处理${startTarget} | ` +
-  `总优选 ${GLOBAL_MAX_NODES} / 地区保底 ${MIN_REGION_NODES} / 端点保底 ${MIN_ENDPOINTS} / 端点上限 ${MAX_ENDPOINTS} / OpenVPN上限 ${MAX_OPENVPN}`
+  `总优选 ${GLOBAL_MAX_NODES} / 地区保底 ${MIN_REGION_NODES} / 端点保底 ${MIN_ENDPOINTS} / 端点上限 ${MAX_ENDPOINTS} / OpenVPN上限 ${MAX_OPENVPN}` +
+  (compatParts.length ? ` | 兼容: ${compatParts.join(' / ')}` : '')
 )
+
+if (rawVersion !== undefined && !SB_VERSION) {
+  log(`无法识别的版本参数「${rawVersion}」，已忽略版本兼容预设（示例：1.14 / 1.15-pre）`, 'WARN')
+}
 
 const jsonParser = (typeof ProxyUtils !== 'undefined' && ProxyUtils.JSON5) ? ProxyUtils.JSON5 : JSON
 let config
@@ -232,7 +315,7 @@ function extractOpenVPNCandidates(metaProxies) {
 }
 
 // 4. 拉取 Sing-Box 产物与 OpenVPN 补充节点
-const useDualFetch = /^(1|true|yes|on)$/i.test(String(args.dualFetch ?? args.dual_fetch ?? ''))
+const useDualFetch = parseBoolArg(getArg('dualFetch'))
 
 let data
 let ovpnCandidates = []
@@ -608,7 +691,105 @@ if (fallbackGroups.length) {
   log(`${fallbackGroups.length} 个策略组无可用出站，已设为直连兜底 (${COMPATIBLE_TAG})：${fallbackGroups.join(', ')}`, 'WARN')
 }
 
-// 11. 单遍汇总最终配置统计
+// 11. 兼容处理：按参数剔除目标版本或客户端不支持的字段
+function deleteByPath(target, parts, depth, statKey, stats) {
+  if (!target || typeof target !== 'object') return 0
+  if (Array.isArray(target)) {
+    let count = 0
+    for (let i = 0; i < target.length; i++) {
+      const item = target[i]
+      if (item && typeof item === 'object') count += deleteByPath(item, parts, depth, statKey, stats)
+    }
+    return count
+  }
+  const key = parts[depth]
+  if (!Object.prototype.hasOwnProperty.call(target, key)) return 0
+  if (depth === parts.length - 1) {
+    if (CERT_PIN_INSECURE && key === 'certificate_sha256' && target.insecure !== true) {
+      target.insecure = true
+      stats.insecurePatched++
+    }
+    delete target[key]
+    stats.byField[statKey] = (stats.byField[statKey] || 0) + 1
+    return 1
+  }
+  return deleteByPath(target[key], parts, depth + 1, statKey, stats)
+}
+
+function deleteBareKeys(target, keySet, stats) {
+  if (!target || typeof target !== 'object') return 0
+  let count = 0
+  if (Array.isArray(target)) {
+    for (let i = 0; i < target.length; i++) {
+      const item = target[i]
+      if (item && typeof item === 'object') count += deleteBareKeys(item, keySet, stats)
+    }
+    return count
+  }
+  for (const key of Object.keys(target)) {
+    if (keySet.has(key)) {
+      if (CERT_PIN_INSECURE && key === 'certificate_sha256' && target.insecure !== true) {
+        target.insecure = true
+        stats.insecurePatched++
+      }
+      delete target[key]
+      stats.byField[key] = (stats.byField[key] || 0) + 1
+      count++
+    } else {
+      const val = target[key]
+      if (val && typeof val === 'object') count += deleteBareKeys(val, keySet, stats)
+    }
+  }
+  return count
+}
+
+if (dropFieldsList.length) {
+  const bareKeys = new Set()
+  const pathRules = []
+  for (const field of dropFieldsList) {
+    if (field.includes('.')) {
+      const rootOnly = field.startsWith('$.')
+      const parts = (rootOnly ? field.slice(2) : field).split('.').filter(Boolean)
+      if (parts.length) pathRules.push({ field, parts, rootOnly })
+    } else {
+      bareKeys.add(field)
+    }
+  }
+
+  const compatStats = { byField: {}, insecurePatched: 0 }
+  let removedTotal = 0
+
+  if (bareKeys.size) {
+    removedTotal += deleteBareKeys(config, bareKeys, compatStats)
+  }
+  for (const rule of pathRules) {
+    if (rule.rootOnly) {
+      removedTotal += deleteByPath(config, rule.parts, 0, rule.field, compatStats)
+    } else {
+      removedTotal += deleteByPath(config.outbounds, rule.parts, 0, rule.field, compatStats)
+      removedTotal += deleteByPath(config.endpoints, rule.parts, 0, rule.field, compatStats)
+      if (
+        rule.parts[0] !== 'outbounds' &&
+        rule.parts[0] !== 'endpoints' &&
+        Object.prototype.hasOwnProperty.call(config, rule.parts[0])
+      ) {
+        removedTotal += deleteByPath(config, rule.parts, 0, rule.field, compatStats)
+      }
+    }
+  }
+
+  if (removedTotal > 0) {
+    const detail = Object.entries(compatStats.byField)
+      .map(([k, v]) => `${k}×${v}`)
+      .join(', ')
+    log(
+      `🛡️ 兼容处理：已移除 ${removedTotal} 处不支持字段（${detail}）` +
+      (compatStats.insecurePatched ? `，并补全 ${compatStats.insecurePatched} 个节点 tls.insecure=true` : '')
+    )
+  }
+}
+
+// 12. 单遍汇总最终配置统计
 let finalProxyCount = 0
 let finalSelectorCount = 0
 let finalURLTestCount = 0
