@@ -118,6 +118,13 @@ const CERT_PIN_INSECURE = parseBoolArg(getArg('insecure', 'fallbackInsecure'))
 const dropFieldSet = new Set(
   parseListArg(getArg('drop', 'dropField', 'dropFields', 'remove', 'exclude'))
 )
+
+// TODO: 新版本发布后，移除此临时分支。1.14.x 文件夹目前必须移除 certificate_sha256 才能正常使用
+if (!SB_VERSION) {
+  dropFieldSet.add('certificate_sha256')
+  dropFieldSet.add('client_certificate_sha256')
+}
+
 if (SB_VERSION && (SB_VERSION.major < 1 || (SB_VERSION.major === 1 && SB_VERSION.minor < 15))) {
   dropFieldSet.add('certificate_sha256')
   dropFieldSet.add('client_certificate_sha256')
