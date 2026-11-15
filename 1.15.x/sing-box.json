@@ -810,10 +810,6 @@
     "rules": [
       {
         "process_name": [
-          "ntrace.exe",
-          "iperf3.exe",
-          "tcping.exe",
-          "mtr.exe",
           "WinStore.App",
           "quark_cloud_drive",
           "quark_cloud_drive.exe",
@@ -829,7 +825,11 @@
           "QQ.exe",
           "DingTalk.exe",
           "WeMeet.exe",
-          "AliWangWang.exe"
+          "AliWangWang.exe",
+          "QQLive.exe",
+          "QyClient.exe",
+          "QyPlayer.exe",
+          "cloudmusic.exe"
         ],
         "outbound": "DIRECT"
       },
