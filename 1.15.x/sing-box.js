@@ -75,7 +75,7 @@ function parseBoolArg(val) {
 
 function parseMajorMinor(ver) {
   if (ver === undefined || ver === null || ver === '') return null
-  const m = String(ver).trim().match(/^v?(\d+)\.(\d+)/i)
+  const m = String(ver).trim().match(/(?:^|[^\d.])v?(\d+)\.(\d+)/i)
   return m ? { major: Number(m[1]), minor: Number(m[2]) } : null
 }
 
