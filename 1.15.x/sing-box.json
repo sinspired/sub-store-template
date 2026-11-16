@@ -365,8 +365,7 @@
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO",
-        "YouTube-CN"
+        "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
       "interrupt_exist_connections": true
@@ -605,7 +604,7 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "6m13s",
+      "interval": "17m13s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -656,17 +655,6 @@
     {
       "type": "urltest",
       "tag": "YouTube-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "15m0s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "YouTube-CN",
       "outbounds": [
         "AUTO"
       ],
@@ -1194,8 +1182,8 @@
   "experimental": {
     "cache_file": {
       "enabled": true,
-      "path": "cache_sinspired_1.14.db",
-      "cache_id": "cache_sinspired_1.14_beta",
+      "path": "cache_sinspired_1.15.db",
+      "cache_id": "cache_sinspired_1.15",
       "store_fakeip": true,
       "store_dns": true
     }

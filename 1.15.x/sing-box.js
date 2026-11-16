@@ -5,7 +5,7 @@
  *   - version=1.14 / 1.15 / 1.14-lite / 1.15-lite（<1.15 删证书固定字段，>=1.15 删 tun.stack，含 lite/ios 开启低内存精简）
  *   - lite=1 / ios=1：强制开启低内存精简（不拉取 ClashMeta/OpenVPN、删 services 与冗余规则集、错峰拉长测速）
  * 限额参数（括号内为 标准 / lite 默认值，支持传 all 不限制）：
- *   - maxNodes(100/80) / maxAuto(100/60) / minRegion(10/5) / maxRegion(20/15) / maxTikTok(随地区/3) / maxGroup(60/40)
+ *   - maxNodes(100/60) / maxAuto(100/50) / minRegion(10/5) / maxRegion(20/10) / maxTikTok(随地区/3) / maxGroup(60/30)
  *   - minEndpoints(0) / maxEndpoints(15/0，设 0 跳过 OpenVPN 拉取) / maxOpenVPN(5/0)
  * 其他可选：
  *   - drop=字段1,字段2 / insecure=1 / dropRuleSets=... / noServices=1 / keepServices=1 / noDashboard=1
@@ -120,15 +120,15 @@ const rawVersion = getArg('version', 'ver', 'v', 'sbVersion')
 const SB_VERSION = parseMajorMinor(rawVersion)
 const IS_LITE = parseBoolArg(getArg('lite', 'ios')) || /(?:^|[^a-z0-9])(lite|ios)(?=$|[^a-z0-9])/i.test(String(rawVersion ?? ''))
 
-const GLOBAL_MAX_NODES = parseIntArg(getArg('maxNodes', 'max'), IS_LITE ? 80 : 100)
-const MAX_AUTO_NODES = parseLimitArg(getArg('maxAuto', 'autoMax'), IS_LITE ? 60 : 100)
+const GLOBAL_MAX_NODES = parseIntArg(getArg('maxNodes', 'max'), IS_LITE ? 60 : 100)
+const MAX_AUTO_NODES = parseLimitArg(getArg('maxAuto', 'autoMax'), IS_LITE ? 50 : 100)
 const MIN_REGION_NODES = parseIntArg(getArg('minRegion', 'regionMin'), IS_LITE ? 5 : 10, true)
-const MAX_REGION_NODES = parseLimitArg(getArg('maxRegion', 'regionMax'), IS_LITE ? 15 : 20)
+const MAX_REGION_NODES = parseLimitArg(getArg('maxRegion', 'regionMax'), IS_LITE ? 10 : 20)
 const rawMaxTikTok = getArg('maxTikTok', 'tiktokMax')
 const MAX_TIKTOK_NODES = rawMaxTikTok !== undefined
   ? parseLimitArg(rawMaxTikTok, MAX_REGION_NODES)
   : (IS_LITE ? Math.min(3, MAX_REGION_NODES) : MAX_REGION_NODES)
-const MAX_GROUP_NODES = parseLimitArg(getArg('maxGroup', 'groupMax', 'maxAI', 'aiMax'), IS_LITE ? 40 : 60)
+const MAX_GROUP_NODES = parseLimitArg(getArg('maxGroup', 'groupMax', 'maxAI', 'aiMax'), IS_LITE ? 30 : 60)
 
 const MAX_ENDPOINTS = parseIntArg(getArg('maxEndpoints', 'epMax'), IS_LITE ? 0 : 15, true)
 const MIN_ENDPOINTS = Math.min(parseIntArg(getArg('minEndpoints', 'epMin'), IS_LITE ? 0 : 0, true), MAX_ENDPOINTS)
@@ -257,7 +257,7 @@ const AI_RULES = {
   'YouTube-CN': /^(?=.*(?:CN|RU|IR)).*\b(youtube|yt)\b/i,
   'Netflix-AUTO': /\b(netflix|nf)\b/i,
   'Disney-AUTO': /(?<!\w)(?:disney\+?|d\+)(?!\w)/i,
-  'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)/i,
+  'AI-AUTO': /^(?=.*gpt[⁺+])(?=.*\b(gemini|gm)\b)(?=.*\b(copilot|cp)\b)/i,
   'CF-AUTO': /^(?=.*gpt[⁺+])(?=.*(?:\bX\b|twitter))/i
 }
 const REGIONS = {

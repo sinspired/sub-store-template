@@ -49,13 +49,6 @@
         "disable_cache": true
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
-        ],
-        "action": "reject"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -372,8 +365,7 @@
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO",
-        "YouTube-CN"
+        "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
       "interrupt_exist_connections": true
@@ -612,7 +604,7 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "6m13s",
+      "interval": "17m13s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -673,17 +665,6 @@
     },
     {
       "type": "urltest",
-      "tag": "YouTube-CN",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "15m0s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
       "tag": "Netflix-AUTO",
       "outbounds": [
         "AUTO"
@@ -711,7 +692,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m4s",
+      "interval": "21m3s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -722,7 +703,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m37s",
+      "interval": "21m37s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -744,7 +725,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m38s",
+      "interval": "21m47s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -755,7 +736,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "22m6s",
+      "interval": "22m17s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -962,13 +943,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
-        ],
-        "action": "reject"
-      },
-      {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
@@ -1156,7 +1130,6 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
-          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
@@ -1181,14 +1154,6 @@
         ],
         "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
-        "update_interval": "24h0m0s"
-      },
-      {
-        "type": "remote",
-        "tag": "anti_ad",
-        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
-        "initial_path": "rules/anti_ad.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
       }
@@ -1217,8 +1182,8 @@
   "experimental": {
     "cache_file": {
       "enabled": true,
-      "path": "cache_sinspired_1.14.db",
-      "cache_id": "cache_sinspired_1.14_beta",
+      "path": "cache_sinspired_1.15.db",
+      "cache_id": "cache_sinspired_1.15",
       "store_fakeip": true,
       "store_dns": true
     }

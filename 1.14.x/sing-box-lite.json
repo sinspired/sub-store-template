@@ -203,7 +203,6 @@
         "geosite/private",
         "geoip/cn"
       ],
-      "stack": "mixed",
       "platform": {
         "http_proxy": {
           "enabled": true,
@@ -366,8 +365,7 @@
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO",
-        "YouTube-CN"
+        "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
       "interrupt_exist_connections": true
@@ -607,7 +605,7 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "6m13s",
+      "interval": "17m13s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -658,17 +656,6 @@
     {
       "type": "urltest",
       "tag": "YouTube-AUTO",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "15m0s",
-      "tolerance": 50,
-      "idle_timeout": "30m0s"
-    },
-    {
-      "type": "urltest",
-      "tag": "YouTube-CN",
       "outbounds": [
         "AUTO"
       ],
@@ -1131,7 +1118,7 @@
       "secret": "sinspired",
       "access_control_allow_private_network": true,
       "dashboard": {
-        "enabled": false,
+        "enabled": true,
         "download_url": "https://gh.dev.438250.xyz/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
         "http_client": "client_direct",
         "update_interval": "168h0m0s"
@@ -1142,7 +1129,7 @@
     "cache_file": {
       "enabled": true,
       "path": "cache_sinspired_1.14.db",
-      "cache_id": "cache_sinspired_1.14_beta",
+      "cache_id": "cache_sinspired_1.14",
       "store_fakeip": true,
       "store_dns": true
     }

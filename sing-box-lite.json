@@ -49,10 +49,6 @@
         "disable_cache": true
       },
       {
-        "rule_set": "geosite/category-ads-all",
-        "action": "reject"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -80,7 +76,7 @@
         "inbound": [
           "tun-in",
           "mixed-in",
-          "mixed-lan"
+          "mixed-in-lan"
         ],
         "query_type": [
           "A",
@@ -144,9 +140,9 @@
       "detour": "CN",
       "connect_timeout": "15s",
       "domain_resolver": "ali-dns",
-      "stream_receive_window": "5 MB",
-      "connection_receive_window": "5 MB",
-      "max_concurrent_streams": 10
+      "stream_receive_window": "1 MB",
+      "connection_receive_window": "1 MB",
+      "max_concurrent_streams": 4
     },
     {
       "tag": "client_proxy",
@@ -155,9 +151,9 @@
       "detour": "PROXY",
       "connect_timeout": "10s",
       "domain_resolver": "google-dns",
-      "stream_receive_window": "5 MB",
-      "connection_receive_window": "5 MB",
-      "max_concurrent_streams": 10
+      "stream_receive_window": "1 MB",
+      "connection_receive_window": "1 MB",
+      "max_concurrent_streams": 4
     }
   ],
   "endpoints": [],
@@ -369,8 +365,7 @@
         "JP-AUTO",
         "US-AUTO",
         "TW-AUTO",
-        "SG-AUTO",
-        "YouTube-CN"
+        "SG-AUTO"
       ],
       "default": "YouTube-AUTO",
       "interrupt_exist_connections": true
@@ -599,7 +594,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "2m7s",
+      "interval": "5m7s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -610,8 +605,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m0s",
-      "tolerance": 50
+      "interval": "17m13s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -620,8 +616,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m29s",
-      "tolerance": 50
+      "interval": "6m47s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -630,8 +627,9 @@
         "AUTO"
       ],
       "url": "https://www.google.com/generate_204",
-      "interval": "5m30s",
-      "tolerance": 50
+      "interval": "7m23s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -640,8 +638,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "6m0s",
-      "tolerance": 50
+      "interval": "8m11s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -650,8 +649,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "4m3s",
-      "tolerance": 50
+      "interval": "8m43s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -661,17 +661,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "YouTube-CN",
-      "outbounds": [
-        "AUTO"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "15m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -681,7 +672,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m30s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -691,7 +683,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "16m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -896,10 +889,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geosite/category-ads-all",
-        "action": "reject"
-      },
-      {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
@@ -1087,7 +1076,6 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
-          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
@@ -1140,11 +1128,10 @@
   "experimental": {
     "cache_file": {
       "enabled": true,
-      "path": "cache_sinspired_1.14.db",
-      "cache_id": "cache_sinspired_1.14_beta",
+      "path": "cache_sinspired_1.15.db",
+      "cache_id": "cache_sinspired_1.15",
       "store_fakeip": true,
-      "store_dns": true,
-      "rdrc_timeout": "168h0m0s"
+      "store_dns": true
     }
   }
 }
