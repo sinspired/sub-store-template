@@ -83,7 +83,7 @@
         "inbound": [
           "tun-in",
           "mixed-in",
-          "mixed-lan"
+          "mixed-in-lan"
         ],
         "query_type": [
           "A",
@@ -147,9 +147,9 @@
       "detour": "CN",
       "connect_timeout": "15s",
       "domain_resolver": "ali-dns",
-      "stream_receive_window": "5 MB",
-      "connection_receive_window": "5 MB",
-      "max_concurrent_streams": 10
+      "stream_receive_window": "1 MB",
+      "connection_receive_window": "1 MB",
+      "max_concurrent_streams": 4
     },
     {
       "tag": "client_proxy",
@@ -158,9 +158,9 @@
       "detour": "PROXY",
       "connect_timeout": "10s",
       "domain_resolver": "google-dns",
-      "stream_receive_window": "5 MB",
-      "connection_receive_window": "5 MB",
-      "max_concurrent_streams": 10
+      "stream_receive_window": "1 MB",
+      "connection_receive_window": "1 MB",
+      "max_concurrent_streams": 4
     }
   ],
   "endpoints": [],
@@ -602,7 +602,7 @@
         "DIRECT"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "2m7s",
+      "interval": "5m7s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -613,8 +613,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m0s",
-      "tolerance": 50
+      "interval": "6m13s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -623,8 +624,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m29s",
-      "tolerance": 50
+      "interval": "6m47s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -633,8 +635,9 @@
         "AUTO"
       ],
       "url": "https://www.google.com/generate_204",
-      "interval": "5m30s",
-      "tolerance": 50
+      "interval": "7m23s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -643,8 +646,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "6m0s",
-      "tolerance": 50
+      "interval": "8m11s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -653,8 +657,9 @@
         "AUTO"
       ],
       "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "4m3s",
-      "tolerance": 50
+      "interval": "8m43s",
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -664,7 +669,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -674,7 +680,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -684,7 +691,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "15m30s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -694,7 +702,8 @@
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "16m0s",
-      "tolerance": 50
+      "tolerance": 50,
+      "idle_timeout": "30m0s"
     },
     {
       "type": "urltest",
@@ -1212,7 +1221,6 @@
       "path": "cache_sinspired_1.14.db",
       "cache_id": "cache_sinspired_1.14_beta",
       "store_fakeip": true,
-      "rdrc_timeout": "168h0m0s",
       "store_dns": true
     }
   }
