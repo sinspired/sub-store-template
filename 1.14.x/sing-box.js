@@ -67,13 +67,9 @@ function parseBoolArg(val) {
 }
 
 function parseMajorMinor(ver) {
-  if (ver === undefined || ver === null || valEmpty(ver)) return null
+  if (ver === undefined || ver === null || String(ver).trim() === '') return null
   const m = String(ver).trim().match(/(?:^|[^\d.])v?(\d+)\.(\d+)/i)
   return m ? { major: Number(m[1]), minor: Number(m[2]) } : null
-}
-
-function valEmpty(v) {
-  return v === undefined || v === null || String(v).trim() === ''
 }
 
 function parseListArg(val) {
@@ -122,7 +118,7 @@ const type = getArg('type')
 const name = getArg('name')
 const rawVersion = getArg('version', 'ver', 'v', 'sbVersion')
 const SB_VERSION = parseMajorMinor(rawVersion)
-const IS_LITE = parseBoolArg(getArg('lite', 'ios')) || /\b(lite|ios)\b/i.test(String(rawVersion ?? ''))
+const IS_LITE = parseBoolArg(getArg('lite', 'ios')) || /(?:^|[^a-z0-9])(lite|ios)(?=$|[^a-z0-9])/i.test(String(rawVersion ?? ''))
 
 const GLOBAL_MAX_NODES = parseIntArg(getArg('maxNodes', 'max'), IS_LITE ? 80 : 100)
 const MAX_AUTO_NODES = parseLimitArg(getArg('maxAuto', 'autoMax'), IS_LITE ? 60 : 100)
