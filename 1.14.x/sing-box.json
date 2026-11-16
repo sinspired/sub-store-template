@@ -49,13 +49,6 @@
         "disable_cache": true
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
-        ],
-        "action": "reject"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -712,7 +705,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m4s",
+      "interval": "21m3s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -723,7 +716,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "20m37s",
+      "interval": "21m37s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -745,7 +738,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "21m38s",
+      "interval": "21m47s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -756,7 +749,7 @@
         "AUTO"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "22m6s",
+      "interval": "22m17s",
       "tolerance": 50,
       "idle_timeout": "30m0s"
     },
@@ -963,13 +956,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": [
-          "geosite/category-ads-all",
-          "anti_ad"
-        ],
-        "action": "reject"
-      },
-      {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
@@ -1157,7 +1143,6 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
-          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
@@ -1182,14 +1167,6 @@
         ],
         "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/senshinya/singbox_ruleset/main/rule/{tag}/{tag}.srs",
         "initial_path": "rules/{tag}.srs",
-        "http_client": "client_direct",
-        "update_interval": "24h0m0s"
-      },
-      {
-        "type": "remote",
-        "tag": "anti_ad",
-        "url": "https://gh.dev.438250.xyz/https://raw.githubusercontent.com/privacy-protection-tools/anti-ad.github.io/master/docs/anti-ad-sing-box.srs",
-        "initial_path": "rules/anti_ad.srs",
         "http_client": "client_direct",
         "update_interval": "24h0m0s"
       }

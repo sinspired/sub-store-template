@@ -49,10 +49,6 @@
         "disable_cache": true
       },
       {
-        "rule_set": "geosite/category-ads-all",
-        "action": "reject"
-      },
-      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -905,10 +901,6 @@
         "outbound": "DIRECT"
       },
       {
-        "rule_set": "geosite/category-ads-all",
-        "action": "reject"
-      },
-      {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
@@ -1096,7 +1088,6 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
-          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
@@ -1139,7 +1130,7 @@
       "secret": "sinspired",
       "access_control_allow_private_network": true,
       "dashboard": {
-        "enabled": true,
+        "enabled": false,
         "download_url": "https://gh.dev.438250.xyz/https://github.com/SagerNet/sing-box-dashboard/archive/gh-pages.zip",
         "http_client": "client_direct",
         "update_interval": "168h0m0s"
