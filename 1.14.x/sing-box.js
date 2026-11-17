@@ -143,12 +143,6 @@ const DISABLE_DASHBOARD = parseBoolArg(getArg('noDashboard', 'disableDashboard')
 
 const LITE_DROP_RULESETS = [
   'anti_ad',
-  'geosite/category-ads-all',
-  'Proxy',
-  'geosite/github',
-  'AliPay',
-  'BiliBili',
-  'geosite/apple-cn'
 ]
 const rawDropRuleSets = getArg('dropRuleSets', 'dropRuleset', 'removeRuleSets')
 const dropRuleSetList = rawDropRuleSets !== undefined
