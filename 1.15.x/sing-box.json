@@ -49,6 +49,10 @@
         "disable_cache": true
       },
       {
+        "rule_set": "geosite/category-ads-all",
+        "action": "reject"
+      },
+      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -1007,6 +1011,10 @@
         "outbound": "DIRECT"
       },
       {
+        "rule_set": "geosite/category-ads-all",
+        "action": "reject"
+      },
+      {
         "protocol": "stun",
         "outbound": "DIRECT"
       },
@@ -1194,6 +1202,7 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
+          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
