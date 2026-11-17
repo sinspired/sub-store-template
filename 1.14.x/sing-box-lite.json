@@ -240,8 +240,13 @@
       "type": "selector",
       "tag": "GLOBAL",
       "outbounds": [
-        "DIRECT",
-        "PROXY"
+        "PROXY",
+        "AI",
+        "Youtube",
+        "Netflix",
+        "TikTok",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true

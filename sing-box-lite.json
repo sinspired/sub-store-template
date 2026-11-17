@@ -49,6 +49,10 @@
         "disable_cache": true
       },
       {
+        "rule_set": "geosite/category-ads-all",
+        "action": "reject"
+      },
+      {
         "clash_mode": "Direct",
         "server": "ali-dns"
       },
@@ -235,8 +239,13 @@
       "type": "selector",
       "tag": "GLOBAL",
       "outbounds": [
-        "DIRECT",
-        "PROXY"
+        "PROXY",
+        "AI",
+        "Youtube",
+        "Netflix",
+        "TikTok",
+        "MANUAL",
+        "DIRECT"
       ],
       "default": "PROXY",
       "interrupt_exist_connections": true
@@ -747,6 +756,16 @@
       {
         "process_name": [
           "WinStore.App",
+          "Weixin.exe",
+          "WeChat.exe",
+          "WeChatApp.exe",
+          "WeChatAppEx.exe",
+          "QQ.exe",
+          "DingTalk.exe",
+          "WXWork.exe",
+          "WeMeet.exe",
+          "AliWangWang.exe",
+          "QuarkCloudDrive.exe",
           "quark_cloud_drive",
           "quark_cloud_drive.exe",
           "Thunder.exe",
@@ -756,20 +775,23 @@
           "aria2c.exe",
           "BaiduNetdisk.exe",
           "BaiduNetdiskHost.exe",
-          "WeChat.exe",
-          "WeChatApp.exe",
-          "QQ.exe",
-          "DingTalk.exe",
-          "WeMeet.exe",
-          "AliWangWang.exe",
           "QQLive.exe",
+          "QQLiveService.exe",
           "QyClient.exe",
           "QyPlayer.exe",
-          "cloudmusic.exe"
+          "QyFragment.exe",
+          "Youku.exe",
+          "BiliBili.exe",
+          "哔哩哔哩.exe",
+          "cloudmusic.exe",
+          "QQMusic.exe",
+          "Weather",
+          "VidHub"
         ],
-        "outbound": "DIRECT"
-      },
-      {
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])(Weixin|WeChat|WeChatApp|WeChatAppEx|QQ|DingTalk|WXWork|WeMeet|AliWangWang|QuarkCloudDrive|quark_cloud_drive|Thunder|qBittorrent|uTorrent|BitTorrent|aria2c|BaiduNetdisk|BaiduNetdiskHost|QQLive|QQLiveService|QyClient|QyPlayer|QyFragment|Youku|BiliBili|cloudmusic|QQMusic)(\\.exe)?$",
+          "(?i).*/(WeChat|Weixin|QQ|DingTalk|WXWork|Quark|QuarkCloudDrive|QQLive|iQIYI|Youku|BiliBili|哔哩哔哩|VidHub|Weather)\\.app/Contents/.*$"
+        ],
         "package_name": [
           "com.sinspired.subs_free",
           "com.tencent.mm",
@@ -783,67 +805,117 @@
           "com.baidu.netdisk",
           "com.quark.browser"
         ],
-        "package_name_regex": [
-          "(?i)^com\\.sinspired\\.subs_free.*",
-          "(?i)^com\\.tencent\\.mm.*",
-          "(?i)^com\\.tencent\\.mobileqq.*",
-          "(?i)^com\\.eg\\.android\\.AlipayGphone.*",
-          "(?i)^com\\.taobao\\.taobao.*",
-          "(?i)^com\\.jingdong\\.app\\.mall.*",
-          "(?i)^com\\.sankuai\\.meituan.*",
-          "(?i)^com\\.xunlei\\.downloadprovider.*",
-          "(?i)^com\\.baidu\\.netdisk.*",
-          "(?i)^com\\.quark\\.browser.*"
-        ],
+        "package_name_regex": "(?i)^(com\\.sinspired\\.subs_free|com\\.tencent\\.mm|com\\.tencent\\.mobileqq|com\\.eg\\.android\\.AlipayGphone|com\\.taobao\\.taobao|com\\.jingdong\\.app\\.mall|com\\.sankuai\\.meituan|com\\.sankuai\\.meituan\\.takeoutnew|com\\.xunlei\\.downloadprovider|com\\.baidu\\.netdisk|com\\.quark\\.browser|com\\.tencent\\.qqlive|com\\.qiyi\\.video|com\\.youku\\.phone|tv\\.danmaku\\.bili|com\\.netease\\.cloudmusic|com\\.tencent\\.qqmusic|com\\.alibaba\\.android\\.rimet|com\\.tencent\\.wework)$",
         "outbound": "DIRECT"
       },
       {
-        "process_name": "ChatGPT.exe",
-        "process_path_regex": "(?i)(^|[/\\\\])chatgpt(?:\\.exe)?$",
-        "package_name": "com.openai.chatgpt",
-        "package_name_regex": "(?i)^com\\.openai\\.chatgpt.*",
+        "process_name": [
+          "ChatGPT.exe",
+          "ChatGPT"
+        ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])ChatGPT\\.exe$",
+          "(?i).*/ChatGPT\\.app/Contents/.*$"
+        ],
+        "package_name_regex": "(?i)^com\\.openai\\.chatgpt$",
         "outbound": "OpenAI"
       },
       {
-        "process_name": "Claude.exe",
-        "process_path_regex": "(?i)(^|[/\\\\])claude(?:\\.exe)?$",
-        "package_name": "com.anthropic.claude",
-        "package_name_regex": "(?i)^com\\.anthropic\\.claude.*",
+        "process_name": [
+          "Claude.exe",
+          "Claude"
+        ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])Claude\\.exe$",
+          "(?i).*/Claude\\.app/Contents/.*$"
+        ],
+        "package_name_regex": "(?i)^com\\.anthropic\\.claude$",
         "outbound": "Claude"
       },
       {
-        "package_name": "com.google.android.apps.bard",
-        "package_name_regex": "(?i)^com\\.google\\.android\\.apps\\.bard.*",
+        "process_name": [
+          "Gemini.exe",
+          "Gemini"
+        ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])Gemini\\.exe$",
+          "(?i).*/Gemini\\.app/Contents/.*$"
+        ],
+        "package_name_regex": "(?i)^com\\.google\\.android\\.apps\\.bard$",
         "outbound": "Gemini"
       },
       {
         "process_name": [
-          "copilotapp",
-          "copilotapphost"
+          "copilotapp.exe",
+          "copilotapphost.exe",
+          "copilotapp_proxy.exe",
+          "Copilot.exe"
         ],
-        "process_path_regex": "(?i)(^|[/\\\\])copilot(?:app|apphost)?(?:\\.exe)?$",
-        "package_name": "com.microsoft.copilot",
-        "package_name_regex": "(?i)^com\\.microsoft\\.copilot.*",
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])(copilotapp|copilotapphost|copilotapp_proxy|Copilot)\\.exe$",
+          "(?i).*/(Copilot|Microsoft Copilot)\\.app/Contents/.*$"
+        ],
+        "package_name_regex": "(?i)^com\\.microsoft\\.office\\.officehubrow$",
         "outbound": "Copilot"
       },
       {
         "process_name": [
           "Poe.exe",
-          "Notion.exe"
+          "Poe",
+          "Perplexity.exe",
+          "Perplexity",
+          "Notion.exe",
+          "Notion"
         ],
         "process_path_regex": [
-          "(?i)(^|[/\\\\])poe(?:\\.exe)?$",
-          "(?i)(^|[/\\\\])notion(?:\\.exe)?$"
+          "(?i)(^|[/\\\\])(Poe|Perplexity|Notion)\\.exe$",
+          "(?i).*/(Poe|Perplexity|Notion)\\.app/Contents/.*$"
         ],
-        "package_name": [
-          "com.quora.poe.android",
-          "ai.perplexity"
+        "package_name_regex": "(?i)^(com\\.poe\\.android|ai\\.perplexity\\.app\\.android|notion\\.id)$",
+        "outbound": "AI"
+      },
+      {
+        "process_name": [
+          "Telegram.exe",
+          "Telegram"
+        ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])Telegram\\.exe$",
+          "(?i).*/Telegram\\.app/Contents/.*$"
+        ],
+        "package_name_regex": "(?i)^(org\\.telegram\\.messenger|org\\.thunderdog\\.challegram)$",
+        "outbound": "Telegram"
+      },
+      {
+        "process_name": [
+          "WhatsApp.exe",
+          "WhatsApp",
+          "GitHubDesktop.exe",
+          "GitHub Desktop",
+          "gh.exe",
+          "gh"
+        ],
+        "process_path_regex": [
+          "(?i)(^|[/\\\\])WhatsApp(\\.Root)?\\.exe$",
+          "(?i).*/WhatsApp\\.app/Contents/.*$",
+          "(?i)(^|[/\\\\])(GitHubDesktop|gh)\\.exe$",
+          "(?i).*/GitHub Desktop\\.app/Contents/.*$",
+          "(?i).*[\\\\/]GitHub Desktop Installer[\\\\/]desktop\\.exe$"
         ],
         "package_name_regex": [
-          "(?i)^com\\.quora\\.poe\\.android.*",
-          "(?i)^ai\\.perplexity.*"
+          "(?i)^(com\\.whatsapp|com\\.whatsapp\\.w4b)$",
+          "(?i)^(com\\.facebook\\.katana|com\\.facebook\\.orca|com\\.instagram\\.android|com\\.instagram\\.barcelona|com\\.linkedin\\.android|com\\.discord)$",
+          "(?i)^com\\.github\\.android$"
         ],
-        "outbound": "AI"
+        "outbound": "PROXY"
+      },
+      {
+        "package_name_regex": "(?i)^com\\.twitter\\.android$",
+        "outbound": "Twitter"
+      },
+      {
+        "package_name_regex": "(?i)^com\\.zhiliaoapp\\.musically$",
+        "outbound": "TikTok"
       },
       {
         "inbound": "tun-in",
@@ -851,6 +923,7 @@
           "(?i)(^|[/\\\\])subs-check(?:-pro(?:-gui)?)?(?:\\.exe)?$",
           "(?i)(^|[/\\\\])subs-free(?:-pro(?:-gui)?)?(?:\\.exe)?$"
         ],
+        "package_name": "com.sinspired.subs_free",
         "outbound": "DIRECT"
       },
       {
@@ -887,6 +960,10 @@
       {
         "clash_mode": "Direct",
         "outbound": "DIRECT"
+      },
+      {
+        "rule_set": "geosite/category-ads-all",
+        "action": "reject"
       },
       {
         "protocol": "stun",
@@ -1076,6 +1153,7 @@
           "geosite/cloudflare",
           "geosite/disney",
           "geosite/category-porn",
+          "geosite/category-ads-all",
           "geosite/youku@!cn",
           "geosite/tencent@!cn"
         ],
